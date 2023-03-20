@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 15:04:04
- * @LastEditTime: 2023-03-19 21:27:43
+ * @LastEditTime: 2023-03-20 17:16:45
 -->
 # README
 
@@ -25,7 +25,7 @@ SIS为SIS（单趟调度）。
     MISRR misrr(serverN, theta, m);
     ```
 
-    serverN: 服务器数量
+    serverN: 处理机数量
 
     theta: 结果回传比例
 
@@ -33,7 +33,7 @@ SIS为SIS（单趟调度）。
 
 2. **设置调度的各项参数**
 
-    读入`/data/`目录中的服务器各项属性（`g`、 `o`、 `s`、 `w`）：
+    读入`/data/`目录中的处理机各项属性（`g`、 `o`、 `s`、 `w`）：
 
     ```c++
     misrr.getDataFromFile();
@@ -47,7 +47,7 @@ SIS为SIS（单趟调度）。
 
 3. **计算所需的变量值**
 
-    ```
+    ```c++
     misrr.initValue();
     ```
 
@@ -89,20 +89,48 @@ SIS为SIS（单趟调度）。
     | 变量名 | 论文中符号 | 含义                            |
     | ------ | ---------- | ------------------------------- |
     | beta   | $\beta$    | 内部调度负载比例（公式4.3）     |
-    | alpha  | $\alpha$   | 第一趟调度负载比例（公式4.9)    |
-    | gamma  | $\gamma$   | 最后一趟调度负载比例（公式4.14) |
+    | alpha  | $\alpha$   | 第一趟调度负载比例（公式4.9）    |
+    | gamma  | $\gamma$   | 最后一趟调度负载比例（公式4.14） |
 
     最后检查三个负载比例之和是否等于1。
 
-4. **计算最优总工作时间，以及各服务器工作时间。**
+4. **计算最优总工作时间，以及各处理机工作时间。**
 
     `MISRR: optimalTime()`
 
     `MISRR: usingTime()`
 
-5. **容错算法**
+5. **处理机故障处理。**
 
-    `MISRR: error()`
+    `MISRR: error(vector<int> &errorPlace, int errorInstallment)`
+    
+    分两种情况讨论：
+    
+    1. 若`errorInstallment == m`或`errorInstallment == m - 1`，即最后两趟中出现故障时，将重调度的开始时间设置为所有调度结束的时间，即
+    
+       ```c++
+       this->startTime = optimalTime;
+       ```
+    
+    2. 否则，使用算法4.1，
+    
+       计算重调度开始时间`startTime`，
+    
+       计算各处理机释放时间`busyTime`（公式4.36），
+    
+       获得剩余正常运行的处理机，更新`servers`，
+    
+       计算剩余工作量`leftW`，
+    
+       调用`initValue()`和`getOptimalModel()`进行重调度，
+    
+       计算各处理机重调度后，开始接受任务的时间`reTime`（公式4.37），
+    
+       计算各处理机冲突时间`codeTimeGap`为释放时间减开始时间，
+    
+       获取`codeTimeGap`的最大值为主处理机最优等待时间`timeGap`（公式4.38），
+    
+       最后的总调度时间`optimalTime` = `startTime` + `getOptimalModel()中计算的运行时间` + `timeGap`。
 
 ## 3 Models
 

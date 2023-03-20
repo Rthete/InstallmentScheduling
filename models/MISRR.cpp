@@ -68,6 +68,7 @@ MISRR::MISRR(int valueN, double valueTheta) :
  * 
  */
 void MISRR::initValue() {
+
     // cal mu (beta)
     for (int i = 0; i < this->n; ++i) {
         mu[i] = servers[0].getW() / servers[i].getW();
@@ -126,6 +127,7 @@ void MISRR::initValue() {
     vector<double> lambda(this->n, 0);
     vector<double> psi(this->n, 0);
     vector<double> rho(this->n, 0);
+
     // cal Lambda
     for (int i = 1; i < this->n; ++i) {
         lambda[i] = (servers[i - 1].getW() - servers[i - 1].getG() + servers[i - 1].getG() * this->theta) / servers[i].getW();
@@ -136,6 +138,7 @@ void MISRR::initValue() {
             Lambda[i] *= lambda[j];
         }
     }
+
     // cal Psi
     for (int i = 1; i < this->n; ++i) {
         psi[i] = (servers[i - 1].getG() * this->theta) / servers[i].getW();
@@ -150,6 +153,7 @@ void MISRR::initValue() {
             Psi[i] += ((psi[j] * mu[j - 1]) * value);
         }
     }
+
     // cal Rho
     for (int i = 1; i < this->n; ++i) {
         rho[i] = (servers[i - 1].getS() - servers[i - 1].getO() - servers[i].getS()) / servers[i].getW();
@@ -202,6 +206,7 @@ void MISRR::initValue() {
  * 
  */
 void MISRR::calBeta() {
+
     //cal beta
     double sum_2_n_eta = 0, sum_2_n_mu = 0;
     for (int i = 1; i < this->n; ++i) {
@@ -223,6 +228,7 @@ void MISRR::calBeta() {
  * 
  */
 void MISRR::calAlpha() {
+
     // cal alpha
     double sum_2_n_phi = 0, sum_2_n_epsilon = 0, sum_2_n_delta = 0;
     for (int i = 1; i < this->n; ++i) {
@@ -244,6 +250,7 @@ void MISRR::calAlpha() {
  * 
  */
 void MISRR::calGamma() {
+
     // cal gamma
     double sum_2_n_psi = 0, sum_2_n_p = 0, sum_2_n_lambda = 0;
     for (int i = 1; i < this->n; ++i) {
@@ -311,9 +318,8 @@ void MISRR::calOptimalM() {
  * 
  */
 void MISRR::getOptimalModel() {
-    /**
-     * cal optimal time
-     */
+    
+    // cal optimal time
     this->optimalTime = 0;
     this->optimalTime += (servers[0].getS() + this->V * alpha[0] * servers[0].getW());
     this->optimalTime += (this->m - 2) * (servers[0].getS() + this->V * beta[0] * servers[0].getW());
@@ -325,9 +331,8 @@ void MISRR::getOptimalModel() {
         this->optimalTime += gamma[i] * this->V * servers[i].getG() * this->theta;
     }
 
-    /**
-     * update usingTime
-     */
+    
+    // update usingTime
     for (int i = 0; i < this->n; i++) {
         int id = servers[i].getId();
         usingTime[id] += (alpha[i] * V * servers[i].getW() + servers[i].getS() +
@@ -404,8 +409,9 @@ void MISRR::printResult() {
         fprintf(fpResult, "%d : %lf\n", i, usingTime[i]);
         usingRate += ((double)usingTime[i] / ((double)(this->optimalTime) * this->serversNumberWithoutError));
     }
-    fprintf(fpResult, "using rate: %lf\n", usingRate);
 
+    // print usingRate
+    fprintf(fpResult, "using rate: %lf\n", usingRate);
     fprintf(fpResult, "\n\n");
 
     fclose(fpResult);
@@ -425,17 +431,17 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
         outputName = outputName + '_' + to_string(i);
     }
 
-    // cal startTime
+    // cal re-schedule start time
     if (errorInstallment == 1) {
         this->startTime = servers[0].getS() * 2 + servers[0].getW() * (alpha[0] + beta[0]) * this->V;
     } else if (errorInstallment == this->m || errorInstallment == this->m - 1) {
-        // more
+        this->startTime = optimalTime;
     } else {
         this->startTime = servers[0].getS() * (errorInstallment + 1) +
                 servers[0].getW() * (alpha[0] + beta[0] * errorInstallment) * this->V;
     }
 
-    // cal release time
+    // cal each server's release time
     vector<double> busyTime(this->n, 0);
     double preTime = servers[0].getO();
     for (int i = 0; i < this->n; ++i) {
@@ -445,6 +451,7 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
         busyTime[i] = preTime;
     }
 
+    // cal each server's using time
     for (int i = 0; i < n; ++i) {
         auto iter = find(errorPlace.begin(), errorPlace.end(), i + 1);
         if (iter == errorPlace.end()) {
@@ -491,10 +498,9 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
         }
     }
 
+    // re-schedule
     this->W = this->leftW;
     beforeInstallment = errorInstallment + 1;
-    if (errorInstallment == this->m || errorInstallment == this->m - 1)     // more
-        this->startTime = optimalTime;
 
     old_V = V;
     old_beta = beta;
@@ -506,7 +512,7 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
     this->optimalTime += this->startTime;
     this->m += beforeInstallment;
 
-    // cal startTime
+    // cal each server's restart time
     position = 0;
     preTime = servers[0].getO();
     vector<double> reTime(serversNumberWithoutError, 0);
@@ -517,13 +523,14 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
         reTime[servers[i].getId()] = preTime;
     }
 
+    // cal each server's conflict time
     vector<double> codeTimeGap(serversNumberWithoutError, 0);
     for (int i = 0; i < serversNumberWithoutError; ++i) {
         if (reTime[i] != 0)
             codeTimeGap[i] = busyTime[i] - reTime[i];
     }
 
-    // math
+    // mathTimeGap
     vector<double> mathTimeGap(serversNumberWithoutError, 0);
     preTime = 0, position = 1;
     for (int i = 0; i < serversNumberWithoutError; ++i) {
@@ -539,10 +546,15 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
         mathTimeGap[demo] = preTime;
         ++position;
     }
-//    cout << "code: " << codeTimeGap[serversNumberWithoutError - 1] <<
-//        "math: " << mathTimeGap[serversNumberWithoutError - 1] << endl;
 
+    // compare codeTimeGap & mathTimeGap
+    // cout << "code: " << codeTimeGap[serversNumberWithoutError - 1] <<
+    //     "math: " << mathTimeGap[serversNumberWithoutError - 1] << endl;
+
+    // cal server[0]'s optimal waiting time
     timeGap = *max_element(codeTimeGap.begin(), codeTimeGap.end());
+
+    // get whole schedule's optimal makespan
     this->optimalTime += timeGap;
 }
 
