@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 15:04:04
- * @LastEditTime: 2023-03-20 17:16:45
+ * @LastEditTime: 2023-03-20 17:21:49
 -->
 # README
 
@@ -130,7 +130,7 @@ SIS为SIS（单趟调度）。
     
        获取`codeTimeGap`的最大值为主处理机最优等待时间`timeGap`（公式4.38），
     
-       最后的总调度时间`optimalTime` = `startTime` + `getOptimalModel()中计算的运行时间` + `timeGap`。
+       最后的总调度时间`optimalTime` = `startTime` + `getOptimalModel()`中计算的运行时间 + `timeGap`。
 
 ## 3 Models
 

@@ -3,13 +3,13 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-03-15 16:43:42
+ * @LastEditTime: 2023-03-20 19:54:19
  */
 
 #include "include/MISRR.h"
 
-int main() {
-    auto workload = 1000;   // total workload
+int modelMISRR() {
+    auto workload = 2000;   // total workload
     auto serverN = 15;      // number of servers
     auto theta = 0.3;       // Ratio of the output load size to input load size
     auto m = 30;            // installment size
@@ -26,8 +26,15 @@ int main() {
     misrr.theLastInstallmentGap();
 
     fprintf(fMISRR, "%d\t\t%.2lf\n", workload, misrr.getOptimalTime());
-    misrr.printResult();
 
-    cout << "done" << endl;
+    return 1;
+}
+
+int main() {
+
+    if(modelMISRR()) {
+        cout << "done" << endl;
+    }
+
     return 0;
 }

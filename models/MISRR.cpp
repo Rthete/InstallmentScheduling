@@ -319,7 +319,7 @@ void MISRR::calOptimalM() {
  */
 void MISRR::getOptimalModel() {
     
-    // cal optimal time
+    // cal optimal time(4.15)
     this->optimalTime = 0;
     this->optimalTime += (servers[0].getS() + this->V * alpha[0] * servers[0].getW());
     this->optimalTime += (this->m - 2) * (servers[0].getS() + this->V * beta[0] * servers[0].getW());
