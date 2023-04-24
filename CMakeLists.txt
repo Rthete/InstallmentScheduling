@@ -6,6 +6,7 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME} SHARED
+    models/APMISRR.cpp
     models/MISRR.cpp
     models/PMIS.cpp
     models/RRMIS.cpp

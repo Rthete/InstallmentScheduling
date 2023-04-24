@@ -1,13 +1,14 @@
 /*
- * @FilePath: \InstallmentScheduling\main.cpp
+ * @FilePath: \Installment_Scheduling\main.cpp
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-04-22 16:32:17
+ * @LastEditTime: 2023-04-24 20:46:34
  */
 
 #include "include/MISRR.h"
 #include "include/PMIS.h"
+#include "include/APMISRR.h"
 
 void runPMIS() {
     auto workload = 1000;   // total workload
@@ -55,8 +56,43 @@ void runMISRR() {
     cout << "done" << endl;
 }
 
+double runAPMISRR(double lambda) {
+    auto serverN = 16;      // number of servers
+    auto theta = 0.3;       // Ratio of the output load size to input load size
+    auto m = 10;            // installment size
+    
+    // auto fAPMISRR = fopen("../output/APMISRR.txt", "w");
+    // fprintf(fAPMISRR, "----------m: %d----------\n", m);
+    // fprintf(fAPMISRR, "workload\tAPMISRR\n");
+
+    APMISRR apmisrr(serverN, theta);
+    apmisrr.getDataFromFile();
+    apmisrr.setM((int)m);
+    apmisrr.setLambda((double)lambda);
+    apmisrr.initValue();
+    return apmisrr.getOptimalTime();
+}
+
+void testAPMISRR() {
+    double lambda[10];
+    double time[10];
+    for(int i = 0; i < 10; i++) {
+        lambda[i] = 0.1 * i;
+        cout << "lambda = " << lambda[i] << "\t";
+        time[i] = runAPMISRR(lambda[i]);
+    }
+
+    cout << "********" << "(time[i] - time[i-1]) / 0.1" << "********" << endl;
+    for(int i = 1; i < 10; i++) {
+        cout << (time[i] - time[i-1]) / 0.1 << endl;
+    }
+    cout << "Total makespan is linearly dependant on \\lambda." << endl;
+}
+
 int main() {
     // runMISRR();
-    runPMIS();
+    // runPMIS();
+    testAPMISRR();
+    // todo: 可行性判断
     return 0;
 }
