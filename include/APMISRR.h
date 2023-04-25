@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-04-22 16:49:36
- * @LastEditTime: 2023-04-24 17:16:58
+ * @LastEditTime: 2023-04-25 15:57:00
  */
 
 #ifndef FIRSTMODEL_APMISRR_H
@@ -39,6 +39,9 @@ public:
     // result
     double getOptimalTime();
     // double getUsingRate();
+
+    // check schedulable
+    void isSchedulable();
 
 private:
     int n;                                          // 处理机个数

@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-04-24 20:46:34
+ * @LastEditTime: 2023-04-25 17:16:39
  */
 
 #include "include/MISRR.h"
@@ -60,6 +60,11 @@ double runAPMISRR(double lambda) {
     auto serverN = 16;      // number of servers
     auto theta = 0.3;       // Ratio of the output load size to input load size
     auto m = 10;            // installment size
+
+    cout << "**********************run APMISRR**********************" << endl;
+    cout << serverN << " servers, m = " << m << ", theta = " << theta << ", lambda = " << lambda << endl;
+    cout << "last installment load = " << lambda / m << endl;
+    cout << "each internal installment load = " << (m - lambda) / (m * (m - 1)) << endl;
     
     // auto fAPMISRR = fopen("../output/APMISRR.txt", "w");
     // fprintf(fAPMISRR, "----------m: %d----------\n", m);
@@ -70,23 +75,25 @@ double runAPMISRR(double lambda) {
     apmisrr.setM((int)m);
     apmisrr.setLambda((double)lambda);
     apmisrr.initValue();
+    apmisrr.isSchedulable();
     return apmisrr.getOptimalTime();
 }
 
 void testAPMISRR() {
     double lambda[10];
     double time[10];
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < 11; i++) {
         lambda[i] = 0.1 * i;
-        cout << "lambda = " << lambda[i] << "\t";
+        // cout << "lambda = " << lambda[i] << "\t";
         time[i] = runAPMISRR(lambda[i]);
     }
 
-    cout << "********" << "(time[i] - time[i-1]) / 0.1" << "********" << endl;
-    for(int i = 1; i < 10; i++) {
-        cout << (time[i] - time[i-1]) / 0.1 << endl;
-    }
-    cout << "Total makespan is linearly dependant on \\lambda." << endl;
+    // 实验：总时间与\lambda线性正相关
+    // cout << "***********" << "(time[i] - time[i-1]) / 0.1" << "***********" << endl;
+    // for(int i = 1; i < 10; i++) {
+    //     cout << (time[i] - time[i-1]) / 0.1 << endl;
+    // }
+    // cout << "Total makespan is linearly dependant on \\lambda." << endl;
 }
 
 int main() {
