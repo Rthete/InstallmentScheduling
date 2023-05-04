@@ -349,11 +349,11 @@ void MISRR::getDataFromFile() {
     FILE *fpo, *fps, *fpg, *fpw, *totalW;
     double valueO[this->n], valueS[this->n], valueG[this->n], valueW[this->n];
 
-    fpo = fopen("../data/o.txt", "r");
-    fps = fopen("../data/s.txt", "r");
-    fpg = fopen("../data/g.txt", "r");
-    fpw = fopen("../data/w.txt", "r");
-    totalW  = fopen("../data/WTotal.txt", "r");
+    fpo = fopen("../data/MISRR_2/o.txt", "r");
+    fps = fopen("../data/MISRR_2/s.txt", "r");
+    fpg = fopen("../data/MISRR_2/g.txt", "r");
+    fpw = fopen("../data/MISRR_2/w.txt", "r");
+    totalW  = fopen("../data/MISRR_2/WTotal.txt", "r");
 
     if (fpo == nullptr || fps == nullptr || fpg == nullptr || fpw == nullptr || totalW == nullptr) {
         printf("The file can not be opened:\n");

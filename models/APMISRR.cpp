@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-04-22 16:46:39
- * @LastEditTime: 2023-04-25 17:14:00
+ * @LastEditTime: 2023-04-25 20:56:22
  */
 #include "APMISRR.h"
 
@@ -170,8 +170,8 @@ void APMISRR::getDataFromFile() {
 
     fpo = fopen("../data/o.txt", "r");
     fps = fopen("../data/s.txt", "r");
-    fpg = fopen("../data/APMISRR/g.txt", "r");
-    fpw = fopen("../data/APMISRR/w.txt", "r");
+    fpg = fopen("../data/g.txt", "r");
+    fpw = fopen("../data/w.txt", "r");
     totalW  = fopen("../data/WTotal.txt", "r");
 
     if (fpo == nullptr || fps == nullptr || fpg == nullptr || fpw == nullptr || totalW == nullptr) {

@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-04-25 17:16:39
+ * @LastEditTime: 2023-04-25 21:26:05
  */
 
 #include "include/MISRR.h"
@@ -37,7 +37,7 @@ void runMISRR() {
     auto workload = 1000;   // total workload
     auto serverN = 15;      // number of servers
     auto theta = 0.3;       // Ratio of the output load size to input load size
-    auto m = 30;            // installment size
+    auto m = 10;            // installment size
     
     auto fMISRR = fopen("../output/MISRR.txt", "w");
     fprintf(fMISRR, "----------m: %d----------\n", m);
@@ -57,7 +57,7 @@ void runMISRR() {
 }
 
 double runAPMISRR(double lambda) {
-    auto serverN = 16;      // number of servers
+    auto serverN = 14;      // number of servers
     auto theta = 0.3;       // Ratio of the output load size to input load size
     auto m = 10;            // installment size
 
@@ -97,9 +97,9 @@ void testAPMISRR() {
 }
 
 int main() {
-    // runMISRR();
+    runMISRR();
     // runPMIS();
-    testAPMISRR();
-    // todo: 可行性判断
+    // testAPMISRR();
+    // runAPMISRR(0.4);
     return 0;
 }
