@@ -17,7 +17,7 @@ PMIS::PMIS(int valueN, double valueTheta) :
         usingTimes(vector<double>(MAX_N, 0)),
 
         // print
-        outputName("PMIS") {}
+        outputName("PMIS_printResult") {}
 
 // init value
 void PMIS::setW(double value) {
@@ -133,11 +133,11 @@ void PMIS::getDataFromFile() {
     FILE *fpo, *fps, *fpg, *fpw, *totalW;
     double valueO[this->n], valueS[this->n], valueG[this->n], valueW[this->n];
 
-    fpo = fopen("../o.txt", "r");
-    fps = fopen("../s.txt", "r");
-    fpg = fopen("../g.txt", "r");
-    fpw = fopen("../w.txt", "r");
-    totalW  = fopen("../WTotal.txt", "r");
+    fpo = fopen("../data/o.txt", "r");
+    fps = fopen("../data/s.txt", "r");
+    fpg = fopen("../data/g.txt", "r");
+    fpw = fopen("../data/w.txt", "r");
+    totalW  = fopen("../data/WTotal.txt", "r");
 
     if (fpo == nullptr || fps == nullptr || fpg == nullptr || fpw == nullptr || totalW == nullptr) {
         printf("The file can not be opened:\n");
@@ -237,7 +237,7 @@ void PMIS::error(vector<int> &errorPlace, int errorInstallment) {
 
 void PMIS::printResult() {
     FILE * fpResult;
-    fpResult = fopen((outputName + ".txt").c_str(), "a+");
+    fpResult = fopen(("../output/" + outputName + ".txt").c_str(), "a+");
 
     if (fpResult == nullptr) {
         printf("The file result.txt can not be opened:\n");
