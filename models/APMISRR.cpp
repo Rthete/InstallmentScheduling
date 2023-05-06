@@ -3,8 +3,9 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-04-22 16:46:39
- * @LastEditTime: 2023-05-04 23:23:27
+ * @LastEditTime: 2023-05-06 21:09:10
  */
+
 #include "APMISRR.h"
 
 APMISRR::APMISRR(int valueN, double valueTheta) :
@@ -36,6 +37,14 @@ void APMISRR::setLambda(double value) {
     this->lambda = value;
 }
 
+double APMISRR::getAlpha() {
+    return alpha[1];
+}
+
+double APMISRR::getBeta() {
+    return beta[1];
+}
+
 void APMISRR::initValue_cost() {
     // 式(11)
     double temp = 0;
@@ -48,12 +57,12 @@ void APMISRR::initValue_cost() {
     }
     this->P = (this->m - this->lambda) / (m * (m - 1));
     this->P = (this->P + temp1) / temp;
-    cout << "P=" << P << endl;
+    cout << "P = " << P << endl;
 
     // 式(12)
     for (int i = 0; i <= this->n; ++i) {
         alpha[i] = (P - servers[i].getS())/ servers[i].getW();
-        cout << "alpha[i]: " << alpha[i] << endl;
+        // cout << "alpha[" << i << "] = " << alpha[i] << endl;
         // cout << "start cost for computation: " << servers[i].getS() << endl;
         // cout << "compute time in first installment: " << alpha[i] * servers[i].getW() << endl;
     }
@@ -64,76 +73,78 @@ void APMISRR::initValue_cost() {
                 alpha[i] * theta * servers[i].getG();
     }
     double d = P - temp;
-    cout << "temp: " << temp << "\td: " << d << endl;
+    cout << "d = " << d << endl;
+    
     
 
+    // 式(15)
+    vector<double> a(this->n + 1, 0);
+    for (int i = 0; i < this->n; ++i) {
+        a[i] = (servers[i].getW() + theta * servers[i].getG()) / servers[i+1].getW();
+    }
+    vector<double> c(this->n + 1, 0);
+    for (int i = 0; i < this->n; ++i) {
+        c[i] = (- alpha[i] * theta * servers[i].getG() - alpha[i+1] * servers[i+1].getG() + 
+                servers[i].getS() - servers[i].getO() - servers[i+1].getS() - servers[i+1].getO()) / 
+                servers[i+1].getW();
+    }
 
-    // // 式(15)
-    // vector<double> a(this->n + 1, 0);
-    // for (int i = 0; i < this->n; ++i) {
-    //     a[i] = (servers[i].getW() + theta * servers[i].getG()) / servers[i+1].getW();
-    // }
-    // vector<double> c(this->n + 1, 0);
-    // for (int i = 0; i < this->n; ++i) {
-    //     c[i] = -((alpha[i] * theta * servers[i].getG() + alpha[i+1] * servers[i+1].getG()) / servers[i+1].getW());
-    // }
+    // 式(17)
+    vector<double> D(this->n + 1, 0);
+    for (int i = 2; i <= this->n; ++i) {
+        for (int j = 1; j < i - 1; ++j) {
+            double multi_a = 1;
+            for (int k = j + 1; k < i - 1; ++k) {
+                multi_a *= a[k];
+            }
+            D[i] += c[j] * multi_a;
+        }
+    }
 
-    // // 式(17)
-    // vector<double> D(this->n + 1, 0);
-    // for (int i = 2; i <= this->n; ++i) {
-    //     for (int j = 1; j < i - 1; ++j) {
-    //         double multi_a = 1;
-    //         for (int k = j + 1; k < i - 1; ++k) {
-    //             multi_a *= a[k];
-    //         }
-    //         D[i] += c[j] * multi_a;
-    //     }
-    // }
+    // 式(20)
+    double A = (servers[0].getW() + servers[1].getW() + theta * servers[1].getG()) / servers[0].getW();
+    for (int i = 2; i <= this->n; ++i) {
+        double multi_a = 1;
+        for (int j = 1; j < i - 1; ++j) {
+            multi_a *= a[j];
+        }
+        A += multi_a * (1 + (theta * servers[i].getG()) / servers[0].getW());
+    }
 
-    // // 式(20)
-    // double A = (servers[0].getW() + servers[1].getW() + theta * servers[1].getG()) / servers[0].getW();
-    // for (int i = 2; i <= this->n; ++i) {
-    //     double multi_a = 1;
-    //     for (int j = 1; j < i - 1; ++j) {
-    //         multi_a *= a[j];
-    //     }
-    //     A += multi_a * (1 + (theta * servers[i].getG()) / servers[0].getW());
-    // }
+    // 式(21)
+    double B = (2 * servers[1].getO() + alpha[1] * servers[1].getG() + servers[1].getS() - servers[0].getS()) / servers[0].getW();
+    for (int i = 2; i <= this->n; ++i) {
+        B += D[i] * (1 + (theta * servers[i].getG()) / servers[0].getW()) + servers[i].getO() / servers[0].getW();
+    }
 
-    // // 式(21)
-    // double B = (alpha[1] * servers[1].getG()) / servers[0].getW();
-    // for (int i = 2; i <= this->n; ++i) {
-    //     B += D[i] * (1 + (theta * servers[i].getG()) / servers[0].getW());
-    // }
+    // 式(19)
+    beta[1] = (lambda / m - B) / A;
 
-    // // 式(19)
-    // beta[1] = (lambda / m - B) / A;
+    // 式(18)
+    for (int i = 2; i <= this->n; ++i) {
+        double multi_a = 1;
+        for (int j = 1; j < i - 1; ++j) {
+            multi_a *= a[j];
+        }
+        beta[i] = multi_a * beta[1] + D[i];
+    }
 
-    // // 式(18)
-    // for (int i = 2; i <= this->n; ++i) {
-    //     double multi_a = 1;
-    //     for (int j = 1; j < i - 1; ++j) {
-    //         multi_a *= a[j];
-    //     }
-    //     beta[i] = multi_a * beta[1] + D[i];
-    // }
+    // 式(10)
+    beta[0] = servers[1].getO() + alpha[1] * servers[1].getG() + servers[1].getS() + beta[1] * servers[1].getW();
+    for (int i = 1; i <= this->n; ++i) {
+        beta[0] += servers[i].getO() + beta[i] * theta * servers[i].getG();
+    }
+    beta[0] = (beta[0] - servers[0].getS()) / servers[0].getW();
 
-    // // 式(10)
-    // beta[0] = alpha[1] * servers[1].getG() + beta[1] * servers[1].getW();
-    // for (int i = 1; i <= this->n; ++i) {
-    //     beta[0] += beta[i] * theta * servers[i].getG();
-    // }
-    // beta[0] = beta[0] / servers[0].getW();
-
-    // // 打印alpha[i], beta[i]
-    // double load_sum = 0;
-    // for (int i = 0; i <=this->n; ++i) {
-    //     cout << "alpha" << i << "=" << alpha[i] << "\t";
-    //     cout << "beta" << i << "=" << beta[i] << endl;
-    //     load_sum += alpha[i] * (m - 1);
-    //     load_sum += beta[i];
-    // }
-    // load_sum为1
+    // 打印alpha[i], beta[i]
+    double load_sum = 0;
+    for (int i = 0; i <=this->n; ++i) {
+        cout << "alpha" << i << "=" << alpha[i] << "\t";
+        cout << "beta" << i << "=" << beta[i] << endl;
+        load_sum += alpha[i] * (m - 1);
+        load_sum += beta[i];
+    }
+    // 检验load_sum为1
     // cout << "load_sum = " << load_sum << endl;
 }
 
@@ -227,6 +238,13 @@ double APMISRR::getOptimalTime() {
     return optimalTime;
 }
 
+double APMISRR::getOptimalTime_cost() {
+    // 式(29)
+    optimalTime = (m - 1) * P + beta[0] * servers[0].getW() + servers[0].getO();
+    cout << "optimalTime = " << optimalTime << endl;
+    return optimalTime;
+}
+
 void APMISRR::isSchedulable() {
     int condition_1 = 0, condition_2 = 0, condition_3 = 0;
     
@@ -258,6 +276,41 @@ void APMISRR::isSchedulable() {
     } else {
         cout << "condition_1 = " << condition_1 << ", condition_2 = " << condition_2 << ", condition_3 = " << condition_3 << endl;
         cout << "not schedulable" << endl;
+    }
+}
+
+int APMISRR::isSchedulable_cost() {
+    int condition1 = 1, condition2 = 1, condition3 = 1;
+
+    // 负载分量必须为正数
+    for (int i = 0; i <= this->n; ++i) {
+        if(alpha[i] <= 0 || beta[i] <= 0) {
+            condition1 = 1;
+            cout << "!!!!!!! not schedulable 1 !!!!!!!" << endl;
+            break;
+        }
+    }
+
+    // 引理8
+    int num = this->n;
+    if(servers[num].getO() + beta[num] * servers[num].getW() < 
+        servers[num].getS() + alpha[num] * theta * servers[num].getG() + servers[num-1].getS() + 
+        beta[num-1] * theta * servers[num-1].getG()) {
+            condition2 = 0;
+            cout << "!!!!!!! not schedulable 2 !!!!!!!" << endl;
+        }
+
+    // 处理器P_1的最后一趟负载分量是否能在传输窗口放下
+    if(alpha[1] < beta[1]) {
+        condition3 = 0;
+        cout << "!!!!!!! not schedulable 3 !!!!!!!" << endl;
+    }
+
+    if(condition1 && condition2 && condition3) {
+        cout << "```````````` schedulable ````````````" << endl;
+        return 1;
+    } else {
+        return 0;
     }
 }
 

@@ -220,7 +220,7 @@ void MISRR::calBeta() {
             continue;
         }
         beta[i] = mu[i] * beta[0] + (eta[i] / this->V);
-        cout << beta[i] << "\t" << beta[i] * servers[i].getW() << endl;
+        // cout << beta[i] << "\t" << beta[i] * servers[i].getW() << endl;
     }
 }
 
@@ -370,8 +370,8 @@ void MISRR::getDataFromFile() {
     for (int i = 0; i < this->n; i++) {
         Server demo(i);
 
-        demo.setO(valueO[i]/100);
-        demo.setS(valueS[i]/100);
+        demo.setO(valueO[i]/500);
+        demo.setS(valueS[i]/500);
         demo.setG(valueG[i]);
         demo.setW(valueW[i]);
 

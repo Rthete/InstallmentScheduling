@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-04-22 16:49:36
- * @LastEditTime: 2023-05-04 20:33:04
+ * @LastEditTime: 2023-05-06 21:06:35
  */
 
 #ifndef FIRSTMODEL_APMISRR_H
@@ -22,6 +22,9 @@ public:
     void setM(int value);
     void setW(double value);
     void setLambda(double value);
+
+    double getAlpha();
+    double getBeta();
     void initValue_cost();
     void initValue();
     void getDataFromFile();
@@ -39,10 +42,12 @@ public:
 
     // result
     double getOptimalTime();
+    double getOptimalTime_cost();
     // double getUsingRate();
 
     // check schedulable
     void isSchedulable();
+    int isSchedulable_cost();
 
 private:
     int n;                                          // 处理机个数
