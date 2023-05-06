@@ -220,6 +220,7 @@ void MISRR::calBeta() {
             continue;
         }
         beta[i] = mu[i] * beta[0] + (eta[i] / this->V);
+        cout << beta[i] << "\t" << beta[i] * servers[i].getW() << endl;
     }
 }
 
@@ -349,11 +350,11 @@ void MISRR::getDataFromFile() {
     FILE *fpo, *fps, *fpg, *fpw, *totalW;
     double valueO[this->n], valueS[this->n], valueG[this->n], valueW[this->n];
 
-    fpo = fopen("../data/MISRR_2/o.txt", "r");
-    fps = fopen("../data/MISRR_2/s.txt", "r");
-    fpg = fopen("../data/MISRR_2/g.txt", "r");
-    fpw = fopen("../data/MISRR_2/w.txt", "r");
-    totalW  = fopen("../data/MISRR_2/WTotal.txt", "r");
+    fpo = fopen("../data/o.txt", "r");
+    fps = fopen("../data/s.txt", "r");
+    fpg = fopen("../data/g.txt", "r");
+    fpw = fopen("../data/w.txt", "r");
+    totalW  = fopen("../data/WTotal.txt", "r");
 
     if (fpo == nullptr || fps == nullptr || fpg == nullptr || fpw == nullptr || totalW == nullptr) {
         printf("The file can not be opened:\n");
@@ -369,8 +370,8 @@ void MISRR::getDataFromFile() {
     for (int i = 0; i < this->n; i++) {
         Server demo(i);
 
-        demo.setO(valueO[i]);
-        demo.setS(valueS[i]);
+        demo.setO(valueO[i]/100);
+        demo.setS(valueS[i]/100);
         demo.setG(valueG[i]);
         demo.setW(valueW[i]);
 

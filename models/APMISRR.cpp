@@ -1,9 +1,9 @@
 /*
- * @FilePath: \Installment_Scheduling\models\APMISRR.cpp
+ * @FilePath: \InstallmentScheduling\models\APMISRR.cpp
  * @Description:  
  * @Author: rthete
  * @Date: 2023-04-22 16:46:39
- * @LastEditTime: 2023-04-25 20:56:22
+ * @LastEditTime: 2023-05-04 23:23:27
  */
 #include "APMISRR.h"
 
@@ -34,6 +34,107 @@ void APMISRR::setM(int value) {
 
 void APMISRR::setLambda(double value) {
     this->lambda = value;
+}
+
+void APMISRR::initValue_cost() {
+    // 式(11)
+    double temp = 0;
+    for (int i = 0; i <= this->n; ++i) {
+        temp += 1 / servers[i].getW();
+    }
+    double temp1 = 0;
+    for (int i = 0; i <= this->n; ++i) {
+        temp1 += (servers[i].getS() / servers[i].getW());
+    }
+    this->P = (this->m - this->lambda) / (m * (m - 1));
+    this->P = (this->P + temp1) / temp;
+    cout << "P=" << P << endl;
+
+    // 式(12)
+    for (int i = 0; i <= this->n; ++i) {
+        alpha[i] = (P - servers[i].getS())/ servers[i].getW();
+        cout << "alpha[i]: " << alpha[i] << endl;
+        // cout << "start cost for computation: " << servers[i].getS() << endl;
+        // cout << "compute time in first installment: " << alpha[i] * servers[i].getW() << endl;
+    }
+
+    temp = 0;
+    for (int i = 0; i <= this->n; ++i) {
+        temp += servers[i].getO() + alpha[i] * servers[i].getG() + servers[i].getO() + 
+                alpha[i] * theta * servers[i].getG();
+    }
+    double d = P - temp;
+    cout << "temp: " << temp << "\td: " << d << endl;
+    
+
+
+    // // 式(15)
+    // vector<double> a(this->n + 1, 0);
+    // for (int i = 0; i < this->n; ++i) {
+    //     a[i] = (servers[i].getW() + theta * servers[i].getG()) / servers[i+1].getW();
+    // }
+    // vector<double> c(this->n + 1, 0);
+    // for (int i = 0; i < this->n; ++i) {
+    //     c[i] = -((alpha[i] * theta * servers[i].getG() + alpha[i+1] * servers[i+1].getG()) / servers[i+1].getW());
+    // }
+
+    // // 式(17)
+    // vector<double> D(this->n + 1, 0);
+    // for (int i = 2; i <= this->n; ++i) {
+    //     for (int j = 1; j < i - 1; ++j) {
+    //         double multi_a = 1;
+    //         for (int k = j + 1; k < i - 1; ++k) {
+    //             multi_a *= a[k];
+    //         }
+    //         D[i] += c[j] * multi_a;
+    //     }
+    // }
+
+    // // 式(20)
+    // double A = (servers[0].getW() + servers[1].getW() + theta * servers[1].getG()) / servers[0].getW();
+    // for (int i = 2; i <= this->n; ++i) {
+    //     double multi_a = 1;
+    //     for (int j = 1; j < i - 1; ++j) {
+    //         multi_a *= a[j];
+    //     }
+    //     A += multi_a * (1 + (theta * servers[i].getG()) / servers[0].getW());
+    // }
+
+    // // 式(21)
+    // double B = (alpha[1] * servers[1].getG()) / servers[0].getW();
+    // for (int i = 2; i <= this->n; ++i) {
+    //     B += D[i] * (1 + (theta * servers[i].getG()) / servers[0].getW());
+    // }
+
+    // // 式(19)
+    // beta[1] = (lambda / m - B) / A;
+
+    // // 式(18)
+    // for (int i = 2; i <= this->n; ++i) {
+    //     double multi_a = 1;
+    //     for (int j = 1; j < i - 1; ++j) {
+    //         multi_a *= a[j];
+    //     }
+    //     beta[i] = multi_a * beta[1] + D[i];
+    // }
+
+    // // 式(10)
+    // beta[0] = alpha[1] * servers[1].getG() + beta[1] * servers[1].getW();
+    // for (int i = 1; i <= this->n; ++i) {
+    //     beta[0] += beta[i] * theta * servers[i].getG();
+    // }
+    // beta[0] = beta[0] / servers[0].getW();
+
+    // // 打印alpha[i], beta[i]
+    // double load_sum = 0;
+    // for (int i = 0; i <=this->n; ++i) {
+    //     cout << "alpha" << i << "=" << alpha[i] << "\t";
+    //     cout << "beta" << i << "=" << beta[i] << endl;
+    //     load_sum += alpha[i] * (m - 1);
+    //     load_sum += beta[i];
+    // }
+    // load_sum为1
+    // cout << "load_sum = " << load_sum << endl;
 }
 
 void APMISRR::initValue() {
@@ -188,8 +289,8 @@ void APMISRR::getDataFromFile() {
     for (int i = 0; i < this->n + 1; i++) {
         Server demo(i);
 
-        demo.setO(valueO[i]);
-        demo.setS(valueS[i]);
+        demo.setO(valueO[i]/500);
+        demo.setS(valueS[i]/500);
         demo.setG(valueG[i]);
         demo.setW(valueW[i]);
 

@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-05-04 20:17:51
+ * @LastEditTime: 2023-05-04 23:24:22
  */
 
 #include "include/MISRR.h"
@@ -34,10 +34,10 @@ void runPMIS() {
 }
 
 void runMISRR() {
-    auto workload = 1000;   // total workload
+    auto workload = 1;   // total workload
     auto serverN = 15;      // number of servers
     auto theta = 0.3;       // Ratio of the output load size to input load size
-    auto m = 10;            // installment size
+    auto m = 5;            // installment size
     
     auto fMISRR = fopen("../output/MISRR.txt", "w");
     fprintf(fMISRR, "----------m: %d----------\n", m);
@@ -58,7 +58,7 @@ void runMISRR() {
 double runAPMISRR(double lambda) {
     auto serverN = 14;      // number of servers
     auto theta = 0.3;       // Ratio of the output load size to input load size
-    auto m = 10;            // installment size
+    auto m = 9;            // installment size
 
     cout << "**********************run APMISRR**********************" << endl;
     cout << serverN << " servers, m = " << m << ", theta = " << theta << ", lambda = " << lambda << endl;
@@ -73,9 +73,11 @@ double runAPMISRR(double lambda) {
     apmisrr.getDataFromFile();
     apmisrr.setM((int)m);
     apmisrr.setLambda((double)lambda);
-    apmisrr.initValue();
-    apmisrr.isSchedulable();
-    return apmisrr.getOptimalTime();
+    apmisrr.initValue_cost();
+    // apmisrr.initValue();
+    // apmisrr.isSchedulable();
+    // return apmisrr.getOptimalTime();
+    return 0;
 }
 
 void testAPMISRR() {
@@ -83,7 +85,6 @@ void testAPMISRR() {
     double time[10];
     for(int i = 0; i < 11; i++) {
         lambda[i] = 0.1 * i;
-        // cout << "lambda = " << lambda[i] << "\t";
         time[i] = runAPMISRR(lambda[i]);
     }
 
@@ -96,9 +97,9 @@ void testAPMISRR() {
 }
 
 int main() {
-    runMISRR();
+    // runMISRR();
     // runPMIS();
-    // testAPMISRR();
-    // runAPMISRR(0.4);
+    testAPMISRR();
+    // runAPMISRR(0.6);
     return 0;
 }

@@ -1,9 +1,9 @@
 /*
- * @FilePath: \Installment_Scheduling\include\APMISRR.h
+ * @FilePath: \InstallmentScheduling\include\APMISRR.h
  * @Description:  
  * @Author: rthete
  * @Date: 2023-04-22 16:49:36
- * @LastEditTime: 2023-04-25 15:57:00
+ * @LastEditTime: 2023-05-04 20:33:04
  */
 
 #ifndef FIRSTMODEL_APMISRR_H
@@ -22,6 +22,7 @@ public:
     void setM(int value);
     void setW(double value);
     void setLambda(double value);
+    void initValue_cost();
     void initValue();
     void getDataFromFile();
     // void getOptimalModel();
