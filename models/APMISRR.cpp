@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-04-22 16:46:39
- * @LastEditTime: 2023-05-06 21:09:10
+ * @LastEditTime: 2023-05-09 20:48:01
  */
 
 #include "APMISRR.h"
@@ -46,6 +46,9 @@ double APMISRR::getBeta() {
 }
 
 void APMISRR::initValue_cost() {
+    // 每趟调度任务量
+    this->V = (this->m - this->lambda) * this->W / (m * (m - 1));
+
     // 式(11)
     double temp = 0;
     for (int i = 0; i <= this->n; ++i) {
@@ -55,28 +58,32 @@ void APMISRR::initValue_cost() {
     for (int i = 0; i <= this->n; ++i) {
         temp1 += (servers[i].getS() / servers[i].getW());
     }
-    this->P = (this->m - this->lambda) / (m * (m - 1));
-    this->P = (this->P + temp1) / temp;
+    this->P = (this->V + temp1) / temp;
     cout << "P = " << P << endl;
 
     // 式(12)
+    double sum = 0;
     for (int i = 0; i <= this->n; ++i) {
-        alpha[i] = (P - servers[i].getS())/ servers[i].getW();
+        alpha[i] = (P - servers[i].getS())/ (servers[i].getW() * this->V);
         // cout << "alpha[" << i << "] = " << alpha[i] << endl;
+        sum += alpha[i];
         // cout << "start cost for computation: " << servers[i].getS() << endl;
-        // cout << "compute time in first installment: " << alpha[i] * servers[i].getW() << endl;
+        // cout << "compute time in first installment: " << alpha[i] * servers[i].getW() * this->V << endl;
+        // cout << "start cost + compute time = " << servers[i].getS() + alpha[i] * servers[i].getW() * this->V << endl; // ==P
     }
+    // cout << "sum = " << sum << endl; // alpha[i]之和==1
 
     temp = 0;
-    for (int i = 0; i <= this->n; ++i) {
-        temp += servers[i].getO() + alpha[i] * servers[i].getG() + servers[i].getO() + 
-                alpha[i] * theta * servers[i].getG();
+    for (int i = 1; i <= this->n; ++i) {
+        temp += servers[i].getO() + alpha[i] * servers[i].getG() * this->V + servers[i].getO() + 
+                alpha[i] * theta * servers[i].getG() * this->V;
     }
+
+    // 内部调度间空闲时间
     double d = P - temp;
     cout << "d = " << d << endl;
-    
-    
 
+    this->Vb = lambda / m * this->W;
     // 式(15)
     vector<double> a(this->n + 1, 0);
     for (int i = 0; i < this->n; ++i) {
@@ -84,9 +91,9 @@ void APMISRR::initValue_cost() {
     }
     vector<double> c(this->n + 1, 0);
     for (int i = 0; i < this->n; ++i) {
-        c[i] = (- alpha[i] * theta * servers[i].getG() - alpha[i+1] * servers[i+1].getG() + 
+        c[i] = ((- alpha[i] * theta * servers[i].getG() - alpha[i+1] * servers[i+1].getG()) * this->V + 
                 servers[i].getS() - servers[i].getO() - servers[i+1].getS() - servers[i+1].getO()) / 
-                servers[i+1].getW();
+                (servers[i+1].getW() * this->Vb);
     }
 
     // 式(17)
@@ -112,13 +119,13 @@ void APMISRR::initValue_cost() {
     }
 
     // 式(21)
-    double B = (2 * servers[1].getO() + alpha[1] * servers[1].getG() + servers[1].getS() - servers[0].getS()) / servers[0].getW();
+    double B = (2 * servers[1].getO() + alpha[1] * servers[1].getG() * this->V + servers[1].getS() - servers[0].getS()) / (servers[0].getW() * this->Vb);
     for (int i = 2; i <= this->n; ++i) {
-        B += D[i] * (1 + (theta * servers[i].getG()) / servers[0].getW()) + servers[i].getO() / servers[0].getW();
+        B += D[i] * (1 + (theta * servers[i].getG()) / servers[0].getW()) + servers[i].getO() / (servers[0].getW() * this->Vb);
     }
 
     // 式(19)
-    beta[1] = (lambda / m - B) / A;
+    beta[1] = (1 - B) / A;
 
     // 式(18)
     for (int i = 2; i <= this->n; ++i) {
@@ -130,22 +137,11 @@ void APMISRR::initValue_cost() {
     }
 
     // 式(10)
-    beta[0] = servers[1].getO() + alpha[1] * servers[1].getG() + servers[1].getS() + beta[1] * servers[1].getW();
+    beta[0] = servers[1].getO() + alpha[1] * servers[1].getG() * this->V + servers[1].getS() + beta[1] * servers[1].getW() * this->Vb;
     for (int i = 1; i <= this->n; ++i) {
-        beta[0] += servers[i].getO() + beta[i] * theta * servers[i].getG();
+        beta[0] += servers[i].getO() + beta[i] * theta * servers[i].getG() * this->Vb;
     }
-    beta[0] = (beta[0] - servers[0].getS()) / servers[0].getW();
-
-    // 打印alpha[i], beta[i]
-    double load_sum = 0;
-    for (int i = 0; i <=this->n; ++i) {
-        cout << "alpha" << i << "=" << alpha[i] << "\t";
-        cout << "beta" << i << "=" << beta[i] << endl;
-        load_sum += alpha[i] * (m - 1);
-        load_sum += beta[i];
-    }
-    // 检验load_sum为1
-    // cout << "load_sum = " << load_sum << endl;
+    beta[0] = (beta[0] - servers[0].getS()) / (servers[0].getW() * this->Vb);
 }
 
 void APMISRR::initValue() {
@@ -219,16 +215,7 @@ void APMISRR::initValue() {
     }
     beta[0] = beta[0] / servers[0].getW();
 
-    // 打印alpha[i], beta[i]
-    double load_sum = 0;
-    for (int i = 0; i <=this->n; ++i) {
-        cout << "alpha" << i << "=" << alpha[i] << "\t";
-        cout << "beta" << i << "=" << beta[i] << endl;
-        load_sum += alpha[i] * (m - 1);
-        load_sum += beta[i];
-    }
-    // load_sum为1
-    // cout << "load_sum = " << load_sum << endl;
+    
 }
 
 double APMISRR::getOptimalTime() {
@@ -240,7 +227,7 @@ double APMISRR::getOptimalTime() {
 
 double APMISRR::getOptimalTime_cost() {
     // 式(29)
-    optimalTime = (m - 1) * P + beta[0] * servers[0].getW() + servers[0].getO();
+    optimalTime = (m - 1) * P + beta[0] * servers[0].getW() * this->V + servers[0].getO();
     cout << "optimalTime = " << optimalTime << endl;
     return optimalTime;
 }
@@ -280,12 +267,24 @@ void APMISRR::isSchedulable() {
 }
 
 int APMISRR::isSchedulable_cost() {
+
+    // 打印alpha[i], beta[i]
+    double load_sum = 0;
+    for (int i = 0; i <=this->n; ++i) {
+        cout << "alpha" << i << "=" << alpha[i] << "\t";
+        cout << "beta" << i << "=" << beta[i] << endl;
+        // load_sum += alpha[i] * (m - 1) * this->V;
+        // load_sum += beta[i] * this->Vb;
+    }
+    // load_sum为1
+    // cout << "load_sum = " << load_sum << endl;
+
     int condition1 = 1, condition2 = 1, condition3 = 1;
 
     // 负载分量必须为正数
     for (int i = 0; i <= this->n; ++i) {
-        if(alpha[i] <= 0 || beta[i] <= 0) {
-            condition1 = 1;
+        if(!(alpha[i] > 0 && beta[i] > 0)) {
+            condition1 = 0;
             cout << "!!!!!!! not schedulable 1 !!!!!!!" << endl;
             break;
         }
@@ -293,15 +292,15 @@ int APMISRR::isSchedulable_cost() {
 
     // 引理8
     int num = this->n;
-    if(servers[num].getO() + beta[num] * servers[num].getW() < 
-        servers[num].getS() + alpha[num] * theta * servers[num].getG() + servers[num-1].getS() + 
-        beta[num-1] * theta * servers[num-1].getG()) {
+    if(servers[num].getO() + beta[num] * servers[num].getW() * this->V < 
+        servers[num].getS() + alpha[num] * theta * servers[num].getG() * this->V + servers[num-1].getS() + 
+        beta[num-1] * theta * servers[num-1].getG() * this->V) {
             condition2 = 0;
             cout << "!!!!!!! not schedulable 2 !!!!!!!" << endl;
         }
 
     // 处理器P_1的最后一趟负载分量是否能在传输窗口放下
-    if(alpha[1] < beta[1]) {
+    if(alpha[1] * this->V < beta[1] * this->Vb) {
         condition3 = 0;
         cout << "!!!!!!! not schedulable 3 !!!!!!!" << endl;
     }
@@ -342,8 +341,8 @@ void APMISRR::getDataFromFile() {
     for (int i = 0; i < this->n + 1; i++) {
         Server demo(i);
 
-        demo.setO(valueO[i]/500);
-        demo.setS(valueS[i]/500);
+        demo.setO(valueO[i]);
+        demo.setS(valueS[i]);
         demo.setG(valueG[i]);
         demo.setW(valueW[i]);
 

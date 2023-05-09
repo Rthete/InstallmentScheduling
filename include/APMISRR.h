@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-04-22 16:49:36
- * @LastEditTime: 2023-05-06 21:06:35
+ * @LastEditTime: 2023-05-09 21:37:27
  */
 
 #ifndef FIRSTMODEL_APMISRR_H
@@ -54,7 +54,8 @@ private:
     int m;                                          // 计算趟数
     double theta;                                   // 结果回传比例
     double W = 0;                                   // 总任务量
-    double V = 0;                                   // 每一趟调度的任务量
+    double V = 0;                                   // 内部调度每一趟调度的任务量
+    double Vb = 0;                                  // 最后一趟调度的任务量
     double optimalTime = 0;                         // 调度最短时间
     double usingRate;                               // 处理机使用率
     vector<Server> servers;                         // 所有的处理器

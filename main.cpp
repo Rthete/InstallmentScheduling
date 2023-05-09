@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-05-06 21:06:43
+ * @LastEditTime: 2023-05-09 21:28:06
  */
 
 #include "include/MISRR.h"
@@ -34,7 +34,7 @@ void runPMIS() {
 }
 
 void runMISRR() {
-    auto workload = 1;   // total workload
+    auto workload = 8000;   // total workload
     auto serverN = 15;      // number of servers
     auto theta = 0.3;       // Ratio of the output load size to input load size
     auto m = 8;            // installment size
@@ -80,23 +80,24 @@ double runAPMISRR(double lambda) {
 /**
  * 运行带启动开销的APMISRR算法
 */
-double runAPMISRR_cost(double lambda) {
+double runAPMISRR_cost(double lambda, int m) {
     auto serverN = 14;      // number of servers
     auto theta = 0.3;       // Ratio of the output load size to input load size
-    auto m = 8;            // installment size
+    // auto m = 8;            // installment size
 
     cout << "**********************run APMISRR**********************" << endl;
-    cout << serverN << " servers, m = " << m << ", theta = " << theta << ", lambda = " << lambda << endl;
-    cout << "last installment load = " << lambda / m << endl;
-    cout << "each internal installment load = " << (m - lambda) / (m * (m - 1)) << endl;
+    cout << serverN + 1 << " servers, m = " << m << ", theta = " << theta << ", lambda = " << lambda << endl;
+    cout << "total load = " << 8000 << endl;
+    cout << "last installment load = " << lambda / m * 8000 << endl;
+    cout << "each internal installment load = " << (m - lambda) * 8000 / (m * (m - 1)) << endl;
 
     APMISRR apmisrr(serverN, theta);
     apmisrr.getDataFromFile();
     apmisrr.setM((int)m);
     apmisrr.setLambda((double)lambda);
     apmisrr.initValue_cost();
-    if(apmisrr.isSchedulable_cost())
-        return apmisrr.getOptimalTime_cost(); // test APMISRR total time
+    apmisrr.isSchedulable_cost();
+    return apmisrr.getOptimalTime_cost(); // test APMISRR total time
     // return apmisrr.getAlpha(); // test APMISRR alpha_1
     // return apmisrr.getBeta(); // test APMISRR beta_1
     return 0;
@@ -130,7 +131,7 @@ void test_APMISRR_alpha() {
     double alpha1[10];
     for(int i = 0; i < 11; i++) {
         lambda[i] = 0.1 * i;
-        alpha1[i] = runAPMISRR_cost(lambda[i]);
+        alpha1[i] = runAPMISRR_cost(lambda[i], 8);
     }
 
     // 实验：alpha[1]与\lambda负线性相关
@@ -138,7 +139,7 @@ void test_APMISRR_alpha() {
     for(int i = 1; i < 10; i++) {
         cout << (alpha1[i] - alpha1[i-1]) / 0.1 << endl;
     }
-    cout << "alpha_1 is linearly dependant on \\lambda." << endl;
+    // cout << "alpha_1 is linearly dependant on \\lambda." << endl;
 }
 
 /**
@@ -150,7 +151,7 @@ void test_APMISRR_beta() {
     double beta1[10];
     for(int i = 0; i < 11; i++) {
         lambda[i] = 0.1 * i;
-        beta1[i] = runAPMISRR_cost(lambda[i]);
+        beta1[i] = runAPMISRR_cost(lambda[i], 8);
     }
 
     // 实验：beta[1]与\lambda负线性相关
@@ -159,7 +160,7 @@ void test_APMISRR_beta() {
         cout << "lambda = " << lambda[i] << ", beta_1 = " << beta1[i] << endl;
         cout << (beta1[i] - beta1[i-1]) / 0.1 << endl;
     }
-    cout << "beta_1 is linearly dependant on \\lambda." << endl;
+    // cout << "beta_1 is linearly dependant on \\lambda." << endl;
 }
 
 /**
@@ -170,25 +171,38 @@ void test_APMISRR_totalTime_cost() {
     double time[10];
     for(int i = 0; i < 11; i++) {
         lambda[i] = 0.1 * i;
-        time[i] = runAPMISRR_cost(lambda[i]);
+        time[i] = runAPMISRR_cost(lambda[i], 8);
     }
 
-    // // 实验：总时间与\lambda线性正相关
-    // cout << "***********" << "(time[i] - time[i-1]) / 0.1" << "***********" << endl;
-    // for(int i = 1; i < 10; i++) {
-    //     cout << (time[i] - time[i-1]) / 0.1 << endl;
-    // }
+    // 实验：总时间与\lambda线性正相关
+    cout << "***********" << "(time[i] - time[i-1]) / 0.1" << "***********" << endl;
+    for(int i = 1; i < 10; i++) {
+        cout << (time[i] - time[i-1]) / 0.1 << endl;
+    }
     // cout << "Total makespan is linearly dependant on \\lambda." << endl;
+}
+
+/**
+ * 测试总时间与趟数m的关系
+*/
+void test_APMISRR_installment() {
+    FILE * fpResult;
+    fpResult = fopen("../output/test.csv", "w");
+    for(int m = 3; m <= 20; m++) {
+        fprintf(fpResult, "%lf\n", runAPMISRR_cost(0.5, m));
+    }
+    fclose(fpResult);
 }
 
 int main() {
     // runMISRR();
     // runPMIS();
     // runAPMISRR(0.6);
-    // runAPMISRR_cost(0.6);
+    // runAPMISRR_cost(0.6, 8);
     // test_APMISRR_totalTime();
     // test_APMISRR_alpha();
     // test_APMISRR_beta();
-    test_APMISRR_totalTime_cost();
+    // test_APMISRR_totalTime_cost();
+    // test_APMISRR_installment();
     return 0;
 }

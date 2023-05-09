@@ -213,15 +213,24 @@ void MISRR::calBeta() {
         sum_2_n_mu += mu[i];
         sum_2_n_eta += eta[i];
     }
-
+    double sum = 0;
     for (int i = 0 ; i < this->n; ++i) {
         if (i == 0) {
             beta[i] = (1.0 - sum_2_n_eta / this->V) / (1.0 + sum_2_n_mu);
+            sum += beta[i];
             continue;
         }
         beta[i] = mu[i] * beta[0] + (eta[i] / this->V);
-        // cout << beta[i] << "\t" << beta[i] * servers[i].getW() << endl;
+        // 计算每趟内部调度所用时间
+        cout << "beta[i]: " << beta[i] << "\tserver[i].getS(): " << servers[i].getS() << "\ttime: " 
+            << beta[i] * servers[i].getW() * this->V + servers[i].getS() << endl;
+
+        sum += beta[i];
     }
+    // beta[i]之和为1
+    cout << "this->V: " << this->V << endl;
+    cout << "sum: " << sum << endl;
+    cout << "sum * this->V: " << sum * this->V << endl;
 }
 
 /**
@@ -370,8 +379,8 @@ void MISRR::getDataFromFile() {
     for (int i = 0; i < this->n; i++) {
         Server demo(i);
 
-        demo.setO(valueO[i]/500);
-        demo.setS(valueS[i]/500);
+        demo.setO(valueO[i]);
+        demo.setS(valueS[i]);
         demo.setG(valueG[i]);
         demo.setW(valueW[i]);
 
