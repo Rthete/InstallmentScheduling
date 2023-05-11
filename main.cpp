@@ -3,12 +3,13 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-05-09 21:28:06
+ * @LastEditTime: 2023-05-11 21:13:56
  */
 
 #include "include/MISRR.h"
 #include "include/PMIS.h"
 #include "include/APMISRR.h"
+#include <tuple>
 
 void runPMIS() {
     auto workload = 1000;   // total workload
@@ -33,26 +34,45 @@ void runPMIS() {
     cout << "done" << endl;
 }
 
-void runMISRR() {
+/**
+ * 运行MISRR算法
+*/
+ tuple<double, double> runMISRR(int theta, int m) {
     auto workload = 8000;   // total workload
     auto serverN = 15;      // number of servers
-    auto theta = 0.3;       // Ratio of the output load size to input load size
-    auto m = 8;            // installment size
+    // auto theta = 10;       // Ratio of the output load size to input load size
+    // auto m = 8;            // installment size
     
-    auto fMISRR = fopen("../output/MISRR.txt", "w");
-    fprintf(fMISRR, "----------m: %d----------\n", m);
-    fprintf(fMISRR, "workload\tMISRR\n");
+    // auto fMISRR = fopen("../output/MISRR.txt", "w");
+    // fprintf(fMISRR, "----------m: %d----------\n", m);
+    // fprintf(fMISRR, "workload\tMISRR\n");
 
     MISRR misrr(serverN, theta, m);
     misrr.getDataFromFile();
     misrr.setW((double)workload);
     misrr.initValue();
     misrr.getOptimalModel();
-    misrr.theLastInstallmentGap();
+    // misrr.theLastInstallmentGap();
 
-    fprintf(fMISRR, "%d\t\t%.2lf\n", workload, misrr.getOptimalTime());
+    // fprintf(fMISRR, "%d\t\t%.2lf\n", workload, misrr.getOptimalTime());
+    return make_tuple(misrr.getOptimalM(), misrr.getUsingRate());
+    // return make_tuple(misrr.getOptimalTime(), misrr.getUsingRate());
+    // printf("%d\t\t%.2lf\n", workload, misrr.getOptimalTime());
+}
 
-    cout << "done" << endl;
+/**
+ * 测试theta对可行性的影响
+*/
+void test_MISRR_theta() {
+    // FILE * fpResult;
+    // fpResult = fopen("../output/test_MISRR_theta_calM.csv", "w");
+    for(int i = 0; i < 20; i+=1) {
+        // cout << "theta = " << i;
+        cout<< get<0>(runMISRR(i, 0)) << endl;
+        // cout << "\ttime = " << get<0>(runMISRR(i, 0)) << "\tusing rate = " << get<1>(runMISRR(i, 0)) << endl;
+        // fprintf(fpResult, "%d,%lf,%lf\n", i, get<0>(runMISRR(i, 0)), get<1>(runMISRR(i, 0)));
+    }
+    // fclose(fpResult);
 }
 
 /**
@@ -189,13 +209,14 @@ void test_APMISRR_installment() {
     FILE * fpResult;
     fpResult = fopen("../output/test.csv", "w");
     for(int m = 3; m <= 20; m++) {
-        fprintf(fpResult, "%lf\n", runAPMISRR_cost(0.5, m));
+        fprintf(fpResult, "%lf\n", runAPMISRR_cost(0.2, m));
     }
     fclose(fpResult);
 }
 
 int main() {
-    // runMISRR();
+    runMISRR(0.3, 8);
+    test_MISRR_theta();
     // runPMIS();
     // runAPMISRR(0.6);
     // runAPMISRR_cost(0.6, 8);

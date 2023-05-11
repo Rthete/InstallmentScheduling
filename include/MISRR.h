@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-13 22:37:48
- * @LastEditTime: 2023-03-15 17:34:55
+ * @LastEditTime: 2023-05-11 21:12:57
  */
 
 #ifndef INSTALLMENTSCHEDULING_MISRR_H
@@ -25,6 +25,7 @@ public:
     void printResult();
     double getOptimalTime() const;
     double getUsingRate() const;
+    int getOptimalM() const;
     void theLastInstallmentGap();
 
 private:

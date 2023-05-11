@@ -30,7 +30,7 @@ MISRR::MISRR(int valueN, double valueTheta, int installment) :
 
         // time
         usingTime(vector<double>(MAX_N, 0)),
-        outputName("MIS-CRR"){}
+        outputName("MISRR_print_result"){}
 
 MISRR::MISRR(int valueN, double valueTheta) :
         n(valueN),
@@ -222,15 +222,16 @@ void MISRR::calBeta() {
         }
         beta[i] = mu[i] * beta[0] + (eta[i] / this->V);
         // 计算每趟内部调度所用时间
-        cout << "beta[i]: " << beta[i] << "\tserver[i].getS(): " << servers[i].getS() << "\ttime: " 
-            << beta[i] * servers[i].getW() * this->V + servers[i].getS() << endl;
+        // cout << "beta[i]: " << beta[i] << endl;
+        // cout << "\tserver[i].getS(): " << servers[i].getS() << "\ttime: " 
+        //     << beta[i] * servers[i].getW() * this->V + servers[i].getS() << endl;
 
         sum += beta[i];
     }
     // beta[i]之和为1
-    cout << "this->V: " << this->V << endl;
-    cout << "sum: " << sum << endl;
-    cout << "sum * this->V: " << sum * this->V << endl;
+    // cout << "this->V: " << this->V << endl;
+    // cout << "sum: " << sum << endl;
+    // cout << "sum * this->V: " << sum * this->V << endl;
 }
 
 /**
@@ -252,6 +253,7 @@ void MISRR::calAlpha() {
             continue;
         }
         alpha[i] = Delta[i] * alpha[0] + Phi[i] * beta[0] + (Epsilon[i] / this->V);
+        // cout << "alpha[i]: " << alpha[i] << endl;
     }
 }
 
@@ -274,6 +276,7 @@ void MISRR::calGamma() {
             continue;
         }
         gamma[i] = Lambda[i] * gamma[0] - Psi[i] * beta[0] + P[i] / this->V;
+        // cout << "gamma[i]: " << gamma[i] << endl;
     }
 }
 
@@ -321,6 +324,7 @@ void MISRR::calOptimalM() {
 
     // cal m
     this->m = (int)(sqrt(1.0 / 4.0 + A / B) + 1.0 / 2.0);
+    // cout << "optimal m = " << this->m << endl;
 }
 
 /**
@@ -348,6 +352,12 @@ void MISRR::getOptimalModel() {
         usingTime[id] += (alpha[i] * V * servers[i].getW() + servers[i].getS() +
                 (m - 2) * (beta[i] * V * servers[i].getW() + servers[i].getS()) +
                 gamma[i] * V * servers[i].getW() + servers[i].getS() + gamma[i] * V * servers[i].getG() * theta);
+    }
+
+    // cal using rate
+    usingRate = 0.0;
+    for (int i = 0; i < this->serversNumberWithoutError; ++i) {
+        usingRate += ((double)usingTime[i] / ((double)(this->optimalTime) * this->serversNumberWithoutError));
     }
 }
 
@@ -579,6 +589,10 @@ double MISRR::getOptimalTime() const {
 
 double MISRR::getUsingRate() const {
     return this->usingRate;
+}
+
+int MISRR::getOptimalM() const {
+    return this->m;
 }
 
 /**
