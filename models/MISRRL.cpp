@@ -1,6 +1,6 @@
-#include "MISRR.h"
+#include "MISRRL.h"
 
-MISRR::MISRR(int valueN, double valueTheta, int installment) :
+MISRRL::MISRRL(int valueN, double valueTheta, int installment) :
         n(valueN),
         m(installment),
         theta(valueTheta),
@@ -30,9 +30,9 @@ MISRR::MISRR(int valueN, double valueTheta, int installment) :
 
         // time
         usingTime(vector<double>(MAX_N, 0)),
-        outputName("MISRR_print_result"){}
+        outputName("MISRRL_print_result"){}
 
-MISRR::MISRR(int valueN, double valueTheta) :
+MISRRL::MISRRL(int valueN, double valueTheta) :
         n(valueN),
         theta(valueTheta),
         usingRate(0),
@@ -67,7 +67,13 @@ MISRR::MISRR(int valueN, double valueTheta) :
  * @brief Assign model.
  * 
  */
-void MISRR::initValue() {
+void MISRRL::initValue() {
+
+    // cal load for each installment
+    // V: 第一趟及内部调度的每趟任务量
+    this->V = (this->m - this->l) * this->W / (this->m * (this->m - 1));
+    // Vb: 最后一趟的任务量
+    this->Vb = this->l / this->m * this->W;
 
     // cal mu (beta)
     for (int i = 0; i < this->n; ++i) {
@@ -124,6 +130,7 @@ void MISRR::initValue() {
         }
     }
 
+    // 最后一趟各项参数
     vector<double> lambda(this->n, 0);
     vector<double> psi(this->n, 0);
     vector<double> rho(this->n, 0);
@@ -141,8 +148,10 @@ void MISRR::initValue() {
 
     // cal Psi
     for (int i = 1; i < this->n; ++i) {
-        psi[i] = (servers[i - 1].getG() * this->theta) / servers[i].getW();
+        psi[i] = (servers[i - 1].getG() * this->theta) / servers[i].getW() * (this->V / this->Vb);
+        // cout << "psi[i] = " << psi[i] << endl;
     }
+    // cout << "this->V / this->Vb = " << this->V / this->Vb << endl;
     for (int i = 1; i < this->n; ++i) {
         Psi[i] = 0;
         for (int j = 1; j <= i; j++) {
@@ -151,6 +160,7 @@ void MISRR::initValue() {
                 value *= lambda[k];
             }
             Psi[i] += ((psi[j] * mu[j - 1]) * value);
+            // cout << "Psi[i] = " << Psi[i] << endl;
         }
     }
 
@@ -169,13 +179,58 @@ void MISRR::initValue() {
         }
     }
 
+    // lambda < 1时，修改最后一趟方程
+    if(this->l < 1) {
+        // cal Lambda *
+        for (int i = 1; i < this->n; ++i) {
+            lambda[i] = (servers[i - 1].getW() + servers[i - 1].getG() * this->theta) / servers[i].getW();
+        }
+        for (int i = 1; i < this->n; ++i) {
+            Lambda[i] = 1.0;
+            for (int j = 1; j <= i; j++) {
+                Lambda[i] *= lambda[j];
+            }
+        }
+
+        // cal Psi *
+        for (int i = 1; i < this->n; ++i) {
+            psi[i] = (servers[i - 1].getG() * (this->theta + 1)) / servers[i].getW() * (this->V / this->Vb);
+            // cout << "psi[i] = " << psi[i] << endl;
+        }
+        // cout << "this->V / this->Vb = " << this->V / this->Vb << endl;
+        for (int i = 1; i < this->n; ++i) {
+            Psi[i] = 0;
+            for (int j = 1; j <= i; j++) {
+                double value = 1.0;
+                for (int k = j + 1; k <= i; k++) {
+                    value *= lambda[k];
+                }
+                Psi[i] += ((psi[j] * mu[j - 1]) * value);
+                // cout << "Psi[i] = " << Psi[i] << endl;
+            }
+        }
+
+        // cal Rho *
+        for (int i = 1; i < this->n; ++i) {
+            rho[i] = (servers[i - 1].getS() - servers[i - 1].getO() - servers[i].getS()) / servers[i].getW();
+        }
+        for (int i = 1; i < this->n; ++i) {
+            P[i] = 0;
+            for (int j = 1; j <= i; j++) {
+                double value = 1.0;
+                for (int k = j + 1; k <= i; k++) {
+                    value *= lambda[k];
+                }
+                P[i] += ((rho[j] - psi[j] * eta[j - 1]) * value);
+            }
+        }
+    }
+
     // cal optimal installment size m
     if (m == 0) {
         calOptimalM();
     }
 
-    // cal load for each installment
-    this->V = this->W / this->m;
 
     // cal beta & alpha & gamma
     calBeta();
@@ -188,9 +243,10 @@ void MISRR::initValue() {
         count_alpha += alpha[i];
         count_beta += beta[i];
         count_gamma += gamma[i];
-        if (alpha[i] < 0 || beta[i] < 0 || gamma[i] < 0) {
-            cout << this->W << " error " << "alpha - " << alpha[i] << " beta - " << beta[i]
-                << " gamma - " << gamma[i] << endl;
+        // 此处改为分量 * 总任务量 > 0
+        if (alpha[i] * this->V < 0 || beta[i] * this->V < 0 || gamma[i] * this->Vb < 0) {
+            cout << this->W << " error " << "alpha * V - " << alpha[i] * this->V << " beta * V - " << beta[i] * this->V
+                << " gamma * Vb - " << gamma[i] * this->Vb << endl;
         }
     }
     if ((int)((count_alpha + 0.000005) * 100000) != 100000)
@@ -205,7 +261,7 @@ void MISRR::initValue() {
  * @brief Cal load fraction beta for every internal installment.
  * 
  */
-void MISRR::calBeta() {
+void MISRRL::calBeta() {
 
     //cal beta
     double sum_2_n_eta = 0, sum_2_n_mu = 0;
@@ -238,7 +294,7 @@ void MISRR::calBeta() {
  * @brief Cal load fraction alpha for the first installment.
  * 
  */
-void MISRR::calAlpha() {
+void MISRRL::calAlpha() {
 
     // cal alpha
     double sum_2_n_phi = 0, sum_2_n_epsilon = 0, sum_2_n_delta = 0;
@@ -261,8 +317,7 @@ void MISRR::calAlpha() {
  * @brief Cal load fraction gama for the last installment.
  * 
  */
-void MISRR::calGamma() {
-
+void MISRRL::calGamma() {
     // cal gamma
     double sum_2_n_psi = 0, sum_2_n_p = 0, sum_2_n_lambda = 0;
     for (int i = 1; i < this->n; ++i) {
@@ -272,10 +327,10 @@ void MISRR::calGamma() {
     }
     for (int i = 0; i < this->n; ++i) {
         if (i == 0) {
-            gamma[i] = (1.0 + beta[0] * sum_2_n_psi - (sum_2_n_p / this->V)) / (1.0 + sum_2_n_lambda);
+            gamma[i] = (1.0 + beta[0] * sum_2_n_psi - (sum_2_n_p / this->Vb)) / (1.0 + sum_2_n_lambda);
             continue;
         }
-        gamma[i] = Lambda[i] * gamma[0] - Psi[i] * beta[0] + P[i] / this->V;
+        gamma[i] = Lambda[i] * gamma[0] - Psi[i] * beta[0] + P[i] / this->Vb;
         // cout << "gamma[i]: " << gamma[i] << endl;
     }
 }
@@ -284,7 +339,7 @@ void MISRR::calGamma() {
  * @brief Cal optimal installment size m using formula (4.35).
  * 
  */
-void MISRR::calOptimalM() {
+void MISRRL::calOptimalM() {
     double A = 0, B = 0;
     double sum_2_n_mu = 0, sum_2_n_eta = 0;
     double sum_2_n_delta = 0, sum_2_n_phi = 0, sum_2_n_epsilon = 0;
@@ -324,25 +379,25 @@ void MISRR::calOptimalM() {
 
     // cal m
     this->m = (int)(sqrt(1.0 / 4.0 + A / B) + 1.0 / 2.0);
-    cout << "optimal m = " << this->m << endl;
+    // cout << "optimal m = " << this->m << endl;
 }
 
 /**
  * @brief Cal optimal makespan & every server's using time.
  * 
  */
-void MISRR::getOptimalModel() {
+void MISRRL::getOptimalModel() {
     
     // cal optimal time(4.15)
     this->optimalTime = 0;
     this->optimalTime += (servers[0].getS() + this->V * alpha[0] * servers[0].getW());
     this->optimalTime += (this->m - 2) * (servers[0].getS() + this->V * beta[0] * servers[0].getW());
-    this->optimalTime += (servers[0].getS() + this->V * gamma[0] * servers[0].getW());
+    this->optimalTime += (servers[0].getS() + this->Vb * gamma[0] * servers[0].getW());
 
-    this->optimalTime += servers[0].getG() * gamma[0] * this->V * this->theta;
+    this->optimalTime += servers[0].getG() * gamma[0] * this->Vb * this->theta;
     for (int i = 1; i < this->n; i++) {
         this->optimalTime += servers[i].getO();
-        this->optimalTime += gamma[i] * this->V * servers[i].getG() * this->theta;
+        this->optimalTime += gamma[i] * this->Vb * servers[i].getG() * this->theta;
     }
 
     
@@ -351,7 +406,7 @@ void MISRR::getOptimalModel() {
         int id = servers[i].getId();
         usingTime[id] += (alpha[i] * V * servers[i].getW() + servers[i].getS() +
                 (m - 2) * (beta[i] * V * servers[i].getW() + servers[i].getS()) +
-                gamma[i] * V * servers[i].getW() + servers[i].getS() + gamma[i] * V * servers[i].getG() * theta);
+                gamma[i] * Vb * servers[i].getW() + servers[i].getS() + gamma[i] * Vb * servers[i].getG() * theta);
     }
 
     // cal using rate
@@ -359,13 +414,19 @@ void MISRR::getOptimalModel() {
     for (int i = 0; i < this->serversNumberWithoutError; ++i) {
         usingRate += ((double)usingTime[i] / ((double)(this->optimalTime) * this->serversNumberWithoutError));
     }
+
+    // for (int i = 0; i < this->n; i++) {
+    //     cout << "alpha[" << i << "] = " << alpha[i];
+    //     cout << ", beta[" << i << "] = " << beta[i];
+    //     cout << ", gamma[" << i << "] = " << gamma[i] << endl;
+    // }
 }
 
 /**
  * @brief Read o & s & g & w & WTotal from "/data" and set every server.
  * 
  */
-void MISRR::getDataFromFile() {
+void MISRRL::getDataFromFile() {
     FILE *fpo, *fps, *fpg, *fpw, *totalW;
     double valueO[this->n], valueS[this->n], valueG[this->n], valueW[this->n];
 
@@ -408,7 +469,7 @@ void MISRR::getDataFromFile() {
  * @brief Output scheduling's using time & using rate to /output.
  * 
  */
-void MISRR::printResult() {
+void MISRRL::printResult() {
     FILE * fpResult;
     fpResult = fopen(("../output/" + outputName + ".txt").c_str(), "a+");
 
@@ -444,7 +505,7 @@ void MISRR::printResult() {
  * @param errorPlace 
  * @param errorInstallment 
  */
-void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
+void MISRRL::error(vector<int> &errorPlace, int errorInstallment) {
     outputName = outputName + '_' + to_string((int)errorPlace.size()) +
             "_installment_" + to_string(errorInstallment) + "_ server";
     for (auto i : errorPlace) {
@@ -578,20 +639,24 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
     this->optimalTime += timeGap;
 }
 
-void MISRR::setW(double value) {
+void MISRRL::setW(double value) {
     this->W = value;
     this->WWithoutError = value;
 }
 
-double MISRR::getOptimalTime() const {
+void MISRRL::setLambda(double value) {
+    this->l = value;
+}
+
+double MISRRL::getOptimalTime() const {
     return  this->optimalTime;
 }
 
-double MISRR::getUsingRate() const {
+double MISRRL::getUsingRate() const {
     return this->usingRate;
 }
 
-int MISRR::getOptimalM() const {
+int MISRRL::getOptimalM() const {
     return this->m;
 }
 
@@ -600,9 +665,9 @@ int MISRR::getOptimalM() const {
  * Output result to "/output/last_installment_gap.txt".
  * 
  */
-void MISRR::theLastInstallmentGap() {
-    vector<double> freeTime(this->n, 0);
-    vector<double> startTime(this->n, 0);
+void MISRRL::theLastInstallmentGap(string title) {
+    vector<double> freeTime(this->n, 0);    // 倒数第二趟计算结束时间
+    vector<double> startTime(this->n, 0);   // 最后一趟计算开始时间
     vector<double> timeGap(this->n, 0);
 
     double preTime = 0;
@@ -617,12 +682,27 @@ void MISRR::theLastInstallmentGap() {
         preTime += servers[i].getO();
         startTime[i] = preTime;
         preTime += (servers[i].getO() + theta * servers[i].getG() * V * beta[i] +
-                servers[i].getG() * V * gamma[i]);
+                servers[i].getG() * Vb * gamma[i]);
+    }
+
+    if(this->l < 1) {
+        double preTime = 0;
+        for (int i = 0; i < this->n; ++i) {
+            preTime += servers[i].getO();
+            freeTime[i] = preTime;
+            preTime += (servers[i].getO() + servers[i].getG() * Vb * gamma[i] + theta * servers[i].getG() * V * beta[i]);
+        }
+
+        preTime = 0;
+        for (int i = 0; i < this->n; ++i) {
+            preTime += servers[i].getO();
+            startTime[i] = preTime;
+            preTime += (servers[i].getO() + (1 + theta) * servers[i].getG() * V * beta[i]);
+        }
     }
 
     FILE *fresult;
-    string title = to_string(theta);
-    string fname = "../output/MISRR/last_installment_gap_m=" + title + ".txt";
+    string fname = "../output/MISRRL/last_installment_gap_lambda" + title + ".txt";
     fresult = fopen(fname.c_str(), "w");
 
     for (int i = 0; i < this->n; ++i) {

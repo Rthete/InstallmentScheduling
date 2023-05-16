@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 15:04:04
- * @LastEditTime: 2023-03-20 17:21:49
+ * @LastEditTime: 2023-05-15 15:05:16
 -->
 # README
 
@@ -16,6 +16,10 @@ RRMIS为论文中PMIS-RR（带结果回传的周期性多趟调度）。
 PMIS为PMIS（周期性多趟调度）。
 
 SIS为SIS（单趟调度）。
+
+myAPMISRR：APMISRR模型增加启动开销，去除P0的计算功能，改为非阻塞模式。
+
+MISRRL：在MISRR模型中加入lambda调节最后一趟总任务量。
 
 ## 2 Usage
 
