@@ -3,7 +3,7 @@
  * @Description: APMISRR add cost, non-block, remove P0
  * @Author: rthete
  * @Date: 2023-05-12 15:55:34
- * @LastEditTime: 2023-05-12 17:39:41
+ * @LastEditTime: 2023-05-18 15:39:13
  */
 
 #include "myAPMISRR.h"
@@ -22,7 +22,7 @@ myAPMISRR::myAPMISRR(int valueN, double valueTheta) :
         beta(vector<double>(MAX_N, 0)),
 
         // time
-        usingTimes(vector<double>(MAX_N, 0)) {}
+        usingTime(vector<double>(MAX_N, 0)) {}
 
 // init value
 void myAPMISRR::setW(double value) {
@@ -149,6 +149,7 @@ double myAPMISRR::getOptimalTime() {
     for (int i = 0; i < this->n; ++i) {
         optimalTime += servers[i].getO() + beta[i] * servers[i].getG() * theta * this->Vb;
     }
+    optimalTime -= servers[0].getO();
     cout << "optimalTime = " << optimalTime << endl;
     return optimalTime;
 }
@@ -198,6 +199,22 @@ int myAPMISRR::isSchedulable() {
     } else {
         return 0;
     }
+}
+
+double myAPMISRR::getUsingRate() {
+    for (int i = 0; i < this->n; i++) {
+        int id = servers[i].getId();
+        usingTime[id] += ((m - 1) * (alpha[i] * V * servers[i].getW() + servers[i].getS()) +
+                beta[i] * Vb * servers[i].getW() + servers[i].getS() + beta[i] * Vb * servers[i].getG() * theta);
+    }
+
+    // cal using rate
+    getOptimalTime();
+    usingRate = 0.0;
+    for (int i = 0; i < this->n; ++i) {
+        usingRate += ((double)usingTime[i] / ((double)(this->optimalTime) * this->n));
+    }
+    return usingRate;
 }
 
 /**

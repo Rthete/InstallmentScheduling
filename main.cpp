@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-05-16 17:22:00
+ * @LastEditTime: 2023-05-18 15:38:05
  */
 
 #include "include/method.h"
@@ -16,14 +16,16 @@ int main() {
     // run_APMISRR_cost(0.6, 8);
     
     // test_MISRR_theta();
+    // test_MISRR_all();
     // test_APMISRR_totalTime();
     // test_APMISRR_alpha();
     // test_APMISRR_beta();
     // test_APMISRR_totalTime_cost();
     // test_APMISRR_installment();
-    // test_myAPMISRR_installment();
+    test_myAPMISRR_installment();
     // test_MISRRL_lambda();
-    test_MISRRL_installment();
+    // test_MISRRL_installment();
+    // test_MISRRL_all();
 
     // compare_MISRR_and_MISRRL();
     

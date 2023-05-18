@@ -245,16 +245,25 @@ void MISRRL::initValue() {
         count_gamma += gamma[i];
         // 此处改为分量 * 总任务量 > 0
         if (alpha[i] * this->V < 0 || beta[i] * this->V < 0 || gamma[i] * this->Vb < 0) {
+            isSchedulable = 0;
             cout << this->W << " error " << "alpha * V - " << alpha[i] * this->V << " beta * V - " << beta[i] * this->V
                 << " gamma * Vb - " << gamma[i] * this->Vb << endl;
         }
     }
-    if ((int)((count_alpha + 0.000005) * 100000) != 100000)
+    if ((int)((count_alpha + 0.000005) * 100000) != 100000) {
+        isSchedulable = 0;
         cout << this->W << " count: alpha - " << count_alpha << endl;
-    if ((int)((count_beta + 0.000005) * 100000)  != 100000)
+    }
+        
+    if ((int)((count_beta + 0.000005) * 100000)  != 100000) {
+        isSchedulable = 0;
         cout << this->W << " count: beta - " << count_beta << endl;
-    if ((int)((count_gamma + 0.000005) * 100000)  != 100000)
+    }
+
+    if ((int)((count_gamma + 0.000005) * 100000)  != 100000) {
+        isSchedulable = 0;
         cout << this->W << " count: gamma - " << count_gamma << endl;
+    }
 }
 
 /**
@@ -707,6 +716,9 @@ void MISRRL::theLastInstallmentGap(string title) {
 
     for (int i = 0; i < this->n; ++i) {
         timeGap[i] = startTime[i] - freeTime[i];
+        if (timeGap[i] < 0) {
+            isSchedulable = 0;
+        }
         fprintf(fresult, "gap[%d]: \t%.2f\n", i, timeGap[i]);
     }
 }

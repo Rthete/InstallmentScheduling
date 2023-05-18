@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-05-16 17:21:55
+ * @LastEditTime: 2023-05-18 15:36:58
  */
 
 #include "method.h"
@@ -56,6 +56,28 @@ void run_PMIS() {
     // return make_tuple(misrr.getOptimalM(), misrr.getUsingRate());
     return make_tuple(misrr.getOptimalTime(), misrr.getUsingRate());
     // printf("%d\t\t%.2lf\n", workload, misrr.getOptimalTime());
+}
+
+double run_MISRR(int m) {
+    auto workload = 8000;   // total workload
+    auto serverN = 15;      // number of servers
+    auto theta = 0.3;       // Ratio of the output load size to input load size
+    // auto m = 8;            // installment size
+
+    cout << "**********************run MISRR**********************" << endl;
+    cout << serverN << " servers, m = " << m << ", theta = " << theta << endl;
+    cout << "total load = " << 8000 << endl;
+
+    MISRR misrr(serverN, theta, m);
+    misrr.getDataFromFile();
+    misrr.setW((double)workload);
+    misrr.initValue();
+    misrr.getOptimalModel();
+    cout << "misrr.getUsingRate(): " << misrr.getUsingRate() << endl;
+    cout << "misrr.getOptimalTime(): " << misrr.getOptimalTime() << endl;
+    misrr.theLastInstallmentGap();
+    return misrr.getUsingRate();
+    return misrr.getOptimalTime();
 }
 
 
@@ -127,7 +149,11 @@ double run_myAPMISRR(double lambda, int m) {
     myapmisrr.setLambda((double)lambda);
     myapmisrr.initValue();
     // myapmisrr.getOptimalTime();
-    myapmisrr.isSchedulable();
+    int isSchedulable = -1;
+    isSchedulable = myapmisrr.isSchedulable();
+    if (isSchedulable != 1)
+        return 0;
+    return myapmisrr.getUsingRate();
     return myapmisrr.getOptimalTime();
 }
 
@@ -151,13 +177,18 @@ double run_MISRRL(double lambda, int m) {
     // misrrl.setM((int)m);
     // misrrl.isSchedulable();
     misrrl.theLastInstallmentGap(to_string(lambda));
+    if(misrrl.isSchedulable == 0) {
+        cout << "not schedulable" << endl;
+        return 0;
+    }
     cout << "misrrl.getUsingRate(): " << misrrl.getUsingRate() << endl;
     cout << "misrrl.getOptimalTime(): " << misrrl.getOptimalTime() << endl;
+    return misrrl.getUsingRate();
     return misrrl.getOptimalTime();
 }
 
 /**
- * 测试theta对可行性的影响
+ * MISRR: 测试theta对可行性的影响
 */
 void test_MISRR_theta() {
     // FILE * fpResult;
@@ -170,6 +201,18 @@ void test_MISRR_theta() {
         // fprintf(fpResult, "%d,%lf,%lf\n", i, get<0>(run_MISRR(i, 0)), get<1>(run_MISRR(i, 0)));
     }
     // fclose(fpResult);
+}
+
+/**
+ * MISRR:测试趟数m的影响
+*/
+void test_MISRR_all() {
+    FILE * fpResult;
+    fpResult = fopen("../output/MISRR/test_MISRR_using_rate.csv", "w");
+    for(int m = 3; m <= 40; m++) {
+        fprintf(fpResult, "%lf\n", run_MISRR(m));
+    }
+    fclose(fpResult);
 }
 
 /**
@@ -269,9 +312,12 @@ void test_APMISRR_installment() {
 */
 void test_myAPMISRR_installment() {
     FILE * fpResult;
-    fpResult = fopen("../output/myAPMISRR/test.csv", "w");
-    for(int m = 3; m <= 20; m++) {
-        fprintf(fpResult, "%lf\n", run_myAPMISRR(0.9, m));
+    fpResult = fopen("../output/myAPMISRR/test_myAPMISRR_using_rate.csv", "w");
+    for(int m = 3; m <= 40; m++) {
+        for(double lambda = 0.1; lambda < 1; lambda+=0.1) {
+            fprintf(fpResult, "%lf,", run_myAPMISRR(lambda, m));
+        }
+        fprintf(fpResult, "\n");
     }
     fclose(fpResult);
 }
@@ -296,6 +342,19 @@ void test_MISRRL_installment() {
         run_MISRRL(0.2, m);
     }
 }
+
+void test_MISRRL_all() {
+    FILE * fpResult;
+    fpResult = fopen("../output/MISRRL/test_MISRRL_using_rate.csv", "w");
+    for(int m = 3; m <= 40; m++) {
+        for(double lambda = 0.1; lambda < 1; lambda+=0.1) {
+            fprintf(fpResult, "%lf,", run_MISRRL(lambda, m));
+        }
+        fprintf(fpResult, "\n");
+    }
+    fclose(fpResult);
+}
+
 
 void compare_MISRR_and_MISRRL() {
     for(int m = 3; m < 20; m++) {

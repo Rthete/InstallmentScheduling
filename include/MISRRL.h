@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-13 22:37:48
- * @LastEditTime: 2023-05-15 17:28:42
+ * @LastEditTime: 2023-05-18 13:48:54
  */
 
 #ifndef INSTALLMENTSCHEDULING_MISRRL_H
@@ -29,6 +29,7 @@ public:
     void theLastInstallmentGap(string title);
 
     void setLambda(double value);
+    int isSchedulable = 1;
 
 private:
     int n;                                      // 处理机个数

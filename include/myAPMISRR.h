@@ -3,7 +3,7 @@
  * @Description:  APMISRR add cost, non-block, remove P0
  * @Author: rthete
  * @Date: 2023-05-12 15:51:41
- * @LastEditTime: 2023-05-12 16:45:46
+ * @LastEditTime: 2023-05-18 15:08:23
  */
 #ifndef INSTALLMENTSCHEDULING_myAPMISRR_H
 #define INSTALLMENTSCHEDULING_myAPMISRR_H
@@ -29,7 +29,7 @@ public:
 
     // result
     double getOptimalTime();
-    // double getUsingRate();
+    double getUsingRate();
 
     // check schedulable
     int isSchedulable();
@@ -60,7 +60,7 @@ private:
     vector<double> beta;                            // 最后一趟调度中各处理器的负载分量
 
     // time
-    vector<double> usingTimes;                      // 每个处理器的处理时间总和
+    vector<double> usingTime;                      // 每个处理器的处理时间总和
 
     // print
     string outputName;
