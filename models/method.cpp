@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-05-18 15:36:58
+ * @LastEditTime: 2023-05-24 13:25:45
  */
 
 #include "method.h"
@@ -76,7 +76,7 @@ double run_MISRR(int m) {
     cout << "misrr.getUsingRate(): " << misrr.getUsingRate() << endl;
     cout << "misrr.getOptimalTime(): " << misrr.getOptimalTime() << endl;
     misrr.theLastInstallmentGap();
-    return misrr.getUsingRate();
+    // return misrr.getUsingRate();
     return misrr.getOptimalTime();
 }
 
@@ -153,7 +153,7 @@ double run_myAPMISRR(double lambda, int m) {
     isSchedulable = myapmisrr.isSchedulable();
     if (isSchedulable != 1)
         return 0;
-    return myapmisrr.getUsingRate();
+    // return myapmisrr.getUsingRate();
     return myapmisrr.getOptimalTime();
 }
 
@@ -183,7 +183,7 @@ double run_MISRRL(double lambda, int m) {
     }
     cout << "misrrl.getUsingRate(): " << misrrl.getUsingRate() << endl;
     cout << "misrrl.getOptimalTime(): " << misrrl.getOptimalTime() << endl;
-    return misrrl.getUsingRate();
+    // return misrrl.getUsingRate();
     return misrrl.getOptimalTime();
 }
 
@@ -208,7 +208,7 @@ void test_MISRR_theta() {
 */
 void test_MISRR_all() {
     FILE * fpResult;
-    fpResult = fopen("../output/MISRR/test_MISRR_using_rate.csv", "w");
+    fpResult = fopen("../output/MISRR/test_MISRR_time.csv", "w");
     for(int m = 3; m <= 40; m++) {
         fprintf(fpResult, "%lf\n", run_MISRR(m));
     }
@@ -312,7 +312,7 @@ void test_APMISRR_installment() {
 */
 void test_myAPMISRR_installment() {
     FILE * fpResult;
-    fpResult = fopen("../output/myAPMISRR/test_myAPMISRR_using_rate.csv", "w");
+    fpResult = fopen("../output/myAPMISRR/test_myAPMISRR_time.csv", "w");
     for(int m = 3; m <= 40; m++) {
         for(double lambda = 0.1; lambda < 1; lambda+=0.1) {
             fprintf(fpResult, "%lf,", run_myAPMISRR(lambda, m));
@@ -335,7 +335,7 @@ void test_MISRRL_lambda() {
 
 /**
  * MISRRL: 测试总时间与m的关系
- * 结论: 仍有最优趟数m
+ * 结论: 有最优趟数m
 */
 void test_MISRRL_installment() {
     for(int m = 3; m < 40; m++) {
@@ -345,7 +345,7 @@ void test_MISRRL_installment() {
 
 void test_MISRRL_all() {
     FILE * fpResult;
-    fpResult = fopen("../output/MISRRL/test_MISRRL_using_rate.csv", "w");
+    fpResult = fopen("../output/MISRRL/test_MISRRL_time.csv", "w");
     for(int m = 3; m <= 40; m++) {
         for(double lambda = 0.1; lambda < 1; lambda+=0.1) {
             fprintf(fpResult, "%lf,", run_MISRRL(lambda, m));
