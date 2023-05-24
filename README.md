@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 15:04:04
- * @LastEditTime: 2023-05-15 15:05:16
+ * @LastEditTime: 2023-05-24 15:43:01
 -->
 # README
 
@@ -20,6 +20,8 @@ SIS为SIS（单趟调度）。
 myAPMISRR：APMISRR模型增加启动开销，去除P0的计算功能，改为非阻塞模式。
 
 MISRRL：在MISRR模型中加入lambda调节最后一趟总任务量。
+
+MISRRLL：在MISRR模型中分别加入不同lambda调节第一趟和最后一趟任务量。
 
 ## 2 Usage
 

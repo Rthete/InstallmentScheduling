@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:54:33
- * @LastEditTime: 2023-05-18 13:42:25
+ * @LastEditTime: 2023-05-24 16:32:28
  */
 #ifndef FIRSTMODEL_METHOD_H
 #define FIRSTMODEL_METHOD_H
@@ -13,6 +13,7 @@
 #include "APMISRR.h"
 #include "myAPMISRR.h"
 #include "MISRRL.h"
+#include "MISRRLL.h"
 #include <tuple>
 
 void run_PMIS();
@@ -22,6 +23,7 @@ double run_APMISRR(double lambda);
 double run_APMISRR_cost(double lambda, int m);
 double run_myAPMISRR(double lambda, int m);
 double run_MISRRL(double lambda, int m);
+double run_MISRRLL(double lambda1, double lambda2, int m);
 
 void test_MISRR_theta();
 void test_MISRR_all();
@@ -34,6 +36,10 @@ void test_myAPMISRR_installment();
 void test_MISRRL_lambda();
 void test_MISRRL_installment();
 void test_MISRRL_all();
+void test_MISRRLL_lambda2();
+void test_MISRRLL_lambda1();
+void test_MISRRLL_all();
+void test_MISRRLL_2_lambda();
 
 void compare_MISRR_and_MISRRL();
 

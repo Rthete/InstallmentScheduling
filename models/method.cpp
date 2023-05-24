@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-05-24 13:25:45
+ * @LastEditTime: 2023-05-24 16:32:48
  */
 
 #include "method.h"
@@ -187,6 +187,35 @@ double run_MISRRL(double lambda, int m) {
     return misrrl.getOptimalTime();
 }
 
+double run_MISRRLL(double lambda1, double lambda2, int m) {
+    auto serverN = 15;
+    auto theta = 0.3;
+    auto workload = 8000;
+
+    cout << "**********************run MISRRLL**********************" << endl;
+    cout << serverN << " servers, m = " << m << ", theta = " << theta << ", lambda1 = " << lambda1 << ", lambda2 = " << lambda2 << endl;
+    cout << "total load = " << workload << endl;
+    cout << "last installment load = " << lambda1 / m * workload << endl;
+    cout << "first installment load = " << lambda2 / m * workload << endl;
+    cout << "each internal installment load = " << (m - lambda1 - lambda2) * workload / (m * (m - 2)) << endl;
+    
+    MISRRLL misrrll(serverN, theta, m);
+    misrrll.getDataFromFile();
+    misrrll.setW((double)workload);
+    misrrll.setLambda((double)lambda1, (double)lambda2);
+    misrrll.initValue();
+    misrrll.getOptimalModel();
+    misrrll.theLastInstallmentGap(to_string(lambda1));
+    if(misrrll.isSchedulable == 0) {
+        cout << "not schedulable" << endl;
+        return 0;
+    }
+    cout << "misrrll.getUsingRate(): " << misrrll.getUsingRate() << endl;
+    cout << "misrrll.getOptimalTime(): " << misrrll.getOptimalTime() << endl;
+    // return misrrll.getUsingRate();
+    return misrrll.getOptimalTime();
+}
+
 /**
  * MISRR: 测试theta对可行性的影响
 */
@@ -355,6 +384,41 @@ void test_MISRRL_all() {
     fclose(fpResult);
 }
 
+void test_MISRRLL_lambda2() {
+    for(double lambda = 0; lambda < 5; lambda+=0.5) {
+        run_MISRRLL(0.6, lambda, 8);
+    }
+}
+
+void test_MISRRLL_lambda1() {
+    for(double lambda = 0; lambda < 1; lambda+=0.1) {
+        run_MISRRLL(lambda, 0.6, 8);
+    }
+}
+
+void test_MISRRLL_all() {
+    FILE * fpResult;
+    fpResult = fopen("../output/MISRRLL/test_MISRRL_time_lambda2.csv", "w");
+    for(int m = 3; m <= 40; m++) {
+        for(double lambda = 0.1; lambda < 1; lambda+=0.1) {
+            fprintf(fpResult, "%lf,", run_MISRRLL(0.2, lambda, m));
+        }
+        fprintf(fpResult, "\n");
+    }
+    fclose(fpResult);
+}
+
+void test_MISRRLL_2_lambda() {
+    FILE * fpResult;
+    fpResult = fopen("../output/MISRRLL/test_MISRRL_time_2_lambda.csv", "w");
+    for(double lambda1 = 0.1; lambda1 < 1; lambda1+=0.1) {
+        for(double lambda2 = 0.1; lambda2 < 1; lambda2+=0.1) {
+            fprintf(fpResult, "%lf,", run_MISRRLL(lambda1, lambda2, 15));
+        }
+        fprintf(fpResult, "\n");
+    }
+    fclose(fpResult);
+}
 
 void compare_MISRR_and_MISRRL() {
     for(int m = 3; m < 20; m++) {
