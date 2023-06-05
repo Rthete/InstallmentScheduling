@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-13 22:37:48
- * @LastEditTime: 2023-05-11 21:12:57
+ * @LastEditTime: 2023-06-05 16:43:58
  */
 
 #ifndef INSTALLMENTSCHEDULING_MISRR_H
@@ -27,6 +27,8 @@ public:
     double getUsingRate() const;
     int getOptimalM() const;
     void theLastInstallmentGap();
+    void checkTime();
+    void calOptimalM();
 
 private:
     int n;                                      // 处理机个数
@@ -76,7 +78,7 @@ private:
     void calAlpha();
     void calBeta();
     void calGamma();
-    void calOptimalM();
+    
 };
 
 

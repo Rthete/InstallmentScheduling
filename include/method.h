@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:54:33
- * @LastEditTime: 2023-05-24 16:32:28
+ * @LastEditTime: 2023-05-31 16:59:42
  */
 #ifndef FIRSTMODEL_METHOD_H
 #define FIRSTMODEL_METHOD_H
@@ -19,6 +19,7 @@
 void run_PMIS();
 tuple<double, double> run_MISRR(double theta, int m);
 double run_MISRR(int m);
+void run_MISRR_check();
 double run_APMISRR(double lambda);
 double run_APMISRR_cost(double lambda, int m);
 double run_myAPMISRR(double lambda, int m);

@@ -321,6 +321,8 @@ void MISRR::calOptimalM() {
 
     // cal B
     B = servers[0].getS() - servers[0].getW() * KAPPA;
+    
+    cout << "A: " << A << ", B: " << B << endl;
 
     // cal m
     this->m = (int)(sqrt(1.0 / 4.0 + A / B) + 1.0 / 2.0);
@@ -335,6 +337,7 @@ void MISRR::getOptimalModel() {
     
     // cal optimal time(4.15)
     this->optimalTime = 0;
+    this->optimalTime += servers[0].getO();
     this->optimalTime += (servers[0].getS() + this->V * alpha[0] * servers[0].getW());
     this->optimalTime += (this->m - 2) * (servers[0].getS() + this->V * beta[0] * servers[0].getW());
     this->optimalTime += (servers[0].getS() + this->V * gamma[0] * servers[0].getW());
@@ -629,4 +632,37 @@ void MISRR::theLastInstallmentGap() {
         timeGap[i] = startTime[i] - freeTime[i];
         fprintf(fresult, "gap[%d]: \t%.2f\n", i, timeGap[i]);
     }
+}
+
+
+void MISRR::checkTime() {
+    // 方法1
+    double lastServerTime = 0;  // 最后一个处理机第二趟结束时间
+    double firstServerTime = 0; // 第一个处理机第二趟结束时间
+    double period = servers[n - 1].getS() + servers[n - 1].getW() * beta[n - 1] * this->V; // 内部调度周期
+
+    cout << "internal installment P = " << period << endl;
+
+    for (int i = 0; i < this->n - 1; ++i) {
+        lastServerTime += servers[i].getO() + servers[i].getG() * beta[i] * this->V;
+        lastServerTime += servers[i].getO() + servers[i].getG() * alpha[i] * theta * this->V;
+    }
+    lastServerTime += servers[n - 1].getO() + period;
+    firstServerTime += period;
+    if(lastServerTime > firstServerTime * 2) {
+        cout << firstServerTime * 2 << ", " << lastServerTime << endl;
+        cout << "method1: Pn computing inst_X while P1 has started inst_X+2" << endl;
+    }
+
+    // 方法2
+    double lateTime = 0; // Pn比P1晚开始的时间
+    lateTime = lastServerTime - period;
+    // 比较lateTime和period
+    if(lateTime > period) {
+        cout << "lateTime: " << lateTime << endl;
+        cout << "method2: Pn computing inst_X while P1 has started inst_X+2" << endl;
+    }
+
+    
+    
 }
