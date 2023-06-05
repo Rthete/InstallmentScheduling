@@ -3,19 +3,21 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-05-24 17:14:21
+ * @LastEditTime: 2023-06-05 17:46:53
  */
 
 #include "include/method.h"
 
 int main() {
     // run_myAPMISRR(0.6, 8);
-    run_MISRR(0.3, 8); 
+    // run_MISRR(0.3, 8); 
+    // run_MISRR(8);
     // run_PMIS();
     // run_APMISRR(0.6);
     // run_APMISRR_cost(0.6, 8);
-    run_MISRRL(1, 8);
-    run_MISRRLL(1, 1, 8);
+    // run_MISRRL(1, 8);
+    // run_MISRRLL(1, 1, 8);
+    run_MISRRLL(0.6, 0.6, 9);
     
     // test_MISRR_theta();
     // test_MISRR_all();

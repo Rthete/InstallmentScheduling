@@ -1,3 +1,11 @@
+/*
+ * @FilePath: \InstallmentScheduling\models\MISRRLL.cpp
+ * @Description:  
+ * @Author: rthete
+ * @Date: 2023-05-24 13:45:33
+ * @LastEditTime: 2023-06-05 17:35:15
+ */
+
 #include "MISRRLL.h"
 
 MISRRLL::MISRRLL(int valueN, double valueTheta, int installment) :
@@ -71,11 +79,11 @@ void MISRRLL::initValue() {
 
     // cal load for each installment
     // V: 内部调度的每趟任务量
-    this->V = (this->m - this->l - this->l2) * this->W / (this->m * (this->m - 2));
+    this->V = (this->m - this->l_2 - this->l_1) * this->W / (this->m * (this->m - 2));
     // Vb: 最后一趟的任务量
-    this->Vb = this->l / this->m * this->W;
+    this->Vb = this->l_2 / this->m * this->W;
     // Va: 第一趟的任务量
-    this->Va = this->l2 / this->m * this->W;
+    this->Va = this->l_1 / this->m * this->W;
 
     // mu & eta: 内部调度参数
     // cal mu (beta)
@@ -106,7 +114,8 @@ void MISRRLL::initValue() {
 
     // cal Phi
     for (int i = 1; i < this->n; ++i) {
-        phi[i] = servers[i - 1].getG() / servers[i].getW() * this->V / this->Va;
+        // phi[i] = servers[i - 1].getG() / servers[i].getW() * this->V / this->Va;
+        phi[i] = servers[i - 1].getG() / servers[i].getW();
     }
     for (int i = 1; i < this->n; ++i) {
         Phi[i] = 0;
@@ -152,7 +161,8 @@ void MISRRLL::initValue() {
 
     // cal Psi
     for (int i = 1; i < this->n; ++i) {
-        psi[i] = (servers[i - 1].getG() * this->theta) / servers[i].getW() * (this->V / this->Vb);
+        // psi[i] = (servers[i - 1].getG() * this->theta) / servers[i].getW() * (this->V / this->Vb);
+        psi[i] = (servers[i - 1].getG() * this->theta) / servers[i].getW();
         // cout << "psi[i] = " << psi[i] << endl;
     }
     // cout << "this->V / this->Vb = " << this->V / this->Vb << endl;
@@ -184,7 +194,7 @@ void MISRRLL::initValue() {
     }
 
     // lambda < 1时，修改最后一趟方程
-    if(this->l < 1) {
+    if(this->l_2 < 1) {
         // cal Lambda *
         for (int i = 1; i < this->n; ++i) {
             lambda[i] = (servers[i - 1].getW() + servers[i - 1].getG() * this->theta) / servers[i].getW();
@@ -198,7 +208,8 @@ void MISRRLL::initValue() {
 
         // cal Psi *
         for (int i = 1; i < this->n; ++i) {
-            psi[i] = (servers[i - 1].getG() * (this->theta + 1)) / servers[i].getW() * (this->V / this->Vb);
+            // psi[i] = (servers[i - 1].getG() * (this->theta + 1)) / servers[i].getW() * (this->V / this->Vb);
+            psi[i] = (servers[i - 1].getG() * (this->theta + 1)) / servers[i].getW();
             // cout << "psi[i] = " << psi[i] << endl;
         }
         // cout << "this->V / this->Vb = " << this->V / this->Vb << endl;
@@ -324,10 +335,12 @@ void MISRRLL::calAlpha() {
     }
     for (int i = 0; i < this->n; ++i) {
         if (i == 0) {
-            alpha[i] = (1.0 - beta[0] * sum_2_n_phi - (sum_2_n_epsilon / this->Va)) / (1.0 + sum_2_n_delta);
+            // alpha[i] = (1.0 - beta[0] * sum_2_n_phi - (sum_2_n_epsilon / this->Va)) / (1.0 + sum_2_n_delta);
+            alpha[i] = (1.0 - beta[0] * sum_2_n_phi * this->V / this->Va - (sum_2_n_epsilon / this->Va)) / (1.0 + sum_2_n_delta);
             continue;
         }
-        alpha[i] = Delta[i] * alpha[0] + Phi[i] * beta[0] + (Epsilon[i] / this->Va);
+        // alpha[i] = Delta[i] * alpha[0] + Phi[i] * beta[0] + (Epsilon[i] / this->Va);
+        alpha[i] = Delta[i] * alpha[0] + Phi[i] * beta[0] * this->V / this->Va + (Epsilon[i] / this->Va);
         // cout << "alpha[i]: " << alpha[i] << endl;
     }
 }
@@ -346,10 +359,11 @@ void MISRRLL::calGamma() {
     }
     for (int i = 0; i < this->n; ++i) {
         if (i == 0) {
-            gamma[i] = (1.0 + beta[0] * sum_2_n_psi - (sum_2_n_p / this->Vb)) / (1.0 + sum_2_n_lambda);
+            // gamma[i] = (1.0 + beta[0] * sum_2_n_psi - (sum_2_n_p / this->Vb)) / (1.0 + sum_2_n_lambda);
+            gamma[i] = (1.0 + beta[0] * sum_2_n_psi * (this->V / this->Vb) - (sum_2_n_p / this->Vb)) / (1.0 + sum_2_n_lambda);
             continue;
         }
-        gamma[i] = Lambda[i] * gamma[0] - Psi[i] * beta[0] + P[i] / this->Vb;
+        gamma[i] = Lambda[i] * gamma[0] - Psi[i] * beta[0] * (this->V / this->Vb) + P[i] / this->Vb;
         // cout << "gamma[i]: " << gamma[i] << endl;
     }
 }
@@ -359,7 +373,8 @@ void MISRRLL::calGamma() {
  * 
  */
 void MISRRLL::calOptimalM() {
-    double A = 0, B = 0;
+    double A = 0, B = 0, C = 0, D = 0;
+    double A_prime = 0, C_prime = 0;
     double sum_2_n_mu = 0, sum_2_n_eta = 0;
     double sum_2_n_delta = 0, sum_2_n_phi = 0, sum_2_n_epsilon = 0;
     double sum_2_n_lambda = 0, sum_2_n_psi = 0, sum_2_n_p = 0;
@@ -376,29 +391,63 @@ void MISRRLL::calOptimalM() {
         sum_2_n_p += P[i];
     }
 
-    double GAMMA = ((1.0 + sum_2_n_mu - sum_2_n_phi) * (1.0 + sum_2_n_lambda)) /
-            ((1.0 + sum_2_n_mu) * (1.0 + sum_2_n_delta) * (1.0 + sum_2_n_lambda));
-    double IOT = ((1.0 + sum_2_n_lambda) * (1.0 + sum_2_n_delta)) /
-            ((1.0 + sum_2_n_mu) * (1.0 + sum_2_n_delta) * (1.0 + sum_2_n_lambda));
-    double CHI = ((1.0 + sum_2_n_mu + sum_2_n_psi) * (1.0 + sum_2_n_delta)) /
-            ((1.0 + sum_2_n_mu) * (1.0 + sum_2_n_delta) * (1.0 + sum_2_n_lambda));
-    double KAPPA = (sum_2_n_eta * (1.0 + sum_2_n_lambda) * (1.0 + sum_2_n_delta)) /
-            ((1.0 + sum_2_n_mu) * (1.0 + sum_2_n_delta) * (1.0 + sum_2_n_lambda));
+    double GAMMA = 1 / (1.0 + sum_2_n_delta);
+    double ZETA = (sum_2_n_epsilon * (1 + sum_2_n_mu) - sum_2_n_phi * sum_2_n_eta) /
+            ((1.0 + sum_2_n_mu) * (1.0 + sum_2_n_delta));
+    double UPSILON = - sum_2_n_phi /
+            ((1.0 + sum_2_n_mu) * (1.0 + sum_2_n_delta));
+
+    double IOT = 1 / (1.0 + sum_2_n_mu);
+    double KAPPA = sum_2_n_eta / (1.0 + sum_2_n_mu);
+
+    double CHI = 1 / (1.0 + sum_2_n_lambda);
+    double OMEGA = (sum_2_n_p * (1 + sum_2_n_mu) + sum_2_n_psi * sum_2_n_eta) /
+            ((1.0 + sum_2_n_mu) * (1.0 + sum_2_n_lambda));
+    double TAU = sum_2_n_psi /
+            ((1.0 + sum_2_n_mu) * (1.0 + sum_2_n_lambda));
 
     // cal A
-    A += servers[0].getG() * theta * CHI;
+    A += (servers[0].getG() * theta + servers[0].getW()) * CHI;
     for (int i = 1; i < this->n; ++i) {
-        A += (servers[i].getG() * theta * (Lambda[i] * CHI - Psi[i] * IOT));
+        A += (servers[i].getG() * theta * Lambda[i] * CHI);
     }
-    A += ((GAMMA + CHI - 2 * IOT) * servers[0].getW());
+    A *= l_1;
+    A += (servers[0].getW() * GAMMA * l_2);
+    A -= (servers[0].getW() * IOT * (l_1 + l_2));
     A *= this->W;
 
     // cal B
     B = servers[0].getS() - servers[0].getW() * KAPPA;
 
-    // cal m
-    this->m = (int)(sqrt(1.0 / 4.0 + A / B) + 1.0 / 2.0);
-    // cout << "optimal m = " << this->m << endl;
+    // cal C
+    C += (servers[0].getG() * theta * TAU);
+    for (int i = 1; i < this->n; ++i) {
+        C += (servers[i].getG() * theta * (Lambda[i] * TAU - Psi[i] * IOT));
+    }
+    C += servers[0].getW() * (UPSILON + TAU);
+    C *= this->W;
+
+    // cal D
+    D += servers[0].getW() * (- ZETA - OMEGA + 2 * KAPPA + this->W * IOT);
+    D -= servers[0].getG() * OMEGA * theta;
+    for (int i = 0; i < this->n; ++i) {
+        D += servers[i].getO();
+    }
+    for (int i = 1; i < this->n; ++i) {
+        D += servers[i].getG() * theta * (Psi[i] * KAPPA - Lambda[i] * OMEGA + P[i]);
+    }
+
+    // cal A_prime
+    A_prime = A + (l_1 + l_2) / 2 * C;
+    C_prime = (2 - l_1 - l_2) / 2 * C;
+
+    // cal T1
+    double T1 = A_prime / m + C_prime / (m - 2) + B * m;
+    cout << "```````````` cal optimal M ````````````" << endl;
+    cout << "A_prime: " << A_prime << ", C_prime: " << C_prime << ", B: " << B 
+        << ", D: " << D << endl;
+    cout << "T1: " << T1 << endl;
+    cout << "T(m): " << T1 + D << endl;
 }
 
 /**
@@ -409,6 +458,7 @@ void MISRRLL::getOptimalModel() {
     
     // cal optimal time(4.15)
     this->optimalTime = 0;
+    this->optimalTime += servers[0].getO();
     this->optimalTime += (servers[0].getS() + this->Va * alpha[0] * servers[0].getW());
     this->optimalTime += (this->m - 2) * (servers[0].getS() + this->V * beta[0] * servers[0].getW());
     this->optimalTime += (servers[0].getS() + this->Vb * gamma[0] * servers[0].getW());
@@ -523,9 +573,16 @@ void MISRRLL::setW(double value) {
     this->WWithoutError = value;
 }
 
+
+/**
+ * @brief: Set 2 lambdas.
+ * @param {double} value1 first installment lambda
+ * @param {double} value2 last installment lambda
+ * @return {*}
+ */
 void MISRRLL::setLambda(double value1, double value2) {
-    this->l = value1;
-    this->l2 = value2;
+    this->l_1 = value1;
+    this->l_2 = value2;
 }
 
 double MISRRLL::getOptimalTime() const {
@@ -565,7 +622,7 @@ void MISRRLL::theLastInstallmentGap(string title) {
                 servers[i].getG() * Vb * gamma[i]);
     }
 
-    if(this->l < 1) {
+    if(this->l_2 < 1) {
         double preTime = 0;
         for (int i = 0; i < this->n; ++i) {
             preTime += servers[i].getO();
@@ -619,7 +676,7 @@ void MISRRLL::theLastInstallmentGap(string title) {
 //                 servers[i].getG() * Vb * gamma[i]);
 //     }
 
-//     if(this->l < 1) {
+//     if(this->l_2 < 1) {
 //         double preTime = 0;
 //         for (int i = 0; i < this->n; ++i) {
 //             preTime += servers[i].getO();

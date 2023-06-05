@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-13 22:37:48
- * @LastEditTime: 2023-05-24 14:34:56
+ * @LastEditTime: 2023-06-05 16:36:19
  */
 
 #ifndef INSTALLMENTSCHEDULING_MISRRLL_H
@@ -26,9 +26,10 @@ public:
     double getUsingRate() const;
     int getOptimalM() const;
     void theLastInstallmentGap(string title);
-    void theFirstInstallmentGap(string title);
 
+    void calOptimalM();
     void setLambda(double value1, double value2);
+    
     int isSchedulable = 1;
 
 private:
@@ -43,8 +44,8 @@ private:
     double optimalTime = 0;                     // 调度最短时间
     vector<Server> servers;                     // 所有的处理器
 
-    double l = 0;                               // 最后一趟lambda参数
-    double l2 = 0;                              // 第一趟lambda参数
+    double l_1 = 0;                              // 第一趟lambda参数
+    double l_2 = 0;                               // 最后一趟lambda参数
 
     // error
     double WWithoutError = 0;                   // 未发生错误时的总任务量
@@ -84,7 +85,6 @@ private:
     void calAlpha();
     void calBeta();
     void calGamma();
-    void calOptimalM();
 
 };
 

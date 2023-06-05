@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-05-24 16:32:48
+ * @LastEditTime: 2023-06-05 16:44:33
  */
 
 #include "method.h"
@@ -75,8 +75,10 @@ double run_MISRR(int m) {
     misrr.getOptimalModel();
     cout << "misrr.getUsingRate(): " << misrr.getUsingRate() << endl;
     cout << "misrr.getOptimalTime(): " << misrr.getOptimalTime() << endl;
-    misrr.theLastInstallmentGap();
+    misrr.calOptimalM();
+    // misrr.theLastInstallmentGap();
     // return misrr.getUsingRate();
+    // misrr.checkTime();
     return misrr.getOptimalTime();
 }
 
@@ -213,6 +215,7 @@ double run_MISRRLL(double lambda1, double lambda2, int m) {
     cout << "misrrll.getUsingRate(): " << misrrll.getUsingRate() << endl;
     cout << "misrrll.getOptimalTime(): " << misrrll.getOptimalTime() << endl;
     // return misrrll.getUsingRate();
+    misrrll.calOptimalM();
     return misrrll.getOptimalTime();
 }
 
