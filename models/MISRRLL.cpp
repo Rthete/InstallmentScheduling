@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-24 13:45:33
- * @LastEditTime: 2023-06-05 17:35:15
+ * @LastEditTime: 2023-06-12 19:33:30
  */
 
 #include "MISRRLL.h"
@@ -141,6 +141,7 @@ void MISRRLL::initValue() {
             }
             Epsilon[i] += ((phi[j] * eta[j - 1] + epsilon[j]) * temp);
         }
+        // cout << "Epsilon[i]: " << Epsilon[i] << endl;
     }
 
     // 最后一趟各项参数
@@ -191,10 +192,11 @@ void MISRRLL::initValue() {
             }
             P[i] += ((rho[j] - psi[j] * eta[j - 1]) * value);
         }
+        // cout << "P[i]: " << P[i] << endl;
     }
 
-    // lambda < 1时，修改最后一趟方程
-    if(this->l_2 < 1) {
+    // lambda <= 1时，修改最后一趟方程
+    if(this->l_2 <= 1) {
         // cal Lambda *
         for (int i = 1; i < this->n; ++i) {
             lambda[i] = (servers[i - 1].getW() + servers[i - 1].getG() * this->theta) / servers[i].getW();
@@ -284,6 +286,10 @@ void MISRRLL::initValue() {
     if ((int)((count_gamma + 0.000005) * 100000)  != 100000) {
         isSchedulable = 0;
         cout << this->W << " count: gamma - " << count_gamma << endl;
+    }
+
+    if(beta[0] * this->V < gamma[0] * this->Vb) {
+        isSchedulable = 0;
     }
 }
 
@@ -406,6 +412,9 @@ void MISRRLL::calOptimalM() {
     double TAU = sum_2_n_psi /
             ((1.0 + sum_2_n_mu) * (1.0 + sum_2_n_lambda));
 
+    // cout << "TAU: " << TAU << endl;
+    // cout << "UPSILON: " << UPSILON << endl;
+
     // cal A
     A += (servers[0].getG() * theta + servers[0].getW()) * CHI;
     for (int i = 1; i < this->n; ++i) {
@@ -421,10 +430,14 @@ void MISRRLL::calOptimalM() {
 
     // cal C
     C += (servers[0].getG() * theta * TAU);
+    // cout << C << endl;
     for (int i = 1; i < this->n; ++i) {
         C += (servers[i].getG() * theta * (Lambda[i] * TAU - Psi[i] * IOT));
+        // cout << "Lambda[i] * TAU - Psi[i] * IOT" << Lambda[i] * TAU - Psi[i] * IOT << endl;
     }
+    // cout << C << endl;
     C += servers[0].getW() * (UPSILON + TAU);
+    // cout << C << endl;
     C *= this->W;
 
     // cal D
