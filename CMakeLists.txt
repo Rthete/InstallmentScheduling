@@ -11,10 +11,12 @@ add_library(${PROJECT_NAME} SHARED
     models/myAPMISRR.cpp
     models/APMISRR.cpp
     models/MISRR.cpp
+    models/SIS.cpp
     models/PMIS.cpp
     models/RRMIS.cpp
     models/Server.cpp
     models/method.cpp
+    exp/exp_1.cpp
 )
 
 add_executable(main main.cpp)

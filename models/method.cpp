@@ -3,10 +3,30 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-06-05 16:44:33
+ * @LastEditTime: 2023-06-13 18:54:52
  */
 
 #include "method.h"
+
+double run_SIS(int workload = 8000, double theta = 0.3) {
+    auto serverN = 15;      // number of servers
+
+    cout << "**********************run SIS**********************" << endl;
+    cout << serverN << " servers, m = " << 1 << ", theta = " << theta << endl;
+    cout << "total load = " << 8000 << endl;
+
+    SIS sis(serverN, theta);
+    sis.getDataFromFile();
+    sis.setW((double)workload);
+    sis.initValue();
+    sis.getOptimalModel();
+    sis.calUsingRate();
+    cout << "sis.getUsingRate(): " << sis.getUsingRate() << endl;
+    cout << "sis.getOptimalTime(): " << sis.getOptimalTime() << endl;
+    return sis.getUsingRate();
+    return sis.getOptimalTime();
+}
+
 void run_PMIS() {
     auto workload = 1000;   // total workload
     auto serverN = 15;      // number of servers
@@ -58,10 +78,10 @@ void run_PMIS() {
     // printf("%d\t\t%.2lf\n", workload, misrr.getOptimalTime());
 }
 
-double run_MISRR(int m) {
-    auto workload = 8000;   // total workload
+double run_MISRR(int m, int workload = 8000, double theta = 0.3) {
+    // auto workload = 8000;   // total workload
     auto serverN = 15;      // number of servers
-    auto theta = 0.3;       // Ratio of the output load size to input load size
+    // auto theta = 0.3;       // Ratio of the output load size to input load size
     // auto m = 8;            // installment size
 
     cout << "**********************run MISRR**********************" << endl;
@@ -77,8 +97,8 @@ double run_MISRR(int m) {
     cout << "misrr.getOptimalTime(): " << misrr.getOptimalTime() << endl;
     misrr.calOptimalM();
     // misrr.theLastInstallmentGap();
-    // return misrr.getUsingRate();
     // misrr.checkTime();
+    return misrr.getUsingRate();
     return misrr.getOptimalTime();
 }
 
@@ -134,10 +154,9 @@ double run_APMISRR_cost(double lambda, int m) {
 /**
  * 运行带启动开销，非阻塞，去掉P0的APMISRR算法
 */
-double run_myAPMISRR(double lambda, int m) {
+double run_myAPMISRR(double lambda, int m, int workload = 8000, double theta = 0.3) {
 
     auto serverN = 15;
-    auto theta = 0.3;
 
     cout << "**********************run myAPMISRR**********************" << endl;
     cout << serverN << " servers, m = " << m << ", theta = " << theta << ", lambda = " << lambda << endl;
@@ -147,6 +166,7 @@ double run_myAPMISRR(double lambda, int m) {
     
     myAPMISRR myapmisrr(serverN, theta);
     myapmisrr.getDataFromFile();
+    myapmisrr.setW(workload);
     myapmisrr.setM((int)m);
     myapmisrr.setLambda((double)lambda);
     myapmisrr.initValue();
@@ -155,7 +175,7 @@ double run_myAPMISRR(double lambda, int m) {
     isSchedulable = myapmisrr.isSchedulable();
     if (isSchedulable != 1)
         return 0;
-    // return myapmisrr.getUsingRate();
+    return myapmisrr.getUsingRate();
     return myapmisrr.getOptimalTime();
 }
 
@@ -242,7 +262,7 @@ void test_MISRR_all() {
     FILE * fpResult;
     fpResult = fopen("../output/MISRR/test_MISRR_time.csv", "w");
     for(int m = 3; m <= 40; m++) {
-        fprintf(fpResult, "%lf\n", run_MISRR(m));
+        fprintf(fpResult, "%lf\n", run_MISRR(m, 8000, 0.3));
     }
     fclose(fpResult);
 }
@@ -347,7 +367,7 @@ void test_myAPMISRR_installment() {
     fpResult = fopen("../output/myAPMISRR/test_myAPMISRR_time.csv", "w");
     for(int m = 3; m <= 40; m++) {
         for(double lambda = 0.1; lambda < 1; lambda+=0.1) {
-            fprintf(fpResult, "%lf,", run_myAPMISRR(lambda, m));
+            fprintf(fpResult, "%lf,", run_myAPMISRR(lambda, m, 8000, 0.3));
         }
         fprintf(fpResult, "\n");
     }

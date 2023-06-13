@@ -3,12 +3,13 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:54:33
- * @LastEditTime: 2023-05-31 16:59:42
+ * @LastEditTime: 2023-06-12 20:23:27
  */
 #ifndef FIRSTMODEL_METHOD_H
 #define FIRSTMODEL_METHOD_H
 
 #include "MISRR.h"
+#include "SIS.h"
 #include "PMIS.h"
 #include "APMISRR.h"
 #include "myAPMISRR.h"
@@ -16,13 +17,14 @@
 #include "MISRRLL.h"
 #include <tuple>
 
+double run_SIS(int workload, double theta);
 void run_PMIS();
 tuple<double, double> run_MISRR(double theta, int m);
-double run_MISRR(int m);
+double run_MISRR(int m, int workload, double theta);
 void run_MISRR_check();
 double run_APMISRR(double lambda);
 double run_APMISRR_cost(double lambda, int m);
-double run_myAPMISRR(double lambda, int m);
+double run_myAPMISRR(double lambda, int m, int workload, double theta);
 double run_MISRRL(double lambda, int m);
 double run_MISRRLL(double lambda1, double lambda2, int m);
 
