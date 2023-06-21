@@ -89,15 +89,15 @@ void SIS::initValue() {
         cout << this->W << " count: alpha - " << count_alpha << endl;
 }
 
-void SIS::getDataFromFile() {
+void SIS::getDataFromFile(string data_path) {
     FILE *fpo, *fps, *fpg, *fpw, *totalW;
-    double valueO[this->n], valueS[this->n], valueG[this->n], valueW[this->n];
+    double valueO[this->n], valueS[this->n], valueG[this->n], valueW[this->n];;
 
-    fpo = fopen("../data/w-20/o.txt", "r");
-    fps = fopen("../data/w-20/s.txt", "r");
-    fpg = fopen("../data/w-20/g.txt", "r");
-    fpw = fopen("../data/w-20/w.txt", "r");
-    totalW  = fopen("../data/w-20/WTotal.txt", "r");
+    fpo = fopen((data_path + "o.txt").c_str(), "r");
+    fps = fopen((data_path + "s.txt").c_str(), "r");
+    fpg = fopen((data_path + "g.txt").c_str(), "r");
+    fpw = fopen((data_path + "w.txt").c_str(), "r");
+    totalW  = fopen((data_path + "WTotal.txt").c_str(), "r");
 
     if (fpo == nullptr || fps == nullptr || fpg == nullptr || fpw == nullptr || totalW == nullptr) {
         printf("The file can not be opened:\n");

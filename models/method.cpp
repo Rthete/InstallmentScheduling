@@ -3,27 +3,30 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-06-13 18:54:52
+ * @LastEditTime: 2023-06-21 16:26:39
  */
 
 #include "method.h"
 
-double run_SIS(int workload = 8000, double theta = 0.3) {
-    auto serverN = 15;      // number of servers
+bool output_using_rate = 0;
+
+double run_SIS(int server_num, int workload, double theta, string data_path) {
+    auto serverN = server_num;      // number of servers
 
     cout << "**********************run SIS**********************" << endl;
     cout << serverN << " servers, m = " << 1 << ", theta = " << theta << endl;
     cout << "total load = " << 8000 << endl;
 
     SIS sis(serverN, theta);
-    sis.getDataFromFile();
+    sis.getDataFromFile(data_path);
     sis.setW((double)workload);
     sis.initValue();
     sis.getOptimalModel();
     sis.calUsingRate();
     cout << "sis.getUsingRate(): " << sis.getUsingRate() << endl;
     cout << "sis.getOptimalTime(): " << sis.getOptimalTime() << endl;
-    return sis.getUsingRate();
+    if(output_using_rate == 1)
+        return sis.getUsingRate();
     return sis.getOptimalTime();
 }
 
@@ -78,9 +81,9 @@ void run_PMIS() {
     // printf("%d\t\t%.2lf\n", workload, misrr.getOptimalTime());
 }
 
-double run_MISRR(int m, int workload = 8000, double theta = 0.3) {
+double run_MISRR(int server_num, int m, int workload, double theta, string data_path) {
     // auto workload = 8000;   // total workload
-    auto serverN = 15;      // number of servers
+    auto serverN = server_num;      // number of servers
     // auto theta = 0.3;       // Ratio of the output load size to input load size
     // auto m = 8;            // installment size
 
@@ -89,7 +92,7 @@ double run_MISRR(int m, int workload = 8000, double theta = 0.3) {
     cout << "total load = " << 8000 << endl;
 
     MISRR misrr(serverN, theta, m);
-    misrr.getDataFromFile();
+    misrr.getDataFromFile(data_path);
     misrr.setW((double)workload);
     misrr.initValue();
     misrr.getOptimalModel();
@@ -98,7 +101,8 @@ double run_MISRR(int m, int workload = 8000, double theta = 0.3) {
     misrr.calOptimalM();
     // misrr.theLastInstallmentGap();
     // misrr.checkTime();
-    return misrr.getUsingRate();
+    if(output_using_rate == 1)
+        return misrr.getUsingRate();
     return misrr.getOptimalTime();
 }
 
@@ -154,18 +158,18 @@ double run_APMISRR_cost(double lambda, int m) {
 /**
  * 运行带启动开销，非阻塞，去掉P0的APMISRR算法
 */
-double run_myAPMISRR(double lambda, int m, int workload = 8000, double theta = 0.3) {
+double run_myAPMISRR(int server_num, double lambda, int m, int workload, double theta, string data_path) {
 
-    auto serverN = 15;
+    auto serverN = server_num;
 
     cout << "**********************run myAPMISRR**********************" << endl;
     cout << serverN << " servers, m = " << m << ", theta = " << theta << ", lambda = " << lambda << endl;
-    cout << "total load = " << 8000 << endl;
-    cout << "last installment load = " << lambda / m * 8000 << endl;
-    cout << "each internal installment load = " << (m - lambda) * 8000 / (m * (m - 1)) << endl;
+    cout << "total load = " << workload << endl;
+    cout << "last installment load = " << lambda / m * workload << endl;
+    cout << "each internal installment load = " << (m - lambda) * workload / (m * (m - 1)) << endl;
     
     myAPMISRR myapmisrr(serverN, theta);
-    myapmisrr.getDataFromFile();
+    myapmisrr.getDataFromFile(data_path);
     myapmisrr.setW(workload);
     myapmisrr.setM((int)m);
     myapmisrr.setLambda((double)lambda);
@@ -175,7 +179,8 @@ double run_myAPMISRR(double lambda, int m, int workload = 8000, double theta = 0
     isSchedulable = myapmisrr.isSchedulable();
     if (isSchedulable != 1)
         return 0;
-    return myapmisrr.getUsingRate();
+    if(output_using_rate == 1)
+        return myapmisrr.getUsingRate();
     return myapmisrr.getOptimalTime();
 }
 

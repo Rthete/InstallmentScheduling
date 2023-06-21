@@ -1,3 +1,10 @@
+/*
+ * @FilePath: \InstallmentScheduling\include\SIS.h
+ * @Description:  
+ * @Author: rthete
+ * @Date: 2023-06-12 19:55:07
+ * @LastEditTime: 2023-06-20 21:12:19
+ */
 //
 // Created by kqzhang on 2022/5/13.
 //
@@ -17,7 +24,7 @@ public:
      */
     void setW(double value);
     void initValue();
-    void getDataFromFile();
+    void getDataFromFile(string data_path="../data/w-20/");
     void getOptimalModel();
 
     // error

@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-06-13 19:39:02
+ * @LastEditTime: 2023-06-21 16:27:06
  */
 
 #include "include/method.h"
@@ -15,12 +15,18 @@ int main() {
     // without_error_15_W();
     // ur_without_error_15_W();
     // without_error_15_theta();
-    ur_without_error_15_theta();
+    // ur_without_error_15_theta();
+
+    // without_error_30_m();
+    // ur_without_error_30_m();
+    // without_error_30_W();
+    // ur_without_error_30_W();
+    // without_error_30_theta();
+    // ur_without_error_30_theta();
 
     // run_SIS();
     // run_myAPMISRR(0.6, 8);
     // run_MISRR(0.3, 8); 
-    // run_MISRR(8);
     // run_PMIS();
     // run_APMISRR(0.6);
     // run_APMISRR_cost(0.6, 8);

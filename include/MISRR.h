@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-13 22:37:48
- * @LastEditTime: 2023-06-05 16:43:58
+ * @LastEditTime: 2023-06-20 21:11:44
  */
 
 #ifndef INSTALLMENTSCHEDULING_MISRR_H
@@ -18,7 +18,7 @@ public:
     MISRR(int valueN, double valueTheta, int installment);
 
     void initValue();
-    void getDataFromFile();
+    void getDataFromFile(string data_path="../data/w-20/");
     void getOptimalModel();
     void setW(double value);
     void error(vector<int> &errorPlace, int errorInstallment);

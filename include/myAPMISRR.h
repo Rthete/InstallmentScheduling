@@ -3,7 +3,7 @@
  * @Description:  APMISRR add cost, non-block, remove P0
  * @Author: rthete
  * @Date: 2023-05-12 15:51:41
- * @LastEditTime: 2023-05-18 15:08:23
+ * @LastEditTime: 2023-06-20 21:12:13
  */
 #ifndef INSTALLMENTSCHEDULING_myAPMISRR_H
 #define INSTALLMENTSCHEDULING_myAPMISRR_H
@@ -25,7 +25,7 @@ public:
     double getAlpha();
     double getBeta();
     void initValue();
-    void getDataFromFile();
+    void getDataFromFile(string data_path="../data/w-20/");
 
     // result
     double getOptimalTime();
