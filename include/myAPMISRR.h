@@ -25,7 +25,7 @@ public:
     double getAlpha();
     double getBeta();
     void initValue();
-    void getDataFromFile(string data_path="../data/w-20/");
+    void getDataFromFile(string data_path="../data/15-servers-w-20/");
 
     // result
     double getOptimalTime();

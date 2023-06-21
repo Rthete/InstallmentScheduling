@@ -24,7 +24,7 @@ public:
      */
     void setW(double value);
     void initValue();
-    void getDataFromFile(string data_path="../data/w-20/");
+    void getDataFromFile(string data_path="../data/15-servers-w-20/");
     void getOptimalModel();
 
     // error

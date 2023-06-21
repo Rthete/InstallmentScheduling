@@ -18,7 +18,7 @@ public:
     MISRR(int valueN, double valueTheta, int installment);
 
     void initValue();
-    void getDataFromFile(string data_path="../data/w-20/");
+    void getDataFromFile(string data_path="../data/15-servers-w-20/");
     void getOptimalModel();
     void setW(double value);
     void error(vector<int> &errorPlace, int errorInstallment);
