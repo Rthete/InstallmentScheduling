@@ -3,25 +3,31 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-06-21 16:26:39
+ * @LastEditTime: 2023-06-22 17:42:17
  */
 
 #include "method.h"
 
 bool output_using_rate = 0;
 
-double run_SIS(int server_num, int workload, double theta, string data_path) {
+/**
+ * 运行SIS模型
+*/
+double run_SIS(int server_num, int workload, double theta, string data_path, vector<int> error_server) {
     auto serverN = server_num;      // number of servers
 
     cout << "**********************run SIS**********************" << endl;
-    cout << serverN << " servers, m = " << 1 << ", theta = " << theta << endl;
-    cout << "total load = " << 8000 << endl;
+    cout << serverN << "servers, theta = " << theta << ", total load = " << workload << endl;
 
     SIS sis(serverN, theta);
     sis.getDataFromFile(data_path);
     sis.setW((double)workload);
     sis.initValue();
     sis.getOptimalModel();
+    if(!error_server.empty()) {
+        cout << "error server size: " << to_string(error_server.size()) << endl;
+        sis.error(error_server);
+    }
     sis.calUsingRate();
     cout << "sis.getUsingRate(): " << sis.getUsingRate() << endl;
     cout << "sis.getOptimalTime(): " << sis.getOptimalTime() << endl;
@@ -54,33 +60,8 @@ void run_PMIS() {
 }
 
 /**
- * 运行MISRR算法
+ * 运行MISRR模型
 */
- tuple<double, double> run_MISRR(double theta, int m) {
-    auto workload = 8000;   // total workload
-    auto serverN = 15;      // number of servers
-    // auto theta = 10;       // Ratio of the output load size to input load size
-    // auto m = 8;            // installment size
-
-    cout << "**********************run MISRR**********************" << endl;
-    cout << serverN << " servers, m = " << m << ", theta = " << theta << endl;
-    cout << "total load = " << 8000 << endl;
-
-    MISRR misrr(serverN, theta, m);
-    misrr.getDataFromFile();
-    misrr.setW((double)workload);
-    misrr.initValue();
-    misrr.getOptimalModel();
-    cout << "misrr.getUsingRate(): " << misrr.getUsingRate() << endl;
-    cout << "misrr.getOptimalTime(): " << misrr.getOptimalTime() << endl;
-    misrr.theLastInstallmentGap();
-
-    // fprintf(fMISRR, "%d\t\t%.2lf\n", workload, misrr.getOptimalTime());
-    // return make_tuple(misrr.getOptimalM(), misrr.getUsingRate());
-    return make_tuple(misrr.getOptimalTime(), misrr.getUsingRate());
-    // printf("%d\t\t%.2lf\n", workload, misrr.getOptimalTime());
-}
-
 double run_MISRR(int server_num, int m, int workload, double theta, string data_path) {
     // auto workload = 8000;   // total workload
     auto serverN = server_num;      // number of servers
@@ -158,7 +139,7 @@ double run_APMISRR_cost(double lambda, int m) {
 /**
  * 运行带启动开销，非阻塞，去掉P0的APMISRR算法
 */
-double run_myAPMISRR(int server_num, double lambda, int m, int workload, double theta, string data_path) {
+double run_myAPMISRR(int server_num, double lambda, int m, int workload, double theta, string data_path, vector<int> error_server) {
 
     auto serverN = server_num;
 
@@ -174,16 +155,28 @@ double run_myAPMISRR(int server_num, double lambda, int m, int workload, double 
     myapmisrr.setM((int)m);
     myapmisrr.setLambda((double)lambda);
     myapmisrr.initValue();
-    // myapmisrr.getOptimalTime();
-    int isSchedulable = -1;
-    isSchedulable = myapmisrr.isSchedulable();
-    if (isSchedulable != 1)
+    if (myapmisrr.isSchedulable() != 1)
         return 0;
+    myapmisrr.calOptimalTime();
+    myapmisrr.calUsingRate();
+
+    auto error_installment = 20;
+    if(!error_server.empty()) {
+        cout << "error server size: " << to_string(error_server.size()) << ", error installment: "  << error_installment << endl;
+        myapmisrr.error(error_server, error_installment);
+    }
+
+    cout << "myapmisrr.getUsingRate(): " << myapmisrr.getUsingRate() << endl;
+    cout << "myapmisrr.getOptimalTime(): " << myapmisrr.getOptimalTime() << endl;
+
     if(output_using_rate == 1)
         return myapmisrr.getUsingRate();
     return myapmisrr.getOptimalTime();
 }
 
+/**
+ * 运行最后一趟含lambda参数的MISRRL算法
+*/
 double run_MISRRL(double lambda, int m) {
     auto serverN = 15;
     auto theta = 0.3;
@@ -214,6 +207,9 @@ double run_MISRRL(double lambda, int m) {
     return misrrl.getOptimalTime();
 }
 
+/**
+ * 运行第一趟、最后一趟含lambda参数的MISRRLL算法
+*/
 double run_MISRRLL(double lambda1, double lambda2, int m) {
     auto serverN = 15;
     auto theta = 0.3;

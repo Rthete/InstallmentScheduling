@@ -3,7 +3,7 @@
  * @Description:  APMISRR add cost, non-block, remove P0
  * @Author: rthete
  * @Date: 2023-05-12 15:51:41
- * @LastEditTime: 2023-06-20 21:12:13
+ * @LastEditTime: 2023-06-22 16:35:16
  */
 #ifndef INSTALLMENTSCHEDULING_myAPMISRR_H
 #define INSTALLMENTSCHEDULING_myAPMISRR_H
@@ -28,11 +28,15 @@ public:
     void getDataFromFile(string data_path="../data/15-servers-w-20/");
 
     // result
+    void calOptimalTime();
+    void calUsingRate();
     double getOptimalTime();
     double getUsingRate();
 
     // check schedulable
     int isSchedulable();
+
+    void error(vector<int> &errorPlace, int errorInstallment);
 
 private:
     int n;                                          // 处理机个数

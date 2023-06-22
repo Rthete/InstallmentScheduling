@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-06-12 18:59:57
- * @LastEditTime: 2023-06-20 20:52:37
+ * @LastEditTime: 2023-06-22 15:18:43
  */
 #ifndef FIRSTMODEL_EXP_1_H
 #define FIRSTMODEL_EXP_1_H
@@ -23,5 +23,7 @@ void without_error_30_W();
 void ur_without_error_30_W();
 void without_error_30_theta();
 void ur_without_error_30_theta();
+
+void with_error_15();
 
 #endif //FIRSTMODEL_EXP_1_H

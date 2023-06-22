@@ -3,7 +3,7 @@
  * @Description: APMISRR add cost, non-block, remove P0
  * @Author: rthete
  * @Date: 2023-05-12 15:55:34
- * @LastEditTime: 2023-06-21 14:14:24
+ * @LastEditTime: 2023-06-22 17:43:02
  */
 
 #include "myAPMISRR.h"
@@ -143,15 +143,14 @@ void myAPMISRR::initValue() {
     
 }
 
-double myAPMISRR::getOptimalTime() {
+void myAPMISRR::calOptimalTime() {
     // 式(29)
     optimalTime = (m - 1) * P + servers[0].getO() + servers[0].getS() + beta[0] * servers[0].getW() * this->Vb;
     for (int i = 0; i < this->n; ++i) {
         optimalTime += servers[i].getO() + beta[i] * servers[i].getG() * theta * this->Vb;
     }
     optimalTime -= servers[0].getO();
-    cout << "optimalTime = " << optimalTime << endl;
-    return optimalTime;
+    // cout << "optimalTime = " << optimalTime << endl;
 }
 
 int myAPMISRR::isSchedulable() {
@@ -201,7 +200,8 @@ int myAPMISRR::isSchedulable() {
     }
 }
 
-double myAPMISRR::getUsingRate() {
+void myAPMISRR::calUsingRate() {
+    
     for (int i = 0; i < this->n; i++) {
         int id = servers[i].getId();
         usingTime[id] += ((m - 1) * (alpha[i] * V * servers[i].getW() + servers[i].getS()) +
@@ -209,12 +209,52 @@ double myAPMISRR::getUsingRate() {
     }
 
     // cal using rate
-    getOptimalTime();
     usingRate = 0.0;
-    for (int i = 0; i < this->n; ++i) {
-        usingRate += ((double)usingTime[i] / ((double)(this->optimalTime) * this->n));
+    for (int i = 0; i < this->numberWithoutError; ++i) {
+        usingRate += ((double)usingTime[i] / ((double)(this->optimalTime) * this->numberWithoutError));
     }
-    return usingRate;
+}
+
+void myAPMISRR::error(vector<int> &errorPlace, int errorInstallment) {
+    // cal left workload
+    for (auto i : errorPlace) {
+        this->leftW += ((this->m - errorInstallment) * alpha[i - 1] * this->V + beta[i - 1] * this->Vb);
+        usingTime[i - 1] = this->P * (errorInstallment - 1);
+    }
+    this->W = this->leftW;
+
+    // cal left server
+    int position = 0;
+    vector<Server> oldServers = servers;
+    servers.clear();
+
+    for (int i = 0; i < oldServers.size(); i++) {
+        auto iter = find(errorPlace.begin(), errorPlace.end(), i + 1);
+        if (iter == errorPlace.end()) {
+            servers[position] = oldServers[i];
+            position++;
+        }
+    }
+    this->n -= (int)errorPlace.size();
+
+    // 最后由第一个服务器处理剩余所有任务
+    optimalTime += servers[0].getO() + servers[0].getS() + servers[0].getW() * leftW + servers[0].getG() * theta * leftW;
+
+    usingRate = 0.0;
+    for (int i = 0; i < this->numberWithoutError; ++i) {
+        usingRate += ((double)usingTime[i] / ((double)(this->optimalTime) * this->numberWithoutError));
+        // cout << "usingTime[i]: " << usingTime[i] << endl;
+    }
+    usingRate += ((servers[0].getO() + servers[0].getS() + servers[0].getW() * leftW + servers[0].getG() * theta * leftW) / 
+                ((double)(this->optimalTime) * this->numberWithoutError));
+}
+
+double myAPMISRR::getOptimalTime() {
+    return this->optimalTime;
+}
+
+double myAPMISRR::getUsingRate() {
+    return this->usingRate;
 }
 
 /**
