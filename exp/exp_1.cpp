@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-06-12 18:59:30
- * @LastEditTime: 2023-06-22 17:44:45
+ * @LastEditTime: 2023-06-23 17:33:58
  */
 #include "exp_1.h"
 
@@ -155,10 +155,10 @@ void with_error_15() {
     FILE * fpResult;
     fpResult = fopen("../output/exp_1/with_error_15.csv", "w");
     fprintf(fpResult, "SIS,APMISRR,toler-MIS\n");
-    for(int W = 5000; W <= 10000; W+=1000) {
+    for(int W = 5000; W <= 5000; W+=1000) {
         fprintf(fpResult, "%.2f,", run_SIS(15, W, 0.3, "../data/15-servers-w-20/", {5}));
         fprintf(fpResult, "%.2f,", run_myAPMISRR(15, 0.5, 24, W, 0.3, "../data/15-servers-w-20/", {5}));
-        // fprintf(fpResult, "%.2f\n", run_MISRR(15, 24, W, 0.3));
+        fprintf(fpResult, "%.2f\n", run_MISRR(15, 24, W, 0.3, "../data/15-servers-w-20/", {5}));
         fprintf(fpResult, "\n");
     }
     fclose(fpResult);

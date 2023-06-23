@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:54:33
- * @LastEditTime: 2023-06-22 16:27:58
+ * @LastEditTime: 2023-06-23 16:38:51
  */
 #ifndef FIRSTMODEL_METHOD_H
 #define FIRSTMODEL_METHOD_H
@@ -19,7 +19,7 @@
 
 double run_SIS(int server_num=15, int workload=8000, double theta=0.3, string data_path="../data/15-servers-w-20/", vector<int> error_server={});
 void run_PMIS();
-double run_MISRR(int server_num=15, int m=8, int workload=8000, double theta=0.3, string data_path="../data/15-servers-w-20/");
+double run_MISRR(int server_num=15, int m=8, int workload=8000, double theta=0.3, string data_path="../data/15-servers-w-20/", vector<int> error_server={});
 void run_MISRR_check();
 double run_APMISRR(double lambda);
 double run_APMISRR_cost(double lambda, int m);

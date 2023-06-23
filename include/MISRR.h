@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-13 22:37:48
- * @LastEditTime: 2023-06-20 21:11:44
+ * @LastEditTime: 2023-06-23 15:56:02
  */
 
 #ifndef INSTALLMENTSCHEDULING_MISRR_H
@@ -22,6 +22,7 @@ public:
     void getOptimalModel();
     void setW(double value);
     void error(vector<int> &errorPlace, int errorInstallment);
+    void error_2(vector<int> &errorPlace, int errorInstallment);
     void printResult();
     double getOptimalTime() const;
     double getUsingRate() const;

@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-06-22 17:42:17
+ * @LastEditTime: 2023-06-23 16:40:59
  */
 
 #include "method.h"
@@ -62,26 +62,30 @@ void run_PMIS() {
 /**
  * 运行MISRR模型
 */
-double run_MISRR(int server_num, int m, int workload, double theta, string data_path) {
+double run_MISRR(int server_num, int m, int workload, double theta, string data_path, vector<int> error_server) {
     // auto workload = 8000;   // total workload
-    auto serverN = server_num;      // number of servers
     // auto theta = 0.3;       // Ratio of the output load size to input load size
     // auto m = 8;            // installment size
 
     cout << "**********************run MISRR**********************" << endl;
-    cout << serverN << " servers, m = " << m << ", theta = " << theta << endl;
+    cout << server_num << " servers, m = " << m << ", theta = " << theta << endl;
     cout << "total load = " << 8000 << endl;
 
-    MISRR misrr(serverN, theta, m);
+    MISRR misrr(server_num, theta, m);
     misrr.getDataFromFile(data_path);
     misrr.setW((double)workload);
     misrr.initValue();
     misrr.getOptimalModel();
+
+    auto error_installment = 20;
+    if(!error_server.empty()) {
+        cout << "error server size: " << to_string(error_server.size()) << ", error installment: "  << error_installment << endl;
+        misrr.error_2(error_server, error_installment);
+    }
+
     cout << "misrr.getUsingRate(): " << misrr.getUsingRate() << endl;
     cout << "misrr.getOptimalTime(): " << misrr.getOptimalTime() << endl;
-    misrr.calOptimalM();
-    // misrr.theLastInstallmentGap();
-    // misrr.checkTime();
+    
     if(output_using_rate == 1)
         return misrr.getUsingRate();
     return misrr.getOptimalTime();
