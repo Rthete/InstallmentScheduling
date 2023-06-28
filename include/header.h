@@ -13,6 +13,10 @@
 #define MAX_N 100
 #define MAX_M 1000
 
-using namespace std;
+using std::cout;
+using std::endl;
+using std::string;
+using std::to_string;
+using std::vector;
 
 #endif //FIRSTMODEL_HEADER_H

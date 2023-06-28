@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-06-23 16:40:59
+ * @LastEditTime: 2023-06-28 16:04:27
  */
 
 #include "method.h"
@@ -77,7 +77,7 @@ double run_MISRR(int server_num, int m, int workload, double theta, string data_
     misrr.initValue();
     misrr.getOptimalModel();
 
-    auto error_installment = 20;
+    auto error_installment = 10;
     if(!error_server.empty()) {
         cout << "error server size: " << to_string(error_server.size()) << ", error installment: "  << error_installment << endl;
         misrr.error_2(error_server, error_installment);
@@ -164,7 +164,7 @@ double run_myAPMISRR(int server_num, double lambda, int m, int workload, double 
     myapmisrr.calOptimalTime();
     myapmisrr.calUsingRate();
 
-    auto error_installment = 20;
+    auto error_installment = 10;
     if(!error_server.empty()) {
         cout << "error server size: " << to_string(error_server.size()) << ", error installment: "  << error_installment << endl;
         myapmisrr.error(error_server, error_installment);

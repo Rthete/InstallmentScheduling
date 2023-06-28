@@ -154,6 +154,7 @@ void SIS::error(vector<int> &errorPlace) {
         leftW += this->W * alpha[i - 1];
         outputName += '_' + to_string(i);
     }
+    cout << "left workload: " << this->leftW << endl;
     this->W = this->leftW;
 
     int position = 0;

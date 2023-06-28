@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-13 22:37:48
- * @LastEditTime: 2023-06-23 15:56:02
+ * @LastEditTime: 2023-06-28 14:32:02
  */
 
 #ifndef INSTALLMENTSCHEDULING_MISRR_H
@@ -71,7 +71,8 @@ private:
     vector<double> old_beta;
 
     // time
-    vector<double> usingTime;
+    vector<double> usingTime;                   // 每个处理机的总使用时间
+    vector<double> usingTime1;                  // 每个处理机除最后一趟的使用时间
 
     // print
     string outputName;

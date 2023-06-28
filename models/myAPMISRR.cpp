@@ -3,7 +3,7 @@
  * @Description: APMISRR add cost, non-block, remove P0
  * @Author: rthete
  * @Date: 2023-05-12 15:55:34
- * @LastEditTime: 2023-06-22 17:43:02
+ * @LastEditTime: 2023-06-28 16:07:46
  */
 
 #include "myAPMISRR.h"
@@ -221,6 +221,7 @@ void myAPMISRR::error(vector<int> &errorPlace, int errorInstallment) {
         this->leftW += ((this->m - errorInstallment) * alpha[i - 1] * this->V + beta[i - 1] * this->Vb);
         usingTime[i - 1] = this->P * (errorInstallment - 1);
     }
+    cout << "left workload: " << this->leftW << endl;
     this->W = this->leftW;
 
     // cal left server
