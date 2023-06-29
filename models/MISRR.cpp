@@ -588,6 +588,16 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
 
 /* TolerMIS */
 void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
+    // Pn内部调度结束时间
+    double internal_installment_end_time = 0;
+    internal_installment_end_time += servers[0].getG() * beta[0] * this->V * (1 + theta) + servers[0].getO();
+    for(int i = 1; i < serversNumberWithoutError - 1; ++i) {
+        internal_installment_end_time += 2 * servers[i].getO();
+        internal_installment_end_time += servers[i].getG() * beta[i] * this->V;
+        internal_installment_end_time += servers[i].getG() * beta[i] * theta * this->V;
+    }
+    internal_installment_end_time += servers[n - 1].getO();
+
     // cal left workload
     // 故障处理机剩余的任务量(仅考虑内部调度中出错)
     for (auto i : errorPlace) {
@@ -610,7 +620,7 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
     this->optimalTime += (servers[0].getS() + this->V * alpha[0] * servers[0].getW());
     this->optimalTime += (this->m - 2) * (servers[0].getS() + this->V * beta[0] * servers[0].getW());
     
-    // cal left server
+    // 重置处理机（去除故障处理机）
     int position = 0;
     vector<Server> oldServers = servers;
     servers.clear();
@@ -656,6 +666,20 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
         usingRate += ((double)usingTime[i] / ((double)(this->optimalTime) * this->serversNumberWithoutError));
     }
 
+    // 查看最后一个处理机是否有冲突
+    double last_installment_start_time = 0;
+    last_installment_start_time += servers[0].getG() * beta[0] * this->V * (1 + theta) + servers[0].getO();
+    for(int i = 1; i < n - 1; ++i) {
+        last_installment_start_time += 2 * servers[i].getO();
+        last_installment_start_time += servers[i].getG() * beta[i] * this->V;
+        last_installment_start_time += servers[i].getG() * beta[i] * theta * this->V;
+    }
+    last_installment_start_time += servers[n - 1].getO();
+    
+    // 若冲突则等待
+    if(internal_installment_end_time > last_installment_start_time) {
+        this->optimalTime += (internal_installment_end_time - last_installment_start_time);
+    }
 }
 
 void MISRR::setW(double value) {
