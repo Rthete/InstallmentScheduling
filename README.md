@@ -16,7 +16,7 @@ InstallmentScheduling
 ├─ data
 │  ├─ 15-servers-w-20
 │  ├─ 15-servers-w-50
-│  ├─ 30-servers
+│  ├─ exp1-30-servers
 │  ├─ APMISRR-homo-no_overhead
 │  ├─ MISRR-hete-no_overhead
 │  └─ MISRR-homo-no_overhead

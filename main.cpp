@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-06-22 15:27:24
+ * @LastEditTime: 2023-06-30 15:45:48
  */
 
 #include "include/method.h"
@@ -24,7 +24,7 @@ int main() {
     // without_error_30_theta();
     // ur_without_error_30_theta();
 
-    with_error_15();
+    // with_error_15();
 
     // run_SIS();
     // run_myAPMISRR(0.6, 8);
