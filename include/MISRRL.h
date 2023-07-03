@@ -6,8 +6,8 @@
  * @LastEditTime: 2023-05-18 13:48:54
  */
 
-#ifndef INSTALLMENTSCHEDULING_MISRRL_H
-#define INSTALLMENTSCHEDULING_MISRRL_H
+#ifndef _MISRRL_H
+#define _MISRRL_H
 
 #include "header.h"
 #include "Server.h"
@@ -87,4 +87,4 @@ private:
 };
 
 
-#endif //INSTALLMENTSCHEDULING_MISRRL_H
+#endif //_MISRRL_H

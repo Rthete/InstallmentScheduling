@@ -5,8 +5,8 @@
  * @Date: 2023-06-12 18:59:57
  * @LastEditTime: 2023-06-22 15:18:43
  */
-#ifndef FIRSTMODEL_EXP_1_H
-#define FIRSTMODEL_EXP_1_H
+#ifndef _EXP_1_H
+#define _EXP_1_H
 
 #include "method.h"
 
@@ -26,4 +26,4 @@ void ur_without_error_30_theta();
 
 void with_error_15();
 
-#endif //FIRSTMODEL_EXP_1_H
+#endif //_EXP_1_H

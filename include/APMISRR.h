@@ -6,8 +6,8 @@
  * @LastEditTime: 2023-05-09 21:37:27
  */
 
-#ifndef FIRSTMODEL_APMISRR_H
-#define FIRSTMODEL_APMISRR_H
+#ifndef _APMISRR_H
+#define _APMISRR_H
 
 #include "header.h"
 #include "Server.h"
@@ -86,4 +86,4 @@ private:
 };
 
 
-#endif //FIRSTMODEL_APMISRR_H
+#endif //_APMISRR_H

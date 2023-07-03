@@ -2,8 +2,8 @@
 // Created by xd_wxl on 2023/1/17.
 //
 
-#ifndef FIRSTMODEL_RRMIS_H
-#define FIRSTMODEL_RRMIS_H
+#ifndef _RRMIS_H
+#define _RRMIS_H
 
 #include "header.h"
 #include "Server.h"
@@ -86,4 +86,4 @@ private:
     void calOptimalM();
 };
 
-#endif //FIRSTMODEL_RRMIS_H
+#endif //_RRMIS_H

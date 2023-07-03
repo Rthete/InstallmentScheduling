@@ -5,8 +5,8 @@
  * @Date: 2023-05-12 15:51:41
  * @LastEditTime: 2023-06-22 16:35:16
  */
-#ifndef INSTALLMENTSCHEDULING_myAPMISRR_H
-#define INSTALLMENTSCHEDULING_myAPMISRR_H
+#ifndef _myAPMISRR_H
+#define _myAPMISRR_H
 
 #include "header.h"
 #include "Server.h"
@@ -75,4 +75,4 @@ private:
 };
 
 
-#endif //INSTALLMENTSCHEDULING_myAPMISRR_H
+#endif //_myAPMISRR_H

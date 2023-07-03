@@ -1,5 +1,5 @@
-#ifndef FIRSTMODEL_SERVER_H
-#define FIRSTMODEL_SERVER_H
+#ifndef _SERVER_H
+#define _SERVER_H
 
 #include "header.h"
 
@@ -29,4 +29,4 @@ private:
     double w = 0;                               // 计算单位任务量所需要时间
 };
 
-#endif //FIRSTMODEL_SERVER_H
+#endif //_SERVER_H

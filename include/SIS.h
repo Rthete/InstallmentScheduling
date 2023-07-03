@@ -9,8 +9,8 @@
 // Created by kqzhang on 2022/5/13.
 //
 
-#ifndef FIRSTMODEL_SIS_H
-#define FIRSTMODEL_SIS_H
+#ifndef _SIS_H
+#define _SIS_H
 
 #include "header.h"
 #include "Server.h"

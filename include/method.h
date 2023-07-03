@@ -5,8 +5,8 @@
  * @Date: 2023-05-15 15:54:33
  * @LastEditTime: 2023-06-23 16:38:51
  */
-#ifndef FIRSTMODEL_METHOD_H
-#define FIRSTMODEL_METHOD_H
+#ifndef _METHOD_H
+#define _METHOD_H
 
 #include "MISRR.h"
 #include "SIS.h"
@@ -45,4 +45,4 @@ void test_MISRRLL_2_lambda();
 
 void compare_MISRR_and_MISRRL();
 
-#endif //FIRSTMODEL_METHOD_H
+#endif //_METHOD_H

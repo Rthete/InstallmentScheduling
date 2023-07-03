@@ -1,5 +1,5 @@
-#ifndef FIRSTMODEL_HEADER_H
-#define FIRSTMODEL_HEADER_H
+#ifndef _HEADER_H
+#define _HEADER_H
 
 #include <ctime>
 #include <vector>
@@ -19,4 +19,4 @@ using std::string;
 using std::to_string;
 using std::vector;
 
-#endif //FIRSTMODEL_HEADER_H
+#endif //_HEADER_H

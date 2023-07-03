@@ -3,11 +3,11 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-13 22:37:48
- * @LastEditTime: 2023-06-28 14:32:02
+ * @LastEditTime: 2023-07-03 17:28:32
  */
 
-#ifndef INSTALLMENTSCHEDULING_MISRR_H
-#define INSTALLMENTSCHEDULING_MISRR_H
+#ifndef _MISRR_H
+#define _MISRR_H
 
 #include "header.h"
 #include "Server.h"
@@ -84,4 +84,4 @@ private:
 };
 
 
-#endif //INSTALLMENTSCHEDULING_MISRR_H
+#endif //_MISRR_H

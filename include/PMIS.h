@@ -9,8 +9,8 @@
 // Created by xd_wxl on 2022/12/7.
 //
 
-#ifndef FIRSTMODEL_PMIS_H
-#define FIRSTMODEL_PMIS_H
+#ifndef _PMIS_H
+#define _PMIS_H
 
 #include "header.h"
 #include "Server.h"
@@ -75,4 +75,4 @@ private:
 };
 
 
-#endif //FIRSTMODEL_PMIS_H
+#endif //_PMIS_H
