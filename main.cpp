@@ -3,13 +3,17 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-06-30 15:45:48
+ * @LastEditTime: 2023-07-11 13:33:52
  */
 
 #include "include/method.h"
 #include "include/exp_1.h"
+#include "include/exp_2.h"
 
 int main() {
+    exp_2::W_vs_m_15();
+    // exp_2::theta_vs_m_15();
+
     // without_error_15_m();
     // ur_without_error_15_m();
     // without_error_15_W();
