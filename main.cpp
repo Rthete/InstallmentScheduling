@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-07-11 13:33:52
+ * @LastEditTime: 2023-07-20 21:38:39
  */
 
 #include "include/method.h"
@@ -11,9 +11,11 @@
 #include "include/exp_2.h"
 
 int main() {
-    exp_2::W_vs_m_15();
+    // exp_2::W_vs_m_15();
     // exp_2::theta_vs_m_15();
-
+    // exp_2::W_vs_m_30();
+    // exp_2::theta_vs_m_30();
+    
     // without_error_15_m();
     // ur_without_error_15_m();
     // without_error_15_W();
