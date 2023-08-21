@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-07-07 11:00:20
+ * @LastEditTime: 2023-08-21 22:58:24
  */
 
 #include "method.h"
@@ -62,7 +62,8 @@ void run_PMIS() {
 /**
  * 运行MISRR模型
 */
-double run_MISRR(int server_num, int m, int workload, double theta, string data_path, vector<int> error_server) {
+double run_MISRR(int server_num, int m, int workload, double theta, string data_path, 
+                 vector<int> error_server, int error_installment) {
     // auto workload = 8000;   // total workload
     // auto theta = 0.3;       // Ratio of the output load size to input load size
     // auto m = 8;            // installment size
@@ -77,7 +78,7 @@ double run_MISRR(int server_num, int m, int workload, double theta, string data_
     misrr.initValue();
     misrr.getOptimalModel();
 
-    auto error_installment = 10;
+    // auto error_installment = 10;
     if(!error_server.empty()) {
         cout << "error server size: " << to_string(error_server.size()) << ", error installment: "  << error_installment << endl;
         misrr.error_2(error_server, error_installment);
@@ -143,7 +144,8 @@ double run_APMISRR_cost(double lambda, int m) {
 /**
  * 运行带启动开销，非阻塞，去掉P0的APMISRR算法
 */
-double run_myAPMISRR(int server_num, double lambda, int m, int workload, double theta, string data_path, vector<int> error_server) {
+double run_myAPMISRR(int server_num, double lambda, int m, int workload, double theta,
+                     string data_path, vector<int> error_server, int error_installment) {
 
     auto serverN = server_num;
 
@@ -164,7 +166,7 @@ double run_myAPMISRR(int server_num, double lambda, int m, int workload, double 
     myapmisrr.calOptimalTime();
     myapmisrr.calUsingRate();
 
-    auto error_installment = 10;
+    // auto error_installment = 10;
     if(!error_server.empty()) {
         cout << "error server size: " << to_string(error_server.size()) << ", error installment: "  << error_installment << endl;
         myapmisrr.error(error_server, error_installment);

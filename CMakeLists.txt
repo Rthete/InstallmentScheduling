@@ -18,6 +18,7 @@ add_library(${PROJECT_NAME} SHARED
     models/method.cpp
     exp/exp_1.cpp
     exp/exp_2.cpp
+    exp/exp_3.cpp
 )
 
 add_executable(main main.cpp)

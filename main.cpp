@@ -3,14 +3,22 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-07-20 21:38:39
+ * @LastEditTime: 2023-08-21 23:05:13
  */
 
 #include "include/method.h"
 #include "include/exp_1.h"
 #include "include/exp_2.h"
+#include "include/exp_3.h"
 
 int main() {
+    // exp_3::error_SIS_15();
+    // exp_3::error_TolerMIS_15();
+    // exp_3::error_APMISRR_15();
+    exp_3::error_SIS_30();
+    exp_3::error_TolerMIS_30();
+    exp_3::error_APMISRR_30();
+
     // exp_2::W_vs_m_15();
     // exp_2::theta_vs_m_15();
     // exp_2::W_vs_m_30();

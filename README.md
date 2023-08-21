@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 15:04:04
- * @LastEditTime: 2023-06-21 19:42:24
+ * @LastEditTime: 2023-08-19 17:37:46
 -->
 # README
 
@@ -22,7 +22,9 @@ InstallmentScheduling
 │  └─ MISRR-homo-no_overhead
 ├─ dataGenerator.py               // randomly generate data using numpy
 ├─ exp                            // experiments
-│  └─ exp_1.cpp         
+│  └─ exp_1.cpp
+│  ├─ exp_2.cpp
+│  └─ exp_3.cpp         
 ├─ include                        // header files
 ├─ main.cpp
 ├─ models                         // implementation of models
