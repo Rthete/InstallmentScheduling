@@ -3,12 +3,13 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-08-19 17:44:04
- * @LastEditTime: 2023-08-21 23:05:38
+ * @LastEditTime: 2023-09-09 14:34:10
  */
 #ifndef _EXP_3_H
 #define _EXP_3_H
 
 #include "method.h"
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 

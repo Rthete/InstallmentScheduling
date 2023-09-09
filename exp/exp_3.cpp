@@ -3,7 +3,7 @@
  * @Description: 带容错的3个模型实验
  * @Author: rthete
  * @Date: 2023-08-19 17:41:41
- * @LastEditTime: 2023-09-09 13:30:25
+ * @LastEditTime: 2023-09-09 15:31:46
  */
 #include "exp_3.h"
 
@@ -79,63 +79,113 @@ namespace exp_3{
         outputFile.close();
     }
 
-    // SIS模型，共30个处理机，故障1/2/3/4个处理机，每种实验30次
+    /* SIS模型，共30个处理机，故障1/2/3/4个处理机，每种实验30次 */
     void error_SIS_30() {
         std::vector<std::vector<int>> error_places;
-        std::ofstream outputFile("../output/exp_3/error_SIS_30.csv");
+        std::ofstream meanFile("../output/exp_3/error_SIS_30_mean.csv");
+        std::ofstream diffFile("../output/exp_3/error_SIS_30_diff.csv");
+
+        /* 故障i个处理机 */
         for(int i = 1; i <= 4; ++i) {
             error_places.clear();
             readTXTFile("../data/exp3-error-place/error-place-30-" + std::to_string(i) + ".txt", error_places);
-            
-            for (const auto& row : error_places) {
-                double result = run_SIS(30, 8000, 0.3, "../data/exp1-30-servers/", row);
-                outputFile << result << ",";
+
+            /* 任务量w */
+            for(int w = 5000; w < 15000; w += 1000) {
+                double result_sum = 0;
+                double result_min = 100000, result_max = 0;
+
+                /* 每种30次取平均 */
+                for (const auto& row : error_places) {
+                    double result = run_SIS(30, w, 0.3, "../data/exp1-30-servers/", row);
+                    result_sum += result;
+                    result_min = std::min(result_min, result);
+                    result_max = std::max(result_max, result);
+                }
+                meanFile << result_sum / 30 << ",";
+                diffFile << result_max - result_min << ",";
             }
-            outputFile << std::endl;
-            
+            meanFile << std::endl;
+            diffFile << std::endl;
         }
-        outputFile.close();
-        transposeCSV("../output/exp_3/error_SIS_30.csv", "../output/exp_3/error_SIS_30_transpose.csv");
-        
+        meanFile.close();
+        diffFile.close();
+        transposeCSV("../output/exp_3/error_SIS_30_mean.csv", "../output/exp_3/t_error_SIS_30_mean.csv"); 
+        transposeCSV("../output/exp_3/error_SIS_30_diff.csv", "../output/exp_3/t_error_SIS_30_diff.csv"); 
     }
 
     void error_TolerMIS_30() {
         std::vector<std::vector<int>> error_places;
         std::vector<std::vector<int>> error_installment;
+        std::ofstream meanFile("../output/exp_3/error_TolerMIS_30_mean.csv");
+        std::ofstream diffFile("../output/exp_3/error_TolerMIS_30_diff.csv");
 
-        std::ofstream outputFile("../output/exp_3/error_TolerMIS_30.csv");
+        /* 故障i个处理机 */
         for(int i = 1; i <= 4; ++i) {
             error_places.clear();
             readTXTFile("../data/exp3-error-place/error-place-30-" + std::to_string(i) + ".txt", error_places);
             readTXTFile("../data/exp3-error-place/error-installment.txt", error_installment);
-            int index = 0;
-            for (const auto& row : error_places) {
-                double result = run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/", row, error_installment[index++][0]);
-                outputFile << result << ",";
+            
+            /* 任务量w */
+            for(int w = 5000; w < 15000; w += 1000) {
+                int index = 0;
+                double result_sum = 0;
+                double result_min = 100000, result_max = 0;
+
+                /* 每种30次取平均 */
+                for (const auto& row : error_places) {
+                    double result = run_MISRR(30, 24, w, 0.3, "../data/exp1-30-servers/", row, error_installment[index++][0]);
+                    result_sum += result;
+                    result_min = std::min(result_min, result);
+                    result_max = std::max(result_max, result);
+                }
+                meanFile << result_sum / 30 << ",";
+                diffFile << result_max - result_min << ",";
             }
-            outputFile << std::endl;
+            meanFile << std::endl;
+            diffFile << std::endl;
         }
-        outputFile.close();
-        transposeCSV("../output/exp_3/error_TolerMIS_30.csv", "../output/exp_3/error_TolerMIS_30_transpose.csv");
+        meanFile.close();
+        diffFile.close();
+        transposeCSV("../output/exp_3/error_TolerMIS_30_mean.csv", "../output/exp_3/t_error_TolerMIS_30_mean.csv"); 
+        transposeCSV("../output/exp_3/error_TolerMIS_30_diff.csv", "../output/exp_3/t_error_TolerMIS_30_diff.csv");
     }
 
     void error_APMISRR_30() {
         std::vector<std::vector<int>> error_places;
         std::vector<std::vector<int>> error_installment;
 
-        std::ofstream outputFile("../output/exp_3/error_APMISRR_30.csv");
+        std::ofstream meanFile("../output/exp_3/error_APMISRR_30_mean.csv");
+        std::ofstream diffFile("../output/exp_3/error_APMISRR_30_diff.csv");
+
+        /* 故障i个处理机 */
         for(int i = 1; i <= 4; ++i) {
             error_places.clear();
             readTXTFile("../data/exp3-error-place/error-place-30-" + std::to_string(i) + ".txt", error_places);
             readTXTFile("../data/exp3-error-place/error-installment.txt", error_installment);
-            int index = 0;
-            for (const auto& row : error_places) {
-                double result = run_myAPMISRR(30, 0.5, 24, 8000, 0.3, "../data/exp1-30-servers/", row, error_installment[index++][0]);
-                outputFile << result << ",";
+            
+            /* 任务量w */
+            for(int w = 5000; w < 15000; w += 1000) {
+                int index = 0;
+                double result_sum = 0;
+                double result_min = 100000, result_max = 0;
+                
+                /* 每种30次取平均 */
+                for (const auto& row : error_places) {
+                    double result = run_myAPMISRR(30, 0.5, 24, w, 0.3, "../data/exp1-30-servers/", row, error_installment[index++][0]);
+                    result_sum += result;
+                    result_min = std::min(result_min, result);
+                    result_max = std::max(result_max, result);
+                }
+                meanFile << result_sum / 30 << ",";
+                diffFile << result_max - result_min << ",";
             }
-            outputFile << std::endl;
+            meanFile << std::endl;
+            diffFile << std::endl;
         }
-        outputFile.close();
-        transposeCSV("../output/exp_3/error_APMISRR_30.csv", "../output/exp_3/error_APMISRR_30_transpose.csv");
+        meanFile.close();
+        diffFile.close();
+        transposeCSV("../output/exp_3/error_APMISRR_30_mean.csv", "../output/exp_3/t_error_APMISRR_30_mean.csv"); 
+        transposeCSV("../output/exp_3/error_APMISRR_30_diff.csv", "../output/exp_3/t_error_APMISRR_30_diff.csv");
     }
 }

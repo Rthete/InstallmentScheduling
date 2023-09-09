@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-08-21 22:58:24
+ * @LastEditTime: 2023-09-09 15:26:04
  */
 
 #include "method.h"
@@ -70,7 +70,7 @@ double run_MISRR(int server_num, int m, int workload, double theta, string data_
 
     cout << "**********************run MISRR**********************" << endl;
     cout << server_num << " servers, m = " << m << ", theta = " << theta << endl;
-    cout << "total load = " << 8000 << endl;
+    cout << "total load = " << workload << endl;
 
     MISRR misrr(server_num, theta, m);
     misrr.getDataFromFile(data_path);
