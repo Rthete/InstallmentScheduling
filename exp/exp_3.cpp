@@ -3,11 +3,12 @@
  * @Description: 带容错的3个模型实验
  * @Author: rthete
  * @Date: 2023-08-19 17:41:41
- * @LastEditTime: 2023-08-21 23:05:07
+ * @LastEditTime: 2023-09-09 13:30:25
  */
 #include "exp_3.h"
 
 namespace exp_3{
+    // 从txt文件中读取数据
     void readTXTFile(const std::string& file_path, std::vector<std::vector<int>>& error_place) {
         std::ifstream file(file_path);
         if(file.is_open()) {
@@ -27,6 +28,7 @@ namespace exp_3{
         }
     }
 
+    // 表格数据调换xy轴
     void transposeCSV(const std::string& inputFilePath, const std::string& outputFilePath) {
         std::ifstream inputFile(inputFilePath);
         std::ofstream outputFile(outputFilePath);

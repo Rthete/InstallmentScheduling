@@ -1,9 +1,9 @@
 /*
  * @FilePath: \InstallmentScheduling\exp\exp_1.cpp
- * @Description: SIS, APMISRR, TolerMIS 
+ * @Description: 对比SIS, APMISRR, TolerMIS 
  * @Author: rthete
  * @Date: 2023-06-12 18:59:30
- * @LastEditTime: 2023-07-07 11:00:53
+ * @LastEditTime: 2023-09-09 13:19:00
  */
 #include "exp_1.h"
 
