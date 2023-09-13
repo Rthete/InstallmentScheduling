@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-09-09 16:52:30
+ * @LastEditTime: 2023-09-11 16:07:02
  */
 
 #include "include/method.h"
@@ -15,9 +15,9 @@ int main() {
     // exp_3::error_SIS_15();
     // exp_3::error_TolerMIS_15();
     // exp_3::error_APMISRR_15();
-    exp_3::error_SIS_30();
-    exp_3::error_TolerMIS_30();
-    exp_3::error_APMISRR_30();
+    // exp_3::error_SIS_30();
+    // exp_3::error_TolerMIS_30();
+    // exp_3::error_APMISRR_30();
 
     // exp_2::W_vs_m_15();
     // exp_2::theta_vs_m_15();
@@ -33,7 +33,7 @@ int main() {
 
     // without_error_30_m();
     // ur_without_error_30_m();
-    // without_error_30_W();
+    without_error_30_W();
     // ur_without_error_30_W();
     // without_error_30_theta();
     // ur_without_error_30_theta();

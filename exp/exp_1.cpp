@@ -3,7 +3,7 @@
  * @Description: 对比SIS, APMISRR, TolerMIS 
  * @Author: rthete
  * @Date: 2023-06-12 18:59:30
- * @LastEditTime: 2023-09-09 13:19:00
+ * @LastEditTime: 2023-09-13 13:08:02
  */
 #include "exp_1.h"
 
@@ -107,10 +107,10 @@ void without_error_30_W() {
     FILE * fpResult;
     fpResult = fopen("../output/exp_1/without_error_30_W.csv", "w");
     fprintf(fpResult, "SIS,APMISRR,toler-MIS\n");
-    for(int W = 5000; W <= 25000; W+=1000) {
+    for(int W = 5000; W <= 15000; W+=1000) {
         fprintf(fpResult, "%.2f,", run_SIS(30, W, 0.3, "../data/exp1-30-servers/"));
         fprintf(fpResult, "%.2f,", run_myAPMISRR(30, 0.5, 24, W, 0.3, "../data/exp1-30-servers/"));
-        fprintf(fpResult, "%.2f\n", run_MISRR(30, 24, W, 0.3, "../data/exp1-30-servers/"));
+        fprintf(fpResult, "%.2f\n", run_MISRR(30, 0, W, 0.3, "../data/exp1-30-servers/"));
     }
     fclose(fpResult);
 }
