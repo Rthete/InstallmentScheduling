@@ -99,7 +99,7 @@ void MISRR::initValue() {
     for (int i = 1; i < this->n; ++i) {
         phi[i] = servers[i - 1].getG() / servers[i].getW();
     }
-    for (int i = 1; i < this->n; ++i) {
+        for (int i = 1; i < this->n; ++i) {
         Phi[i] = 0;
         for (int j = 1; j <= i; j++) {
             double temp = 1.0;
@@ -114,7 +114,7 @@ void MISRR::initValue() {
     for (int i = 1; i < this->n; ++i) {
         epsilon[i] = (servers[i - 1].getO() + servers[i - 1].getS() - servers[i].getS()) / servers[i].getW();
     }
-    for (int i = 1; i < this->n; ++i) {
+        for (int i = 1; i < this->n; ++i) {
         Epsilon[i] = 0.0;
         for (int j = 1; j <= i; j++) {
             double temp = 1.0;
@@ -178,6 +178,10 @@ void MISRR::initValue() {
     // cal load for each installment
     this->V = this->W / this->m;
 
+    if(this->leftW > 0) {
+        setZero();
+    }
+
     // cal beta & alpha & gamma
     calBeta();
     calAlpha();
@@ -223,7 +227,7 @@ void MISRR::calBeta() {
         }
         beta[i] = mu[i] * beta[0] + (eta[i] / this->V);
         // 计算每趟内部调度所用时间
-        // cout << "beta[i]: " << beta[i] << endl;
+        cout << "beta[i]: " << beta[i] << endl;
         // cout << "\tserver[i].getS(): " << servers[i].getS() << "\ttime: " 
         //     << beta[i] * servers[i].getW() * this->V + servers[i].getS() << endl;
 
@@ -251,10 +255,12 @@ void MISRR::calAlpha() {
     for (int i = 0; i < this->n; ++i) {
         if (i == 0) {
             alpha[i] = (1.0 - beta[0] * sum_2_n_phi - (sum_2_n_epsilon / this->V)) / (1.0 + sum_2_n_delta);
+            cout << "alpha[" << i << "]: " << alpha[i] << endl;
             continue;
         }
         alpha[i] = Delta[i] * alpha[0] + Phi[i] * beta[0] + (Epsilon[i] / this->V);
-        // cout << "alpha[i]: " << alpha[i] << endl;
+        cout << "alpha[" << i << "]: " << alpha[i] << endl;
+
     }
 }
 
@@ -277,8 +283,27 @@ void MISRR::calGamma() {
             continue;
         }
         gamma[i] = Lambda[i] * gamma[0] - Psi[i] * beta[0] + P[i] / this->V;
-        // cout << "gamma[i]: " << gamma[i] << endl;
+        cout << "gamma[" << i << "]: " << gamma[i] << endl;
     }
+}
+
+void MISRR::setZero() {
+    mu[5] = 0;
+    mu[11] = 0;
+    eta[5] = 0;
+    eta[11] = 0;
+    Delta[5] = 0;
+    Delta[11] = 0;
+    Phi[5] = 0;
+    Phi[11] = 0;
+    Epsilon[5] = 0;
+    Epsilon[11] = 0;
+    Lambda[5] = 0;
+    Lambda[11] = 0;
+    Psi[5] = 0;
+    Psi[11] = 0;
+    P[5] = 0;
+    P[11] = 0;
 }
 
 /**
@@ -620,15 +645,20 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
     this->optimalTime += (servers[0].getS() + this->V * alpha[0] * servers[0].getW());
     this->optimalTime += (this->m - 2) * (servers[0].getS() + this->V * beta[0] * servers[0].getW());
     
+    // 记录m-1趟结果回传时间
+    vector<double> backupRetrievalTime(this->n - (int)errorPlace.size() + 1, 0);
+
     // 重置处理机（去除故障处理机）
     int position = 0;
     vector<Server> oldServers = servers;
     servers.clear();
 
-    for (int i = 0; i < oldServers.size(); i++) {
+    for (int i = 0; i < this->n; i++) {
         auto iter = find(errorPlace.begin(), errorPlace.end(), i + 1);
+        // 若第i个处理机没有故障
         if (iter == errorPlace.end()) {
             servers[position] = oldServers[i];
+            backupRetrievalTime[position] = oldServers[i].getG() * gamma[i] * this->V * theta;
             position++;
         }
     }
@@ -645,7 +675,7 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
     this->optimalTime += servers[0].getG() * gamma[0] * this->V * this->theta;
     for (int i = 1; i < this->n; i++) {
         this->optimalTime += servers[i].getO();
-        this->optimalTime += gamma[i] * this->V * servers[i].getG() * this->theta;
+        this->optimalTime += backupRetrievalTime[i];
     }
 
     auto j = 0;
@@ -655,7 +685,7 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
         if (iter == errorPlace.end()) {
             // 计算正常处理机的使用时间
             usingTime[i] = usingTime1[i] + (oldServers[i].getS() + oldServers[i].getW() * gamma[j] * this->V + 
-                            oldServers[i].getG() * gamma[j] * this->V * theta);
+                            backupRetrievalTime[i]);
             j++;
         }
     }
