@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-13 22:37:48
- * @LastEditTime: 2023-09-13 21:30:06
+ * @LastEditTime: 2023-09-14 13:13:45
  */
 
 #ifndef _MISRR_H
@@ -80,7 +80,7 @@ private:
     void calAlpha();
     void calBeta();
     void calGamma();
-    void setZero();
+    void calGammaPrime();
 };
 
 
