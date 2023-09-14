@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-09-11 16:00:00
+ * @LastEditTime: 2023-09-13 21:08:01
  */
 
 #include "method.h"
@@ -76,9 +76,6 @@ double run_MISRR(int server_num, int m, int workload, double theta, string data_
     misrr.getDataFromFile(data_path);
     misrr.setW((double)workload);
     misrr.initValue();
-    if (m == 0) {
-        misrr.calOptimalM();
-    }
     misrr.getOptimalModel();
 
     // auto error_installment = 10;

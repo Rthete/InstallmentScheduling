@@ -223,11 +223,12 @@ void MISRR::calBeta() {
         if (i == 0) {
             beta[i] = (1.0 - sum_2_n_eta / this->V) / (1.0 + sum_2_n_mu);
             sum += beta[i];
+            // cout << "beta["<< i << "]: " << beta[i] << endl;
             continue;
         }
         beta[i] = mu[i] * beta[0] + (eta[i] / this->V);
         // 计算每趟内部调度所用时间
-        cout << "beta[i]: " << beta[i] << endl;
+        // cout << "beta["<< i << "]: " << beta[i] << endl;
         // cout << "\tserver[i].getS(): " << servers[i].getS() << "\ttime: " 
         //     << beta[i] * servers[i].getW() * this->V + servers[i].getS() << endl;
 
@@ -255,11 +256,11 @@ void MISRR::calAlpha() {
     for (int i = 0; i < this->n; ++i) {
         if (i == 0) {
             alpha[i] = (1.0 - beta[0] * sum_2_n_phi - (sum_2_n_epsilon / this->V)) / (1.0 + sum_2_n_delta);
-            cout << "alpha[" << i << "]: " << alpha[i] << endl;
+            // cout << "alpha[" << i << "]: " << alpha[i] << endl;
             continue;
         }
         alpha[i] = Delta[i] * alpha[0] + Phi[i] * beta[0] + (Epsilon[i] / this->V);
-        cout << "alpha[" << i << "]: " << alpha[i] << endl;
+        // cout << "alpha[" << i << "]: " << alpha[i] << endl;
 
     }
 }
@@ -280,10 +281,11 @@ void MISRR::calGamma() {
     for (int i = 0; i < this->n; ++i) {
         if (i == 0) {
             gamma[i] = (1.0 + beta[0] * sum_2_n_psi - (sum_2_n_p / this->V)) / (1.0 + sum_2_n_lambda);
+            // cout << "gamma[" << i << "]: " << gamma[i] << endl;
             continue;
         }
         gamma[i] = Lambda[i] * gamma[0] - Psi[i] * beta[0] + P[i] / this->V;
-        cout << "gamma[" << i << "]: " << gamma[i] << endl;
+        // cout << "gamma[" << i << "]: " << gamma[i] << endl;
     }
 }
 
@@ -392,6 +394,7 @@ void MISRR::getOptimalModel() {
     for (int i = 0; i < this->serversNumberWithoutError; ++i) {
         usingRate += ((double)usingTime[i] / ((double)(this->optimalTime) * this->serversNumberWithoutError));
     }
+    cout << "original optimal using rate: " << this->usingRate << endl;
 }
 
 /**
@@ -644,25 +647,21 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
     this->optimalTime += servers[0].getO();
     this->optimalTime += (servers[0].getS() + this->V * alpha[0] * servers[0].getW());
     this->optimalTime += (this->m - 2) * (servers[0].getS() + this->V * beta[0] * servers[0].getW());
-    
-    // 记录m-1趟结果回传时间
-    vector<double> backupRetrievalTime(this->n - (int)errorPlace.size() + 1, 0);
 
-    // 重置处理机（去除故障处理机）
-    int position = 0;
-    vector<Server> oldServers = servers;
-    servers.clear();
+    // // 重置处理机（去除故障处理机）
+    // int position = 0;
+    // vector<Server> oldServers = servers;
+    // servers.clear();
 
-    for (int i = 0; i < this->n; i++) {
-        auto iter = find(errorPlace.begin(), errorPlace.end(), i + 1);
-        // 若第i个处理机没有故障
-        if (iter == errorPlace.end()) {
-            servers[position] = oldServers[i];
-            backupRetrievalTime[position] = oldServers[i].getG() * gamma[i] * this->V * theta;
-            position++;
-        }
-    }
-    this->n -= (int)errorPlace.size();
+    // for (int i = 0; i < oldServers.size(); i++) {
+    //     auto iter = find(errorPlace.begin(), errorPlace.end(), i + 1);
+    //     // 若第i个处理机没有故障
+    //     if (iter == errorPlace.end()) {
+    //         servers[position] = oldServers[i];
+    //         position++;
+    //     }
+    // }
+    // this->n -= (int)errorPlace.size();
 
     // 原来的内部调度结束后，进行一次修改的最后一趟调度
     this->W = this->leftW * m;
@@ -675,7 +674,7 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
     this->optimalTime += servers[0].getG() * gamma[0] * this->V * this->theta;
     for (int i = 1; i < this->n; i++) {
         this->optimalTime += servers[i].getO();
-        this->optimalTime += backupRetrievalTime[i];
+        this->optimalTime += gamma[i] * this->V * servers[i].getG() * this->theta;
     }
 
     auto j = 0;
@@ -684,8 +683,8 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
         auto iter = find(errorPlace.begin(), errorPlace.end(), i + 1);
         if (iter == errorPlace.end()) {
             // 计算正常处理机的使用时间
-            usingTime[i] = usingTime1[i] + (oldServers[i].getS() + oldServers[i].getW() * gamma[j] * this->V + 
-                            backupRetrievalTime[i]);
+            usingTime[i] = usingTime1[i] + (servers[i].getS() + servers[i].getW() * gamma[i] * this->V + 
+                            servers[i].getG() * gamma[i] * this->V * theta);
             j++;
         }
     }
@@ -700,11 +699,15 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
     double last_installment_start_time = 0;
     last_installment_start_time += servers[0].getG() * beta[0] * this->V * (1 + theta) + servers[0].getO();
     for(int i = 1; i < n - 1; ++i) {
+        if(find(errorPlace.begin(), errorPlace.end(), i + 1) != errorPlace.end())
+            continue;
         last_installment_start_time += 2 * servers[i].getO();
         last_installment_start_time += servers[i].getG() * beta[i] * this->V;
         last_installment_start_time += servers[i].getG() * beta[i] * theta * this->V;
     }
     last_installment_start_time += servers[n - 1].getO();
+    cout << "internal_installment_end_time: " << internal_installment_end_time 
+                << ", last_installment_start_time: " << last_installment_start_time << endl;
     
     // 若冲突则等待
     if(internal_installment_end_time > last_installment_start_time) {
