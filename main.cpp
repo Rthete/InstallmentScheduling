@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-09-13 21:14:54
+ * @LastEditTime: 2023-09-14 20:35:05
  */
 
 #include "include/method.h"
@@ -13,7 +13,8 @@
 
 int main() {
     run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/", {6, 12}, 7);
-    // run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/");
+    run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/", {6, 12}, 23);
+    run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/");
 
     // exp_3::error_SIS_15();
     // exp_3::error_TolerMIS_15();

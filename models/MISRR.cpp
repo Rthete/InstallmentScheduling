@@ -90,7 +90,7 @@ void MISRR::initValue() {
     }
     for (int i = 1; i < this->n; ++i) {
         Delta[i] = 1.0;
-        for (int j = 1; j <= i; j++) {
+        for (int j = 1; j <= i; ++j) {
             Delta[i] *= delta[j];
         }
     }
@@ -101,7 +101,7 @@ void MISRR::initValue() {
     }
         for (int i = 1; i < this->n; ++i) {
         Phi[i] = 0;
-        for (int j = 1; j <= i; j++) {
+        for (int j = 1; j <= i; ++j) {
             double temp = 1.0;
             for (int k = j + 1; k <= i; k++) {
                 temp *= delta[k];
@@ -116,7 +116,7 @@ void MISRR::initValue() {
     }
         for (int i = 1; i < this->n; ++i) {
         Epsilon[i] = 0.0;
-        for (int j = 1; j <= i; j++) {
+        for (int j = 1; j <= i; ++j) {
             double temp = 1.0;
             for (int k = j + 1; k <= i; k++) {
                 temp *= delta[k];
@@ -135,7 +135,7 @@ void MISRR::initValue() {
     }
     for (int i = 1; i < this->n; ++i) {
         Lambda[i] = 1.0;
-        for (int j = 1; j <= i; j++) {
+        for (int j = 1; j <= i; ++j) {
             Lambda[i] *= lambda[j];
         }
     }
@@ -146,7 +146,7 @@ void MISRR::initValue() {
     }
     for (int i = 1; i < this->n; ++i) {
         Psi[i] = 0;
-        for (int j = 1; j <= i; j++) {
+        for (int j = 1; j <= i; ++j) {
             double value = 1.0;
             for (int k = j + 1; k <= i; k++) {
                 value *= lambda[k];
@@ -161,7 +161,7 @@ void MISRR::initValue() {
     }
     for (int i = 1; i < this->n; ++i) {
         P[i] = 0;
-        for (int j = 1; j <= i; j++) {
+        for (int j = 1; j <= i; ++j) {
             double value = 1.0;
             for (int k = j + 1; k <= i; k++) {
                 value *= lambda[k];
@@ -613,14 +613,20 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
 /* TolerMIS */
 void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
     // Pi内部调度结束时间
-    double internal_installment_end_time = 0;
-    internal_installment_end_time += servers[0].getG() * beta[0] * this->V * (1 + theta) + servers[0].getO();
-    for(int i = 1; i < serversNumberWithoutError - 1; ++i) {
-        internal_installment_end_time += 2 * servers[i].getO();
-        internal_installment_end_time += servers[i].getG() * beta[i] * this->V;
-        internal_installment_end_time += servers[i].getG() * beta[i] * theta * this->V;
+    vector<double> internal_installment_end_time(this->n, 0);
+    for(int j = 1; j < this->n; ++j) {
+        if(find(errorPlace.begin(), errorPlace.end(), j + 1) != errorPlace.end()) {
+            continue;
+        }
+        internal_installment_end_time[j] += servers[0].getG() * beta[0] * this->V * (1 + theta) + servers[0].getO();
+        for(int i = 1; i < j; ++i) {
+            internal_installment_end_time[j] += 2 * servers[i].getO();
+            internal_installment_end_time[j] += servers[i].getG() * beta[i] * this->V;
+            internal_installment_end_time[j] += servers[i].getG() * beta[i] * theta * this->V;
+        }
+        internal_installment_end_time[j] += servers[j - 1].getO();
     }
-    internal_installment_end_time += servers[n - 1].getO();
+    
 
     // cal left workload
     // 故障处理机剩余的任务量(仅考虑内部调度中出错)
@@ -691,24 +697,36 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
     }
 
     // 查看最后一个处理机是否有冲突
-    double last_installment_start_time = 0;
-    last_installment_start_time += servers[0].getG() * gamma[0] * this->V + servers[0].getO();
-    last_installment_start_time += servers[0].getG() * beta[0] * this->old_V * theta + servers[0].getO();
-    for(int i = 1; i < n - 1; ++i) {
-        if(find(errorPlace.begin(), errorPlace.end(), i + 1) != errorPlace.end())
+    vector<double> last_installment_start_time(this->n, 0);
+    for(int j = 1; j < n - 1; ++j) {
+        if(find(errorPlace.begin(), errorPlace.end(), j + 1) != errorPlace.end()) {
+            cout << j << " internal_installment_end_time: " << internal_installment_end_time[j] 
+                    << ", last_installment_start_time: " << last_installment_start_time[j] << endl;
+            cout << internal_installment_end_time[j] - last_installment_start_time[j] << endl;;
             continue;
-        last_installment_start_time += 2 * servers[i].getO();
-        last_installment_start_time += servers[i].getG() * gamma[i] * this->V;
-        last_installment_start_time += servers[i].getG() * beta[i] * theta * this->old_V;
+        }
+        last_installment_start_time[j] += servers[0].getG() * gamma[0] * this->V;
+        last_installment_start_time[j] += servers[0].getG() * beta[0] * theta * this->old_V;
+        last_installment_start_time[j] += servers[0].getO();
+        for(int i = 1; i < j; ++i) {
+            if(find(errorPlace.begin(), errorPlace.end(), i + 1) != errorPlace.end()) {
+                continue;
+            }
+            last_installment_start_time[j] += 2 * servers[i].getO();
+            last_installment_start_time[j] += servers[i].getG() * gamma[i] * this->V;
+            last_installment_start_time[j] += servers[i].getG() * beta[i] * theta * this->old_V;
+        }
+        last_installment_start_time[j] += servers[j - 1].getO();
+        cout << j << " internal_installment_end_time: " << internal_installment_end_time[j] 
+                    << ", last_installment_start_time: " << last_installment_start_time[j] << endl;
+        cout << internal_installment_end_time[j] - last_installment_start_time[j] << endl;;
     }
-    last_installment_start_time += servers[n - 1].getO();
-    cout << "internal_installment_end_time: " << internal_installment_end_time 
-                << ", last_installment_start_time: " << last_installment_start_time << endl;
     
-    // 若冲突则等待
-    if(internal_installment_end_time > last_installment_start_time) {
-        this->optimalTime += (internal_installment_end_time - last_installment_start_time);
-    }
+    // // 若冲突则等待
+    // if(internal_installment_end_time > last_installment_start_time) {
+    //     this->optimalTime += (internal_installment_end_time[j] - 
+    //                             last_installment_start_time[j]);
+    // }
 }
 
 void MISRR::setW(double value) {
