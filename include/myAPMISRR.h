@@ -3,7 +3,7 @@
  * @Description:  APMISRR add cost, non-block, remove P0
  * @Author: rthete
  * @Date: 2023-05-12 15:51:41
- * @LastEditTime: 2023-06-22 16:35:16
+ * @LastEditTime: 2023-09-17 14:36:57
  */
 #ifndef _myAPMISRR_H
 #define _myAPMISRR_H
@@ -36,6 +36,7 @@ public:
     // check schedulable
     int isSchedulable();
 
+    void SISinitValue();
     void error(vector<int> &errorPlace, int errorInstallment);
 
 private:

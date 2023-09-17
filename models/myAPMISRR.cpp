@@ -3,7 +3,7 @@
  * @Description: APMISRR add cost, non-block, remove P0
  * @Author: rthete
  * @Date: 2023-05-12 15:55:34
- * @LastEditTime: 2023-06-28 16:07:46
+ * @LastEditTime: 2023-09-17 15:04:01
  */
 
 #include "myAPMISRR.h"
@@ -215,6 +215,64 @@ void myAPMISRR::calUsingRate() {
     }
 }
 
+void myAPMISRR::SISinitValue() {
+    /**
+     * cal eta & gamma (alpha)
+     * SIS
+     */
+    vector<double> mu(this->n, 0);
+    vector<double> lambda(this->n, 0);
+    // cal mu & lambda
+    for (int i = 1; i < this->n; ++i) {
+        mu[i] = (servers[i - 1].getS() - servers[i].getO() - servers[i].getS()) / servers[i].getW();
+        lambda[i] = (servers[i - 1].getW() - servers[i - 1].getG()) / servers[i].getW();
+    }
+
+    vector<double> eta(this->n, 0);
+    vector<double> gamma(this->n, 0);
+    // cal eta & gamma
+    for (int i = 1; i < this->n; ++i) {
+        eta[i] = 1.0;
+        for (int j = 1; j <= i; ++j) {
+            eta[i] *= lambda[j];
+        }
+    }
+    for (int i = 1; i < this->n; ++i) {
+        for (int j = 1; j <= i; j++) {
+            double temp = 1.0;
+            for (int k = j + 1; k <= i; k++) {
+                temp *= lambda[k];
+            }
+            gamma[i] += (mu[j] * temp);
+        }
+    }
+
+    // cal alpha
+    double sum_2_n_gamma = 0, sum_2_n_eta = 0;
+    for (int i = 1; i < this->n; ++i) {
+        sum_2_n_eta += eta[i];
+        sum_2_n_gamma += gamma[i];
+    }
+    for (int i = 0; i < this->n; ++i) {
+        if (i == 0) {
+            alpha[i] = (1.0 - sum_2_n_gamma / this->W) / (1.0 + sum_2_n_eta);
+            continue;
+        }
+        alpha[i] = gamma[i] / this->W + eta[i] * alpha[0];
+    }
+
+    double count_alpha = 0;
+    for (int i = 0; i < this->n; ++i) {
+        count_alpha += alpha[i];
+        if (alpha[i] < 0) {
+            cout << this->W << " error " << "alpha - " << alpha[i] << endl;
+        }
+    }
+
+    if ((int)((count_alpha + 0.000005) * 100000) != 100000)
+        cout << this->W << " count: alpha - " << count_alpha << endl;
+}
+
 void myAPMISRR::error(vector<int> &errorPlace, int errorInstallment) {
     // cal left workload
     for (auto i : errorPlace) {
@@ -236,18 +294,35 @@ void myAPMISRR::error(vector<int> &errorPlace, int errorInstallment) {
             position++;
         }
     }
+    int serversNumberWithoutError = this->n;
     this->n -= (int)errorPlace.size();
 
-    // 最后由第一个服务器处理剩余所有任务
-    optimalTime += servers[0].getO() + servers[0].getS() + servers[0].getW() * leftW + servers[0].getG() * theta * leftW;
+    // 最后加一趟单趟调度
+    SISinitValue();
 
-    usingRate = 0.0;
-    for (int i = 0; i < this->numberWithoutError; ++i) {
-        usingRate += ((double)usingTime[i] / ((double)(this->optimalTime) * this->numberWithoutError));
-        // cout << "usingTime[i]: " << usingTime[i] << endl;
+    this->optimalTime += servers[0].getO() + servers[0].getS() + servers[0].getW() * alpha[0] * this->W;
+    for (int i = 0; i < this->n; ++i) {
+        this->optimalTime += (servers[i].getO() + servers[i].getG() * this->theta * alpha[i] * this->W);
     }
-    usingRate += ((servers[0].getO() + servers[0].getS() + servers[0].getW() * leftW + servers[0].getG() * theta * leftW) / 
-                ((double)(this->optimalTime) * this->numberWithoutError));
+
+    // cal using time
+    for (int i = 0; i < serversNumberWithoutError; ++i) {
+        // cout << i << " " << usingTime[i] << endl;
+        auto iter = find(errorPlace.begin(), errorPlace.end(), i + 1);
+        if (iter == errorPlace.end()) {
+            // 计算正常处理机的使用时间
+            usingTime[i] = usingTime[i] + (servers[i].getO() + servers[i].getS() + servers[i].getW() * alpha[i] * this->W + 
+                            servers[i].getG() * alpha[i] * this->W * theta);
+            // cout << i << " " << usingTime[i] << endl;
+        }
+    }
+
+    // cal using rate
+    usingRate = 0.0;
+    for (int i = 0; i < serversNumberWithoutError; ++i) {
+        usingRate += ((double)usingTime[i] / ((double)(this->optimalTime) * serversNumberWithoutError));
+        // cout << i << " " << ((double)usingTime[i] / ((double)(this->optimalTime))) << endl;
+    }
 }
 
 double myAPMISRR::getOptimalTime() {
