@@ -1,12 +1,13 @@
 '''
-FilePath: \InstallmentScheduling\dataGenerator.py
+FilePath: \InstallmentScheduling\scripts\dataGenerator.py
 Description:  
 Author: rthete
 Date: 2023-06-20 19:40:39
-LastEditTime: 2023-09-01 00:46:52
+LastEditTime: 2023-09-17 15:51:56
 '''
 
 import numpy as np
+import os
 np.random.seed(1)
 
 # 生成处理机参数
@@ -50,6 +51,18 @@ def generate_and_save_random_integers(n, error_num, min_value, max_value, output
             f.write(f"{integer_str}\n")
     
     print(f"Random integers saved to {output_file}")
+    
+def a_generate_and_save_random_integers(n, error_num, min_value, max_value, output_file):
+    # Generate n sets of random integers
+    random_integers = np.random.randint(min_value, max_value + 1, size=(n, error_num))
+    
+    # Write the results to a .txt file
+    with open(output_file, "a") as f:
+        for integers in random_integers:
+            integer_str = ", ".join(str(i) for i in integers)
+            f.write(f"{integer_str},")
+        f.write("\n")
+    print(f"Random integers saved to {output_file}")
 
 # 生成故障处理机   
 def generate_servers_error_place(server_num):
@@ -70,15 +83,19 @@ def generate_error_installment():
     error_num = 1
     # 暂不考虑第一趟/最后一趟出错
     min_value = 2
-    max_value = 23
-    output_file = (f"data/exp3-error-place/error-installment.txt")
-
-    # Call the function
-    generate_and_save_random_integers(num_sets, error_num, min_value, max_value, output_file)
+    output_file = (f"data/exp3-error-place/error-installment-2.txt")
+    if os.path.exists(output_file):
+        with open(output_file, 'w') as file:
+            file.write('')
+        print("clean!")
+    
+    for max_value in range(18, 33):
+        a_generate_and_save_random_integers(num_sets, error_num, min_value, max_value, output_file)
     
 if __name__ == "__main__":
-    generate_servers_error_place(30)
-    # generate_error_installment()
+    # generate_servers_error_place(30)
+    
+    generate_error_installment()
     
 
 
