@@ -3,7 +3,7 @@
  * @Description: 带容错的3个模型实验
  * @Author: rthete
  * @Date: 2023-08-19 17:41:41
- * @LastEditTime: 2023-09-09 15:31:46
+ * @LastEditTime: 2023-09-17 15:18:44
  */
 #include "exp_3.h"
 
@@ -91,7 +91,7 @@ namespace exp_3{
             readTXTFile("../data/exp3-error-place/error-place-30-" + std::to_string(i) + ".txt", error_places);
 
             /* 任务量w */
-            for(int w = 5000; w < 15000; w += 1000) {
+            for(int w = 5000; w < 16000; w += 1000) {
                 double result_sum = 0;
                 double result_min = 100000, result_max = 0;
 
@@ -127,7 +127,7 @@ namespace exp_3{
             readTXTFile("../data/exp3-error-place/error-installment.txt", error_installment);
             
             /* 任务量w */
-            for(int w = 5000; w < 15000; w += 1000) {
+            for(int w = 5000; w < 16000; w += 1000) {
                 int index = 0;
                 double result_sum = 0;
                 double result_min = 100000, result_max = 0;
@@ -165,7 +165,7 @@ namespace exp_3{
             readTXTFile("../data/exp3-error-place/error-installment.txt", error_installment);
             
             /* 任务量w */
-            for(int w = 5000; w < 15000; w += 1000) {
+            for(int w = 5000; w < 16000; w += 1000) {
                 int index = 0;
                 double result_sum = 0;
                 double result_min = 100000, result_max = 0;

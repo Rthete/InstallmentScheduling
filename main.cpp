@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-09-14 20:35:05
+ * @LastEditTime: 2023-09-17 15:19:10
  */
 
 #include "include/method.h"
@@ -12,16 +12,17 @@
 #include "include/exp_3.h"
 
 int main() {
-    run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/", {6, 12}, 7);
-    run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/", {6, 12}, 23);
-    run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/");
+    // run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/", {6, 12}, 7);
+    // run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/", {6, 12}, 23);
+    // run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/");
+    // run_myAPMISRR(30, 0.5, 24, 8000, 0.3, "../data/exp1-30-servers/", {6, 12}, 7);
 
     // exp_3::error_SIS_15();
     // exp_3::error_TolerMIS_15();
     // exp_3::error_APMISRR_15();
-    // exp_3::error_SIS_30();
-    // exp_3::error_TolerMIS_30();
-    // exp_3::error_APMISRR_30();
+    exp_3::error_SIS_30();
+    exp_3::error_TolerMIS_30();
+    exp_3::error_APMISRR_30();
 
     // exp_2::W_vs_m_15();
     // exp_2::theta_vs_m_15();
