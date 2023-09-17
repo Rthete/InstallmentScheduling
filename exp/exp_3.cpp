@@ -3,7 +3,7 @@
  * @Description: 带容错的3个模型实验
  * @Author: rthete
  * @Date: 2023-08-19 17:41:41
- * @LastEditTime: 2023-09-17 15:18:44
+ * @LastEditTime: 2023-09-17 16:30:29
  */
 #include "exp_3.h"
 
@@ -124,23 +124,26 @@ namespace exp_3{
         for(int i = 1; i <= 4; ++i) {
             error_places.clear();
             readTXTFile("../data/exp3-error-place/error-place-30-" + std::to_string(i) + ".txt", error_places);
-            readTXTFile("../data/exp3-error-place/error-installment.txt", error_installment);
+            readTXTFile("../data/exp3-error-place/error-installment-2.txt", error_installment);
             
             /* 任务量w */
+            int index_w = 0;
             for(int w = 5000; w < 16000; w += 1000) {
-                int index = 0;
+                int index_30 = 0;
                 double result_sum = 0;
                 double result_min = 100000, result_max = 0;
 
                 /* 每种30次取平均 */
                 for (const auto& row : error_places) {
-                    double result = run_MISRR(30, 24, w, 0.3, "../data/exp1-30-servers/", row, error_installment[index++][0]);
+                    double result = run_MISRR(30, 0, w, 0.3, "../data/exp1-30-servers/", row, error_installment[index_w][index_30++]);
                     result_sum += result;
                     result_min = std::min(result_min, result);
                     result_max = std::max(result_max, result);
                 }
                 meanFile << result_sum / 30 << ",";
                 diffFile << result_max - result_min << ",";
+
+                index_w++;
             }
             meanFile << std::endl;
             diffFile << std::endl;
@@ -159,26 +162,29 @@ namespace exp_3{
         std::ofstream diffFile("../output/exp_3/error_APMISRR_30_diff.csv");
 
         /* 故障i个处理机 */
+        vector<int> m = {19,21,23,25,26,28,29,30,31,33,34};
         for(int i = 1; i <= 4; ++i) {
             error_places.clear();
             readTXTFile("../data/exp3-error-place/error-place-30-" + std::to_string(i) + ".txt", error_places);
-            readTXTFile("../data/exp3-error-place/error-installment.txt", error_installment);
+            readTXTFile("../data/exp3-error-place/error-installment-2.txt", error_installment);
             
             /* 任务量w */
+            int index_w = 0;
             for(int w = 5000; w < 16000; w += 1000) {
-                int index = 0;
+                int index_30 = 0;
                 double result_sum = 0;
                 double result_min = 100000, result_max = 0;
-                
                 /* 每种30次取平均 */
                 for (const auto& row : error_places) {
-                    double result = run_myAPMISRR(30, 0.5, 24, w, 0.3, "../data/exp1-30-servers/", row, error_installment[index++][0]);
+                    double result = run_myAPMISRR(30, 0.5, m[index_w], w, 0.3, "../data/exp1-30-servers/", row, error_installment[index_w][index_30++]);
                     result_sum += result;
                     result_min = std::min(result_min, result);
                     result_max = std::max(result_max, result);
                 }
                 meanFile << result_sum / 30 << ",";
                 diffFile << result_max - result_min << ",";
+
+                index_w++;
             }
             meanFile << std::endl;
             diffFile << std::endl;

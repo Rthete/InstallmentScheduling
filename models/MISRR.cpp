@@ -701,9 +701,9 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
     double waiting_time = 0;
     for(int j = 1; j < n - 1; ++j) {
         if(find(errorPlace.begin(), errorPlace.end(), j + 1) != errorPlace.end()) {
-            cout << j << " internal_installment_end_time: " << internal_installment_end_time[j] 
-                    << ", last_installment_start_time: " << last_installment_start_time[j] << endl;
-            cout << internal_installment_end_time[j] - last_installment_start_time[j] << endl;;
+            // cout << j << " internal_installment_end_time: " << internal_installment_end_time[j] 
+            //         << ", last_installment_start_time: " << last_installment_start_time[j] << endl;
+            // cout << internal_installment_end_time[j] - last_installment_start_time[j] << endl;;
             continue;
         }
         last_installment_start_time[j] += servers[0].getG() * gamma[0] * this->V;
@@ -719,9 +719,9 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
         }
         last_installment_start_time[j] += servers[j - 1].getO();
         waiting_time = std::max(waiting_time, internal_installment_end_time[j] - last_installment_start_time[j]);
-        cout << j << " internal_installment_end_time: " << internal_installment_end_time[j] 
-                    << ", last_installment_start_time: " << last_installment_start_time[j] << endl;
-        cout << internal_installment_end_time[j] - last_installment_start_time[j] << endl;;
+        // cout << j << " internal_installment_end_time: " << internal_installment_end_time[j] 
+        //             << ", last_installment_start_time: " << last_installment_start_time[j] << endl;
+        // cout << internal_installment_end_time[j] - last_installment_start_time[j] << endl;;
     }
     
     // 若冲突则等待
