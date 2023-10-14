@@ -1,9 +1,9 @@
 /*
- * @FilePath: \InstallmentScheduling\main.cpp
+ * @FilePath: /InstallmentScheduling/main.cpp
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-09-17 15:19:10
+ * @LastEditTime: 2023-10-14 16:54:05
  */
 
 #include "include/method.h"
@@ -12,17 +12,33 @@
 #include "include/exp_3.h"
 
 int main() {
+
+    /**
+     * @brief 调度示例测试
+     * 
+     */
+    // run_MISRR(4, 4, 400, 0.2, "../data/4-servers-example/");
+    // run_MISRR(4, 4, 400, 0.2, "../data/4-servers-example/", {3}, 2);
+
+    /**
+     * @brief 容错测试
+     * 
+     */
     // run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/", {6, 12}, 7);
     // run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/", {6, 12}, 23);
     // run_MISRR(30, 24, 8000, 0.3, "../data/exp1-30-servers/");
     // run_myAPMISRR(30, 0.5, 24, 8000, 0.3, "../data/exp1-30-servers/", {6, 12}, 7);
 
+    /**
+     * @brief 带容错的三个模型对比实验
+     * 
+     */
     // exp_3::error_SIS_15();
     // exp_3::error_TolerMIS_15();
     // exp_3::error_APMISRR_15();
-    exp_3::error_SIS_30();
-    exp_3::error_TolerMIS_30();
-    exp_3::error_APMISRR_30();
+    // exp_3::error_SIS_30();
+    // exp_3::error_TolerMIS_30();
+    // exp_3::error_APMISRR_30();
 
     // exp_2::W_vs_m_15();
     // exp_2::theta_vs_m_15();

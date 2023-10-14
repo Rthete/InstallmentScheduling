@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-13 22:37:48
- * @LastEditTime: 2023-09-14 13:13:45
+ * @LastEditTime: 2023-09-19 18:02:01
  */
 
 #ifndef _MISRR_H
@@ -48,6 +48,8 @@ private:
     double timeGap;                             // 冲突时间
     double leftW = 0.0;                         // 发生错误剩下的任务量
     double startTime = 0.0;                     // 发生错误时的开始时间
+    vector<int> errorPlace;
+    int errorInstallment;
 
     // beta
     vector<double> beta;                        // 内部调度分配量

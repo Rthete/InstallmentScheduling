@@ -73,11 +73,13 @@ void MISRR::initValue() {
     // cal mu (beta)
     for (int i = 0; i < this->n; ++i) {
         mu[i] = servers[0].getW() / servers[i].getW();
+        // cout << "mu["<< i << "]: " << mu[i] << endl;
     }
 
     // cal eta (beta)
     for (int i = 0; i < this->n; ++i) {
         eta[i] = (servers[0].getS() - servers[i].getS()) / servers[i].getW();
+        // cout << "eta["<< i << "]: " << eta[i] << endl;
     }
 
     vector<double> delta(this->n, 0);
@@ -87,19 +89,22 @@ void MISRR::initValue() {
     // cal Delta
     for (int i = 1; i < this->n; ++i) {
         delta[i] = (servers[i - 1].getW() + servers[i - 1].getG() * (this->theta - 1.0)) / servers[i].getW();
+        // cout << "delta["<< i << "]: " << delta[i] << endl;
     }
     for (int i = 1; i < this->n; ++i) {
         Delta[i] = 1.0;
         for (int j = 1; j <= i; ++j) {
             Delta[i] *= delta[j];
         }
+        // cout << "Delta["<< i << "]: " << Delta[i] << endl;
     }
 
     // cal Phi
     for (int i = 1; i < this->n; ++i) {
         phi[i] = servers[i - 1].getG() / servers[i].getW();
+        // cout << "phi["<< i << "]: " << phi[i] << endl;
     }
-        for (int i = 1; i < this->n; ++i) {
+    for (int i = 1; i < this->n; ++i) {
         Phi[i] = 0;
         for (int j = 1; j <= i; ++j) {
             double temp = 1.0;
@@ -108,13 +113,15 @@ void MISRR::initValue() {
             }
             Phi[i] += (phi[j] * mu[j - 1] * temp);
         }
+        // cout << "Phi["<< i << "]: " << Phi[i] << endl;
     }
 
     // cal Epsilon
     for (int i = 1; i < this->n; ++i) {
         epsilon[i] = (servers[i - 1].getO() + servers[i - 1].getS() - servers[i].getS()) / servers[i].getW();
+        // cout << "epsilon["<< i << "]: " << epsilon[i] << endl;
     }
-        for (int i = 1; i < this->n; ++i) {
+    for (int i = 1; i < this->n; ++i) {
         Epsilon[i] = 0.0;
         for (int j = 1; j <= i; ++j) {
             double temp = 1.0;
@@ -123,6 +130,7 @@ void MISRR::initValue() {
             }
             Epsilon[i] += ((phi[j] * eta[j - 1] + epsilon[j]) * temp);
         }
+        // cout << "Epsilon["<< i << "]: " << Epsilon[i] << endl;    
     }
 
     vector<double> lambda(this->n, 0);
@@ -132,17 +140,20 @@ void MISRR::initValue() {
     // cal Lambda
     for (int i = 1; i < this->n; ++i) {
         lambda[i] = (servers[i - 1].getW() - servers[i - 1].getG() + servers[i - 1].getG() * this->theta) / servers[i].getW();
+        // cout << "lambda["<< i << "]: " << lambda[i] << endl;
     }
     for (int i = 1; i < this->n; ++i) {
         Lambda[i] = 1.0;
         for (int j = 1; j <= i; ++j) {
             Lambda[i] *= lambda[j];
         }
+        // cout << "Lambda["<< i << "]: " << Lambda[i] << endl;
     }
 
     // cal Psi
     for (int i = 1; i < this->n; ++i) {
         psi[i] = (servers[i - 1].getG() * this->theta) / servers[i].getW();
+        // cout << "psi["<< i << "]: " << psi[i] << endl;
     }
     for (int i = 1; i < this->n; ++i) {
         Psi[i] = 0;
@@ -153,11 +164,13 @@ void MISRR::initValue() {
             }
             Psi[i] += ((psi[j] * mu[j - 1]) * value);
         }
+        // cout << "Psi["<< i << "]: " << Psi[i] << endl;
     }
 
     // cal Rho
     for (int i = 1; i < this->n; ++i) {
         rho[i] = (servers[i - 1].getS() - servers[i - 1].getO() - servers[i].getS()) / servers[i].getW();
+        // cout << "rho["<< i << "]: " << rho[i] << endl;
     }
     for (int i = 1; i < this->n; ++i) {
         P[i] = 0;
@@ -168,6 +181,7 @@ void MISRR::initValue() {
             }
             P[i] += ((rho[j] - psi[j] * eta[j - 1]) * value);
         }
+        // cout << "P["<< i << "]: " << P[i] << endl;
     }
 
     // cal optimal installment size m
@@ -214,6 +228,10 @@ void MISRR::calBeta() {
         sum_2_n_mu += mu[i];
         sum_2_n_eta += eta[i];
     }
+    // cout << "sum_2_n_mu: " << sum_2_n_mu << endl;
+    // cout << "sum_2_n_eta: " << sum_2_n_eta << endl;
+    // cout << "V: " << V << endl;
+    
     double sum = 0;
     for (int i = 0 ; i < this->n; ++i) {
         if (i == 0) {
@@ -249,6 +267,10 @@ void MISRR::calAlpha() {
         sum_2_n_epsilon += Epsilon[i];
         sum_2_n_delta += Delta[i];
     }
+    // cout << "sum_2_n_delta: " << sum_2_n_delta << endl;
+    // cout << "sum_2_n_phi: " << sum_2_n_phi << endl;
+    // cout << "sum_2_n_epsilon: " << sum_2_n_epsilon << endl;
+
     for (int i = 0; i < this->n; ++i) {
         if (i == 0) {
             alpha[i] = (1.0 - beta[0] * sum_2_n_phi - (sum_2_n_epsilon / this->V)) / (1.0 + sum_2_n_delta);
@@ -296,6 +318,9 @@ void MISRR::calGammaPrime() {
     for (int i = 0; i < this->n; ++i) {
         if (i == 0) {
             gamma[i] = (1.0 + beta[0] * sum_2_n_psi * this->old_V / this->V - (sum_2_n_p / this->V)) / (1.0 + sum_2_n_lambda);
+            if (find(errorPlace.begin(), errorPlace.end(), i + 1) != errorPlace.end()) {
+                gamma[i] = 0;
+            }
             // cout << "gamma[" << i << "]: " << gamma[i] << endl;
             continue;
         }
@@ -477,6 +502,9 @@ void MISRR::printResult() {
  * @param errorInstallment 
  */
 void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
+    this->errorPlace = errorPlace;
+    this->errorInstallment = errorInstallment;
+
     outputName = outputName + '_' + to_string((int)errorPlace.size()) +
             "_installment_" + to_string(errorInstallment) + "_ server";
     for (auto i : errorPlace) {
@@ -625,18 +653,30 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
             internal_installment_end_time[j] += servers[i].getG() * beta[i] * theta * this->V;
         }
         internal_installment_end_time[j] += servers[j - 1].getO();
+        // cout << "internal_installment_end_time[" << j << "]: " << internal_installment_end_time[j] << endl;
     }
     
 
     // cal left workload
-    // 故障处理机剩余的任务量(仅考虑内部调度中出错)
-    for (auto i : errorPlace) {
-        // 故障处理机内部调度剩余任务量
-        this->leftW += (this->m - errorInstallment) * beta[i - 1] * this->V;
-        // 计算故障处理机的使用时间
-        usingTime[i - 1] = (servers[i - 1].getS() + alpha[i - 1] * this->V * servers[i - 1].getW() +
-                    (errorInstallment - 2) * (servers[i - 1].getS() + beta[i - 1] * this->V * servers[i - 1].getW()));
+    if(errorInstallment == 1) {
+        for (auto i : errorPlace) {
+            // 故障处理机剩余任务量
+            this->leftW += ((this->m - errorInstallment - 1) * beta[i - 1] + alpha[i - 1]) * this->V;
+            // 计算故障处理机的使用时间
+            usingTime[i - 1] = 0;
+        }
+    } else if (errorInstallment == this->m) {
+        ;
+    } else {
+        for (auto i : errorPlace) {
+            // 故障处理机内部调度剩余任务量
+            this->leftW += (this->m - errorInstallment) * beta[i - 1] * this->V;
+            // 计算故障处理机的使用时间
+            usingTime[i - 1] = (servers[i - 1].getS() + alpha[i - 1] * this->V * servers[i - 1].getW() +
+                        (errorInstallment - 2) * (servers[i - 1].getS() + beta[i - 1] * this->V * servers[i - 1].getW()));
+        }
     }
+    
 
     // 将原来的最后一趟取消，任务量加到剩余任务
     for(int i = 0; i < this->n; i++) {
@@ -656,11 +696,6 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
     this->V = this->leftW;
     
     for (auto i : errorPlace) {
-        mu[i - 1] = 0;
-        eta[i - 1] = 0;
-        Delta[i - 1] = 0;
-        Phi[i - 1] = 0;
-        Epsilon[i - 1] = 0;
         Lambda[i - 1] = 0;
         Psi[i - 1] = 0;
         P[i - 1] = 0;
@@ -699,7 +734,7 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
     // 查看最后一个处理机是否有冲突
     vector<double> last_installment_start_time(this->n, 0);
     double waiting_time = 0;
-    for(int j = 1; j < n - 1; ++j) {
+    for(int j = 1; j <= n - 1; ++j) {
         if(find(errorPlace.begin(), errorPlace.end(), j + 1) != errorPlace.end()) {
             // cout << j << " internal_installment_end_time: " << internal_installment_end_time[j] 
             //         << ", last_installment_start_time: " << last_installment_start_time[j] << endl;
