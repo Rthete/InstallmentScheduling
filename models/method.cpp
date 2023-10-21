@@ -1,14 +1,14 @@
 /*
- * @FilePath: \InstallmentScheduling\models\method.cpp
+ * @FilePath: /InstallmentScheduling/models/method.cpp
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-09-13 21:08:01
+ * @LastEditTime: 2023-10-21 16:21:39
  */
 
 #include "method.h"
 
-bool output_using_rate = 0; // 控制是否输出ur
+bool output_using_rate = 1; // 控制是否输出ur
 
 /**
  * 运行SIS模型

@@ -1,9 +1,9 @@
 <!--
- * @FilePath: \InstallmentScheduling\README.md
+ * @FilePath: /InstallmentScheduling/README.md
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 15:04:04
- * @LastEditTime: 2023-09-09 13:34:07
+ * @LastEditTime: 2023-10-21 20:23:35
 -->
 # README
 
@@ -32,6 +32,7 @@ InstallmentScheduling
 ├─ models   // 模型算法实现
 ├─ README.md
 └─ scripts
+   ├─ plot.py               // 故障实验画图脚本
    ├─ dataGenerator.py      // 随机生成处理机参数
    └─ imgTypeConvertor.py   // 转换图片格式
 

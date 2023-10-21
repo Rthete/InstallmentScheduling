@@ -1,9 +1,9 @@
 /*
- * @FilePath: \InstallmentScheduling\exp\exp_3.cpp
+ * @FilePath: /InstallmentScheduling/exp/exp_3.cpp
  * @Description: 带容错的3个模型实验
  * @Author: rthete
  * @Date: 2023-08-19 17:41:41
- * @LastEditTime: 2023-09-17 16:30:29
+ * @LastEditTime: 2023-10-21 16:48:55
  */
 #include "exp_3.h"
 
@@ -84,6 +84,8 @@ namespace exp_3{
         std::vector<std::vector<int>> error_places;
         std::ofstream meanFile("../output/exp_3/error_SIS_30_mean.csv");
         std::ofstream diffFile("../output/exp_3/error_SIS_30_diff.csv");
+        std::ofstream maxFile("../output/exp_3/error_SIS_30_max.csv");
+        std::ofstream minFile("../output/exp_3/error_SIS_30_min.csv");
 
         /* 故障i个处理机 */
         for(int i = 1; i <= 4; ++i) {
@@ -104,14 +106,20 @@ namespace exp_3{
                 }
                 meanFile << result_sum / 30 << ",";
                 diffFile << result_max - result_min << ",";
+                maxFile << result_max << ",";
+                minFile << result_min << ",";
             }
             meanFile << std::endl;
             diffFile << std::endl;
+            maxFile << std::endl;
+            minFile << std::endl;
         }
         meanFile.close();
         diffFile.close();
-        transposeCSV("../output/exp_3/error_SIS_30_mean.csv", "../output/exp_3/t_error_SIS_30_mean.csv"); 
-        transposeCSV("../output/exp_3/error_SIS_30_diff.csv", "../output/exp_3/t_error_SIS_30_diff.csv"); 
+        maxFile.close();
+        minFile.close();
+        // transposeCSV("../output/exp_3/error_SIS_30_mean.csv", "../output/exp_3/t_error_SIS_30_mean.csv"); 
+        // transposeCSV("../output/exp_3/error_SIS_30_diff.csv", "../output/exp_3/t_error_SIS_30_diff.csv"); 
     }
 
     void error_TolerMIS_30() {
@@ -119,6 +127,8 @@ namespace exp_3{
         std::vector<std::vector<int>> error_installment;
         std::ofstream meanFile("../output/exp_3/error_TolerMIS_30_mean.csv");
         std::ofstream diffFile("../output/exp_3/error_TolerMIS_30_diff.csv");
+        std::ofstream maxFile("../output/exp_3/error_TolerMIS_30_max.csv");
+        std::ofstream minFile("../output/exp_3/error_TolerMIS_30_min.csv");
 
         /* 故障i个处理机 */
         for(int i = 1; i <= 4; ++i) {
@@ -142,16 +152,22 @@ namespace exp_3{
                 }
                 meanFile << result_sum / 30 << ",";
                 diffFile << result_max - result_min << ",";
+                maxFile << result_max << ",";
+                minFile << result_min << ",";
 
                 index_w++;
             }
             meanFile << std::endl;
             diffFile << std::endl;
+            maxFile << std::endl;
+            minFile << std::endl;
         }
         meanFile.close();
         diffFile.close();
-        transposeCSV("../output/exp_3/error_TolerMIS_30_mean.csv", "../output/exp_3/t_error_TolerMIS_30_mean.csv"); 
-        transposeCSV("../output/exp_3/error_TolerMIS_30_diff.csv", "../output/exp_3/t_error_TolerMIS_30_diff.csv");
+        maxFile.close();
+        minFile.close();
+        // transposeCSV("../output/exp_3/error_TolerMIS_30_mean.csv", "../output/exp_3/t_error_TolerMIS_30_mean.csv"); 
+        // transposeCSV("../output/exp_3/error_TolerMIS_30_diff.csv", "../output/exp_3/t_error_TolerMIS_30_diff.csv");
     }
 
     void error_APMISRR_30() {
@@ -160,6 +176,8 @@ namespace exp_3{
 
         std::ofstream meanFile("../output/exp_3/error_APMISRR_30_mean.csv");
         std::ofstream diffFile("../output/exp_3/error_APMISRR_30_diff.csv");
+        std::ofstream maxFile("../output/exp_3/error_APMISRR_30_max.csv");
+        std::ofstream minFile("../output/exp_3/error_APMISRR_30_min.csv");
 
         /* 故障i个处理机 */
         vector<int> m = {19,21,23,25,26,28,29,30,31,33,34};
@@ -183,15 +201,21 @@ namespace exp_3{
                 }
                 meanFile << result_sum / 30 << ",";
                 diffFile << result_max - result_min << ",";
+                maxFile << result_max << ",";
+                minFile << result_min << ",";
 
                 index_w++;
             }
             meanFile << std::endl;
             diffFile << std::endl;
+            maxFile << std::endl;
+            minFile << std::endl;
         }
         meanFile.close();
         diffFile.close();
-        transposeCSV("../output/exp_3/error_APMISRR_30_mean.csv", "../output/exp_3/t_error_APMISRR_30_mean.csv"); 
-        transposeCSV("../output/exp_3/error_APMISRR_30_diff.csv", "../output/exp_3/t_error_APMISRR_30_diff.csv");
+        maxFile.close();
+        minFile.close();
+        // transposeCSV("../output/exp_3/error_APMISRR_30_mean.csv", "../output/exp_3/t_error_APMISRR_30_mean.csv"); 
+        // transposeCSV("../output/exp_3/error_APMISRR_30_diff.csv", "../output/exp_3/t_error_APMISRR_30_diff.csv");
     }
 }

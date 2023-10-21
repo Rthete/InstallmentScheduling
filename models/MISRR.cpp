@@ -666,6 +666,7 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
             usingTime[i - 1] = 0;
         }
     } else if (errorInstallment == this->m) {
+        // TODO: 实现最后一趟出错
         ;
     } else {
         for (auto i : errorPlace) {
