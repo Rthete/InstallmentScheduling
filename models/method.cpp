@@ -3,12 +3,12 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-10-21 16:21:39
+ * @LastEditTime: 2023-10-21 22:33:58
  */
 
 #include "method.h"
 
-bool output_using_rate = 1; // 控制是否输出ur
+bool output_using_rate = 0; // 控制是否输出ur
 
 /**
  * 运行SIS模型
@@ -90,6 +90,33 @@ double run_MISRR(int server_num, int m, int workload, double theta, string data_
     if(output_using_rate == 1)
         return misrr.getUsingRate();
     return misrr.getOptimalTime();
+}
+
+void run_MISRR_conflict(vector<double> &waiting_time, int server_num, int m, int workload, double theta, string data_path, 
+                 vector<int> error_server, int error_installment) {
+    // auto workload = 8000;   // total workload
+    // auto theta = 0.3;       // Ratio of the output load size to input load size
+    // auto m = 8;            // installment size
+
+    cout << "**********************run MISRR**********************" << endl;
+    cout << server_num << " servers, m = " << m << ", theta = " << theta << endl;
+    cout << "total load = " << workload << endl;
+
+    MISRR misrr(server_num, theta, m);
+    misrr.getDataFromFile(data_path);
+    misrr.setW((double)workload);
+    misrr.initValue();
+    misrr.getOptimalModel();
+
+    // auto error_installment = 10;
+    if(!error_server.empty()) {
+        cout << "error server size: " << to_string(error_server.size()) << ", error installment: "  << error_installment << endl;
+        misrr.error_2(error_server, error_installment);
+    }
+
+    cout << "misrr.getUsingRate(): " << misrr.getUsingRate() << endl;
+    cout << "misrr.getOptimalTime(): " << misrr.getOptimalTime() << endl;
+    misrr.getWaitingTime(waiting_time);
 }
 
 

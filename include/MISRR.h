@@ -1,9 +1,9 @@
 /*
- * @FilePath: \InstallmentScheduling\include\MISRR.h
+ * @FilePath: /InstallmentScheduling/include/MISRR.h
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-13 22:37:48
- * @LastEditTime: 2023-09-19 18:02:01
+ * @LastEditTime: 2023-10-21 22:15:14
  */
 
 #ifndef _MISRR_H
@@ -30,6 +30,7 @@ public:
     void theLastInstallmentGap();
     void checkTime();
     void calOptimalM();
+    void getWaitingTime(vector<double> &wating_time) const;
 
 private:
     int n;                                      // 处理机个数
@@ -75,6 +76,7 @@ private:
     // time
     vector<double> usingTime;                   // 每个处理机的总使用时间
     vector<double> usingTime1;                  // 每个处理机除最后一趟的使用时间
+    vector<double> waiting_time;                  // 每个处理机冲突时间
 
     // print
     string outputName;

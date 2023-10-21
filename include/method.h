@@ -1,9 +1,9 @@
 /*
- * @FilePath: \InstallmentScheduling\include\method.h
+ * @FilePath: /InstallmentScheduling/include/method.h
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:54:33
- * @LastEditTime: 2023-08-21 22:34:24
+ * @LastEditTime: 2023-10-21 22:20:11
  */
 #ifndef _METHOD_H
 #define _METHOD_H
@@ -20,6 +20,9 @@
 double run_SIS(int server_num=15, int workload=8000, double theta=0.3, string data_path="../data/15-servers-w-20/", vector<int> error_server={});
 void run_PMIS();
 double run_MISRR(int server_num=15, int m=8, int workload=8000, double theta=0.3,
+                 string data_path="../data/15-servers-w-20/", vector<int> error_server={},
+                 int error_installment=10);
+void run_MISRR_conflict(vector<double> &waiting_time, int server_num=15, int m=8, int workload=8000, double theta=0.3,
                  string data_path="../data/15-servers-w-20/", vector<int> error_server={},
                  int error_installment=10);
 void run_MISRR_check();

@@ -3,7 +3,7 @@
  * @Description: 带容错的3个模型实验
  * @Author: rthete
  * @Date: 2023-08-19 17:41:41
- * @LastEditTime: 2023-10-21 16:48:55
+ * @LastEditTime: 2023-10-21 22:43:14
  */
 #include "exp_3.h"
 
@@ -78,6 +78,37 @@ namespace exp_3{
         inputFile.close();
         outputFile.close();
     }
+    
+    /*冲突时间实验*/
+    void error_TolerMIS_30_conflict() {
+        std::vector<std::vector<int>> error_places;
+        std::vector<std::vector<int>> error_installment;
+        std::ofstream conflictFile("../output/exp_3_conflict/error_TolerMIS_30_conflict.csv");
+            error_places.clear();
+            readTXTFile("../data/exp3-error-conflict/error-place-30-conflict.txt", error_places);
+            readTXTFile("../data/exp3-error-conflict/error-installment-conflict.txt", error_installment);
+            
+
+
+                /* 每种30次取平均 */
+            /* 任务量5000/10000 */
+                for (const auto& row : error_places) {
+                    vector<double> result;
+                    // run_MISRR_conflict(result, 30, 0, 5000, 0.3, "../data/exp1-30-servers/", row, error_installment[0][0]);
+                    run_MISRR_conflict(result, 30, 0, 10000, 0.3, "../data/exp1-30-servers/", row, error_installment[1][0]);
+                    for (auto it = result.begin(); it != result.end(); ++it) {
+                        conflictFile << *it;
+                        // 如果不是最后一个元素，添加逗号
+                        if (std::next(it) != result.end()) {
+                            conflictFile << ",";
+                        }
+                    }
+                    conflictFile << std::endl;
+                }
+            
+        
+        conflictFile.close();
+       }
 
     /* SIS模型，共30个处理机，故障1/2/3/4个处理机，每种实验30次 */
     void error_SIS_30() {

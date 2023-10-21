@@ -31,6 +31,7 @@ MISRR::MISRR(int valueN, double valueTheta, int installment) :
         // time
         usingTime(vector<double>(MAX_N, 0)),
         usingTime1(vector<double>(MAX_N, 0)),
+        waiting_time(vector<double>(valueN, 0)),
         outputName("MISRR_print_result"){}
 
 MISRR::MISRR(int valueN, double valueTheta) :
@@ -734,7 +735,7 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
 
     // 查看最后一个处理机是否有冲突
     vector<double> last_installment_start_time(this->n, 0);
-    double waiting_time = 0;
+
     for(int j = 1; j <= n - 1; ++j) {
         if(find(errorPlace.begin(), errorPlace.end(), j + 1) != errorPlace.end()) {
             // cout << j << " internal_installment_end_time: " << internal_installment_end_time[j] 
@@ -754,14 +755,18 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
             last_installment_start_time[j] += servers[i].getG() * beta[i] * theta * this->old_V;
         }
         last_installment_start_time[j] += servers[j - 1].getO();
-        waiting_time = std::max(waiting_time, internal_installment_end_time[j] - last_installment_start_time[j]);
+        this->waiting_time[j] = internal_installment_end_time[j] - last_installment_start_time[j];
+        if(this->waiting_time[j] < 0) {
+            this->waiting_time[j] = 0;
+        }
         // cout << j << " internal_installment_end_time: " << internal_installment_end_time[j] 
         //             << ", last_installment_start_time: " << last_installment_start_time[j] << endl;
         // cout << internal_installment_end_time[j] - last_installment_start_time[j] << endl;;
+
     }
     
     // 若冲突则等待
-    this->optimalTime += waiting_time;
+    this->optimalTime += *max_element(this->waiting_time.begin(), this->waiting_time.end());
 }
 
 void MISRR::setW(double value) {
@@ -779,6 +784,10 @@ double MISRR::getUsingRate() const {
 
 int MISRR::getOptimalM() const {
     return this->m;
+}
+
+void MISRR::getWaitingTime(vector<double> &waiting_time) const {
+    waiting_time = this->waiting_time;
 }
 
 /**
