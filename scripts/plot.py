@@ -3,7 +3,7 @@ FilePath: /InstallmentScheduling/scripts/plot.py
 Description:  
 Author: rthete
 Date: 2023-09-09 13:53:19
-LastEditTime: 2023-10-21 20:24:39
+LastEditTime: 2023-10-28 17:36:47
 """
 from datetime import datetime
 import random
@@ -86,7 +86,7 @@ def plot(x, x_data, APMISRR_avg, APMISRR_diff, TolerMIS_avg, TolerMIS_diff, SIS_
     plt.yticks(fontproperties='Times New Roman', size=6)
     plt.xticks(fontproperties='Times New Roman', size=6)
 
-    plt.xlabel(r'$\mathit{W}$', fontsize=9)
+    plt.xlabel(r'$\mathit{W(1e3)}$', fontsize=9)
     plt.ylabel(r'$\mathrm{Time}$', fontsize=9)
     # plt.yscale("log")
     plt.xticks(x_data)
@@ -109,7 +109,7 @@ def plot_error_ur(x_data, name="name"):
     }
     rcParams.update(config)
 
-    fig = plt.figure(figsize=(7, 3.7), dpi=2000)
+    fig = plt.figure(figsize=(5, 8), dpi=2000)
 
     ax = Subplot(fig, 111)
     fig.add_subplot(ax)
@@ -119,17 +119,20 @@ def plot_error_ur(x_data, name="name"):
     ax.axis["top"].set_visible(False)
     ax.axis["right"].set_visible(False)
 
+    # ax.set_ylim(70, 100)
+    ax.set_yticks(np.linspace(70,100,11,endpoint=True))
+    
     box = plt.boxplot(x_data,
                       labels=[
                           '$\mathrm{SIS}$', '$\mathrm{APMISRR}$', '$\mathrm{TolerMIS}$'],
-                      vert=False,
+                      vert=True,
                       widths=0.4,
                       meanline=False,
                       showmeans=False,
                       patch_artist=True,
                       medianprops={'color': 'black'})
 
-    plt.xlabel(r'$\mathrm{using \: rate(\%)}$', fontsize=12)
+    plt.ylabel(r'$\mathrm{using \: rate(\%)}$', fontsize=12)
 
     c_list = ['#A5A5A5', '#5B9BD5', '#ED7D31']
 
@@ -140,17 +143,16 @@ def plot_error_ur(x_data, name="name"):
     plt.savefig(name, dpi=1000)
 
 
-"""
-从数据生成数组，返回error_num时的三个模型数据，格式为
-[
-    [SIS数据]
-    [APMISRR数据]
-    [TolerMIS数据]
-]
-"""
-
-
 def generateDataList(error_num):
+    """
+    从数据生成数组，返回error_num时的三个模型数据，格式为
+    [
+        [SIS数据]
+        [APMISRR数据]
+        [TolerMIS数据]
+    ]
+    """
+
     SIS_max = read_data_from_file('./output/exp_3_ur/error_SIS_30_max.csv')
     SIS_min = read_data_from_file('./output/exp_3_ur/error_SIS_30_min.csv')
 
@@ -195,21 +197,21 @@ if __name__ == "__main__":
     """
     30处理机，时间，柱状图
     """
-    # 任务量5000~15000，共11组数据
+    # # 任务量5000~15000，共11组数据
     # x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     # x_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
-    # SIS_diff = read_data_from_file('./output/exp_3/error_SIS_30_diff.csv')
-    # APMISRR_diff = read_data_from_file('./output/exp_3/error_APMISRR_30_diff.csv')
-    # TolerMIS_diff = read_data_from_file('./output/exp_3/error_TolerMIS_30_diff.csv')
-    # SIS_mean = read_data_from_file('./output/exp_3/error_SIS_30_mean.csv')
-    # APMISRR_mean = read_data_from_file('./output/exp_3/error_APMISRR_30_mean.csv')
-    # TolerMIS_mean = read_data_from_file('./output/exp_3/error_TolerMIS_30_mean.csv')
+    # SIS_diff = read_data_from_file('./output/exp_3_time/error_SIS_30_diff.csv')
+    # APMISRR_diff = read_data_from_file('./output/exp_3_time/error_APMISRR_30_diff.csv')
+    # TolerMIS_diff = read_data_from_file('./output/exp_3_time/error_TolerMIS_30_diff.csv')
+    # SIS_mean = read_data_from_file('./output/exp_3_time/error_SIS_30_mean.csv')
+    # APMISRR_mean = read_data_from_file('./output/exp_3_time/error_APMISRR_30_mean.csv')
+    # TolerMIS_mean = read_data_from_file('./output/exp_3_time/error_TolerMIS_30_mean.csv')
 
-    # plot(x, x_data, APMISRR_mean[0], APMISRR_diff[0], TolerMIS_mean[0], TolerMIS_diff[0], SIS_mean[0], SIS_diff[0], f"./output/error_plots/1_error_place_{time_str}")
-    # plot(x, x_data, APMISRR_mean[1], APMISRR_diff[1], TolerMIS_mean[1], TolerMIS_diff[1], SIS_mean[1], SIS_diff[1], f"./output/error_plots/2_error_place_{time_str}")
-    # plot(x, x_data, APMISRR_mean[2], APMISRR_diff[2], TolerMIS_mean[2], TolerMIS_diff[2], SIS_mean[2], SIS_diff[2], f"./output/error_plots/3_error_place_{time_str}")
-    # plot(x, x_data, APMISRR_mean[3], APMISRR_diff[3], TolerMIS_mean[3], TolerMIS_diff[3], SIS_mean[3], SIS_diff[3], f"./output/error_plots/4_error_place_{time_str}")
+    # plot(x, x_data, APMISRR_mean[0], APMISRR_diff[0], TolerMIS_mean[0], TolerMIS_diff[0], SIS_mean[0], SIS_diff[0], f"./output/error_plots/time_1_error_place_{time_str}")
+    # plot(x, x_data, APMISRR_mean[1], APMISRR_diff[1], TolerMIS_mean[1], TolerMIS_diff[1], SIS_mean[1], SIS_diff[1], f"./output/error_plots/time_2_error_place_{time_str}")
+    # plot(x, x_data, APMISRR_mean[2], APMISRR_diff[2], TolerMIS_mean[2], TolerMIS_diff[2], SIS_mean[2], SIS_diff[2], f"./output/error_plots/time_3_error_place_{time_str}")
+    # plot(x, x_data, APMISRR_mean[3], APMISRR_diff[3], TolerMIS_mean[3], TolerMIS_diff[3], SIS_mean[3], SIS_diff[3], f"./output/error_plots/time_4_error_place_{time_str}")
 
     """
     30处理机，利用率，箱线图
@@ -218,7 +220,7 @@ if __name__ == "__main__":
         # 按min和max生成数据
         data = generateDataList(error_num)
         # 储存为csv
-        np.savetxt("plot_ur_data_{}.csv".format(
-            error_num), data, delimiter=",", fmt="%.6f")
-        # plot_error_ur(
-        #     data, f"./output/error_plots/{error_num}_error_place_{time_str}")
+        # np.savetxt("./data/error_plot_ur/plot_ur_data_{}.csv".format(
+            # error_num), data, delimiter=",", fmt="%.6f")
+        plot_error_ur(
+            data, f"./output/error_plots/{error_num}_error_place_{time_str}")

@@ -3,7 +3,7 @@
  * @Description: 带容错的3个模型实验
  * @Author: rthete
  * @Date: 2023-08-19 17:41:41
- * @LastEditTime: 2023-10-21 23:00:41
+ * @LastEditTime: 2023-10-26 18:29:06
  */
 #include "exp_3.h"
 
@@ -100,7 +100,7 @@ namespace exp_3
     {
         std::vector<std::vector<int>> error_places;
         std::vector<std::vector<int>> error_installment;
-        std::ofstream conflictFile("../output/exp_3_conflict/error_TolerMIS_30_conflict.csv");
+        std::ofstream conflictFile("../output/exp_3_conflict/error_TolerMIS_30_conflict_cmp.csv");
         error_places.clear();
         readTXTFile("../data/exp3-error-conflict/error-place-30-conflict.txt", error_places);
         readTXTFile("../data/exp3-error-conflict/error-installment-conflict.txt", error_installment);
@@ -111,7 +111,10 @@ namespace exp_3
         {
             vector<double> result;
             // run_MISRR_conflict(result, 30, 0, 5000, 0.3, "../data/exp1-30-servers/", row, error_installment[0][0]);
-            run_MISRR_conflict(result, 30, 0, 10000, 0.3, "../data/exp1-30-servers/", row, error_installment[1][0]);
+            // run_MISRR_conflict(result, 30, 0, 10000, 0.3, "../data/exp1-30-servers/", row, error_installment[1][0]);
+            // 对比没有冲突情况
+            run_MISRR_conflict(result, 30, 0, 5000, 0.3, "../data/exp1-30-servers/", row, error_installment[2][0]);
+            // run_MISRR_conflict(result, 30, 0, 10000, 0.3, "../data/exp1-30-servers/", row, error_installment[3][0]);
             for (auto it = result.begin(); it != result.end(); ++it)
             {
                 conflictFile << *it;
