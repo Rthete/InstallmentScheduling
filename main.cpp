@@ -40,7 +40,9 @@ int main() {
     // exp_3::error_TolerMIS_30();
     // exp_3::error_APMISRR_30();
     // exp_3::error_TolerMIS_30_conflict();
-    exp_3::error_cmp_3_models_ur();
+    // exp_3::error_cmp_3_models_ur();
+    exp_3::error_save_each_time();
+
 
     // exp_2::W_vs_m_15();
     // exp_2::theta_vs_m_15();
