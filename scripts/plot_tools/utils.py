@@ -3,7 +3,7 @@ FilePath: /InstallmentScheduling/scripts/plot_tools/utils.py
 Description:  
 Author: rthete
 Date: 2023-11-04 16:19:15
-LastEditTime: 2023-11-04 16:22:33
+LastEditTime: 2023-11-04 17:58:55
 """
 import numpy as np
 np.random.seed(1)

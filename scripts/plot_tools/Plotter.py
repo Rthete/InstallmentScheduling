@@ -4,18 +4,27 @@ from mpl_toolkits.axisartist.axislines import Subplot
 import numpy as np
 
 
-class Plotter():
-
-    def plot_error_time_bar(x, x_data, APMISRR_avg, APMISRR_diff, TolerMIS_avg, TolerMIS_diff, SIS_avg, SIS_diff, name="name"):
+class Plotter:
+    def plot_error_time_bar(
+        x,
+        x_data,
+        APMISRR_avg,
+        APMISRR_diff,
+        TolerMIS_avg,
+        TolerMIS_diff,
+        SIS_avg,
+        SIS_diff,
+        name="name",
+    ):
         """
         容错-时间-柱状图
         """
         config = {
-            "font.family": 'serif',  # 衬线字体
+            "font.family": "serif",  # 衬线字体
             "font.size": 13,  # 相当于小四大小
-            "font.serif": ['SimSun'],  # 宋体
-            "mathtext.fontset": 'stix',  # matplotlib渲染数学字体时使用的字体，和Times New Roman差别不大
-            'axes.unicode_minus': False  # 处理负号，即-号
+            "font.serif": ["SimSun"],  # 宋体
+            "mathtext.fontset": "stix",  # matplotlib渲染数学字体时使用的字体，和Times New Roman差别不大
+            "axes.unicode_minus": False,  # 处理负号，即-号
         }
         rcParams.update(config)
 
@@ -34,20 +43,42 @@ class Plotter():
         x = x - (total_width - width) / 2
 
         err_attr = {"elinewidth": 0.8, "ecolor": "black", "capsize": 2.5}
-        plt.bar(x, SIS_avg, yerr=SIS_diff, width=width,
-                label=r'$\mathrm{SIS}$', color='#A5A5A5', error_kw=err_attr)
-        plt.bar(x + width, APMISRR_avg, yerr=APMISRR_diff, width=width,
-                label=r'$\mathrm{APMISRR}$', color='#5B9BD5', error_kw=err_attr)
-        plt.bar(x + 2 * width, TolerMIS_avg, yerr=TolerMIS_diff, width=width,
-                label=r'$\mathrm{TolerMIS}$', color='#ED7D31', error_kw=err_attr)
+        plt.bar(
+            x,
+            SIS_avg,
+            yerr=SIS_diff,
+            width=width,
+            label=r"$\mathrm{SIS}$",
+            color="#A5A5A5",
+            error_kw=err_attr,
+        )
+        plt.bar(
+            x + width,
+            APMISRR_avg,
+            yerr=APMISRR_diff,
+            width=width,
+            label=r"$\mathrm{APMISRR}$",
+            color="#5B9BD5",
+            error_kw=err_attr,
+        )
+        plt.bar(
+            x + 2 * width,
+            TolerMIS_avg,
+            yerr=TolerMIS_diff,
+            width=width,
+            label=r"$\mathrm{TolerMIS}$",
+            color="#ED7D31",
+            error_kw=err_attr,
+        )
 
-        plt.legend(prop={"family": "Times New Roman", 'size': 9},
-                   bbox_to_anchor=(0.28, 0.98))  # 显示上面的label
-        plt.yticks(fontproperties='Times New Roman', size=6)
-        plt.xticks(fontproperties='Times New Roman', size=6)
+        plt.legend(
+            prop={"family": "Times New Roman", "size": 9}, bbox_to_anchor=(0.28, 0.98)
+        )  # 显示上面的label
+        plt.yticks(fontproperties="Times New Roman", size=6)
+        plt.xticks(fontproperties="Times New Roman", size=6)
 
-        plt.xlabel(r'$\mathit{W(1e3)}$', fontsize=9)
-        plt.ylabel(r'$\mathrm{Time}$', fontsize=9)
+        plt.xlabel(r"$\mathit{W(1e3)}$", fontsize=9)
+        plt.ylabel(r"$\mathrm{Time}$", fontsize=9)
         # plt.yscale("log")
         plt.xticks(x_data)
 
@@ -61,11 +92,11 @@ class Plotter():
         容错-利用率-箱线图
         """
         config = {
-            "font.family": 'serif',  # 衬线字体
+            "font.family": "serif",  # 衬线字体
             "font.size": 12.5,  # 相当于小四大小
-            "font.serif": ['SimSun'],  # 宋体
-            "mathtext.fontset": 'stix',  # matplotlib渲染数学字体时使用的字体，和Times New Roman差别不大
-            'axes.unicode_minus': False  # 处理负号，即-号
+            "font.serif": ["SimSun"],  # 宋体
+            "mathtext.fontset": "stix",  # matplotlib渲染数学字体时使用的字体，和Times New Roman差别不大
+            "axes.unicode_minus": False,  # 处理负号，即-号
         }
         rcParams.update(config)
 
@@ -82,36 +113,47 @@ class Plotter():
         # ax.set_ylim(70, 100)
         ax.set_yticks(np.linspace(70, 100, 11, endpoint=True))
 
-        box = plt.boxplot(x_data,
-                          labels=[
-                              '$\mathrm{SIS}$', '$\mathrm{APMISRR}$', '$\mathrm{TolerMIS}$'],
-                          vert=True,
-                          widths=0.4,
-                          meanline=False,
-                          showmeans=False,
-                          patch_artist=True,
-                          medianprops={'color': 'black'})
+        box = plt.boxplot(
+            x_data,
+            labels=["$\mathrm{SIS}$", "$\mathrm{APMISRR}$", "$\mathrm{TolerMIS}$"],
+            vert=True,
+            widths=0.4,
+            meanline=False,
+            showmeans=False,
+            patch_artist=True,
+            medianprops={"color": "black"},
+        )
 
-        plt.ylabel(r'$\mathrm{using \: rate(\%)}$', fontsize=12)
+        plt.ylabel(r"$\mathrm{using \: rate(\%)}$", fontsize=12)
 
-        c_list = ['#A5A5A5', '#5B9BD5', '#ED7D31']
+        c_list = ["#A5A5A5", "#5B9BD5", "#ED7D31"]
 
-        for a, c in zip(box['boxes'], c_list):
-            a.set(color='black')
+        for a, c in zip(box["boxes"], c_list):
+            a.set(color="black")
             a.set(facecolor=c)
 
         plt.savefig(name, dpi=1000)
-        
-    def plot_error_time_box(x, x_data, APMISRR_avg, APMISRR_diff, TolerMIS_avg, TolerMIS_diff, SIS_avg, SIS_diff, name="name"):
+
+    def plot_error_time_box(
+        x,
+        x_data,
+        APMISRR_avg,
+        APMISRR_diff,
+        TolerMIS_avg,
+        TolerMIS_diff,
+        SIS_avg,
+        SIS_diff,
+        name="name",
+    ):
         """
         容错-时间-箱线图
         """
         config = {
-            "font.family": 'serif',  # 衬线字体
+            "font.family": "serif",  # 衬线字体
             "font.size": 13,  # 相当于小四大小
-            "font.serif": ['SimSun'],  # 宋体
-            "mathtext.fontset": 'stix',  # matplotlib渲染数学字体时使用的字体，和Times New Roman差别不大
-            'axes.unicode_minus': False  # 处理负号，即-号
+            "font.serif": ["SimSun"],  # 宋体
+            "mathtext.fontset": "stix",  # matplotlib渲染数学字体时使用的字体，和Times New Roman差别不大
+            "axes.unicode_minus": False,  # 处理负号，即-号
         }
         rcParams.update(config)
 
@@ -130,20 +172,42 @@ class Plotter():
         x = x - (total_width - width) / 2
 
         err_attr = {"elinewidth": 0.8, "ecolor": "black", "capsize": 2.5}
-        plt.bar(x, SIS_avg, yerr=SIS_diff, width=width,
-                label=r'$\mathrm{SIS}$', color='#A5A5A5', error_kw=err_attr)
-        plt.bar(x + width, APMISRR_avg, yerr=APMISRR_diff, width=width,
-                label=r'$\mathrm{APMISRR}$', color='#5B9BD5', error_kw=err_attr)
-        plt.bar(x + 2 * width, TolerMIS_avg, yerr=TolerMIS_diff, width=width,
-                label=r'$\mathrm{TolerMIS}$', color='#ED7D31', error_kw=err_attr)
+        plt.bar(
+            x,
+            SIS_avg,
+            yerr=SIS_diff,
+            width=width,
+            label=r"$\mathrm{SIS}$",
+            color="#A5A5A5",
+            error_kw=err_attr,
+        )
+        plt.bar(
+            x + width,
+            APMISRR_avg,
+            yerr=APMISRR_diff,
+            width=width,
+            label=r"$\mathrm{APMISRR}$",
+            color="#5B9BD5",
+            error_kw=err_attr,
+        )
+        plt.bar(
+            x + 2 * width,
+            TolerMIS_avg,
+            yerr=TolerMIS_diff,
+            width=width,
+            label=r"$\mathrm{TolerMIS}$",
+            color="#ED7D31",
+            error_kw=err_attr,
+        )
 
-        plt.legend(prop={"family": "Times New Roman", 'size': 9},
-                   bbox_to_anchor=(0.28, 0.98))  # 显示上面的label
-        plt.yticks(fontproperties='Times New Roman', size=6)
-        plt.xticks(fontproperties='Times New Roman', size=6)
+        plt.legend(
+            prop={"family": "Times New Roman", "size": 9}, bbox_to_anchor=(0.28, 0.98)
+        )  # 显示上面的label
+        plt.yticks(fontproperties="Times New Roman", size=6)
+        plt.xticks(fontproperties="Times New Roman", size=6)
 
-        plt.xlabel(r'$\mathit{W(1e3)}$', fontsize=9)
-        plt.ylabel(r'$\mathrm{Time}$', fontsize=9)
+        plt.xlabel(r"$\mathit{W(1e3)}$", fontsize=9)
+        plt.ylabel(r"$\mathrm{Time}$", fontsize=9)
         # plt.yscale("log")
         plt.xticks(x_data)
 
