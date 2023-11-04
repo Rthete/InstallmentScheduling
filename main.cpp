@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-10-21 21:25:52
+ * @LastEditTime: 2023-11-04 14:59:23
  */
 
 #include "include/method.h"
@@ -39,7 +39,8 @@ int main() {
     // exp_3::error_SIS_30();
     // exp_3::error_TolerMIS_30();
     // exp_3::error_APMISRR_30();
-    exp_3::error_TolerMIS_30_conflict();
+    // exp_3::error_TolerMIS_30_conflict();
+    exp_3::error_cmp_3_models_ur();
 
     // exp_2::W_vs_m_15();
     // exp_2::theta_vs_m_15();

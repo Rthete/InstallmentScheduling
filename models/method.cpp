@@ -3,12 +3,12 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-15 15:51:07
- * @LastEditTime: 2023-10-21 22:33:58
+ * @LastEditTime: 2023-11-01 12:21:32
  */
 
 #include "method.h"
 
-bool output_using_rate = 0; // 控制是否输出ur
+bool output_using_rate = 1; // 控制是否输出ur
 
 /**
  * 运行SIS模型

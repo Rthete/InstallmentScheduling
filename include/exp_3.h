@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-08-19 17:44:04
- * @LastEditTime: 2023-10-21 21:25:46
+ * @LastEditTime: 2023-11-04 14:59:02
  */
 #ifndef _EXP_3_H
 #define _EXP_3_H
@@ -21,6 +21,7 @@ namespace exp_3
     void error_TolerMIS_30();
     void error_APMISRR_30();
     void error_TolerMIS_30_conflict();
+    void error_cmp_3_models_ur();
 } // namespace exp_3
 
 #endif //_EXP_3_H

@@ -3,7 +3,7 @@ FilePath: /InstallmentScheduling/scripts/plot.py
 Description:  
 Author: rthete
 Date: 2023-09-09 13:53:19
-LastEditTime: 2023-10-28 17:36:47
+LastEditTime: 2023-11-04 14:55:18
 """
 from datetime import datetime
 import random
@@ -145,7 +145,7 @@ def plot_error_ur(x_data, name="name"):
 
 def generateDataList(error_num):
     """
-    从数据生成数组，返回error_num时的三个模型数据，格式为
+    从数据生成数组，返回error_num时的三个模型mock数据，格式为
     [
         [SIS数据]
         [APMISRR数据]
