@@ -19,7 +19,7 @@ namespace exp_2{
         for(int m = 3; m <= 40; m+=1) {
             fprintf(fpResult, "%d,", m);
             for(int W = 1000; W <= 5000; W+=1000) {
-                fprintf(fpResult, "%.2f,", run_MISRR(15, m, W, 0.3, "../data/exp1-15-servers/"));
+                fprintf(fpResult, "%.2f,", ModelRunner::run_MISRR(15, m, W, 0.3, "../data/exp1-15-servers/"));
             }
             fprintf(fpResult, "\n");
         }
@@ -36,7 +36,7 @@ namespace exp_2{
         for(int m = 3; m <= 40; m+=1) {
             fprintf(fpResult, "%d,", m);
             for(double theta = 0.1; theta <= 1; theta+=0.1) {
-                fprintf(fpResult, "%.2f,", run_MISRR(15, m, 5000, theta, "../data/exp1-15-servers/"));
+                fprintf(fpResult, "%.2f,", ModelRunner::run_MISRR(15, m, 5000, theta, "../data/exp1-15-servers/"));
             }
             fprintf(fpResult, "\n");
         }
@@ -53,7 +53,7 @@ namespace exp_2{
         for(int m = 3; m <= 40; m+=1) {
             fprintf(fpResult, "%d,", m);
             for(int W = 1000; W <= 5000; W+=1000) {
-                fprintf(fpResult, "%.2f,", run_MISRR(30, m, W, 0.3, "../data/exp1-30-servers/"));
+                fprintf(fpResult, "%.2f,", ModelRunner::run_MISRR(30, m, W, 0.3, "../data/exp1-30-servers/"));
             }
             fprintf(fpResult, "\n");
         }
@@ -70,7 +70,7 @@ namespace exp_2{
         for(int m = 3; m <= 40; m+=1) {
             fprintf(fpResult, "%d,", m);
             for(double theta = 0.1; theta <= 1; theta+=0.1) {
-                fprintf(fpResult, "%.2f,", run_MISRR(30, m, 5000, theta, "../data/exp1-30-servers/"));
+                fprintf(fpResult, "%.2f,", ModelRunner::run_MISRR(30, m, 5000, theta, "../data/exp1-30-servers/"));
             }
             fprintf(fpResult, "\n");
         }

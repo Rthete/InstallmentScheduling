@@ -1,37 +1,46 @@
 /*
  * @FilePath: /InstallmentScheduling/include/method.h
- * @Description:  
+ * @Description:
  * @Author: rthete
  * @Date: 2023-05-15 15:54:33
- * @LastEditTime: 2023-10-21 22:20:11
+ * @LastEditTime: 2023-11-04 16:05:52
  */
 #ifndef _METHOD_H
 #define _METHOD_H
 
-#include "MISRR.h"
-#include "SIS.h"
-#include "PMIS.h"
-#include "APMISRR.h"
-#include "myAPMISRR.h"
-#include "MISRRL.h"
-#include "MISRRLL.h"
 #include <tuple>
 
-double run_SIS(int server_num=15, int workload=8000, double theta=0.3, string data_path="../data/15-servers-w-20/", vector<int> error_server={});
+#include "APMISRR.h"
+#include "MISRR.h"
+#include "MISRRL.h"
+#include "MISRRLL.h"
+#include "PMIS.h"
+#include "SIS.h"
+#include "myAPMISRR.h"
+namespace ModelRunner {
+double run_SIS(int server_num = 15, int workload = 8000, double theta = 0.3,
+               string data_path = "../data/15-servers-w-20/",
+               vector<int> error_server = {});
 void run_PMIS();
-double run_MISRR(int server_num=15, int m=8, int workload=8000, double theta=0.3,
-                 string data_path="../data/15-servers-w-20/", vector<int> error_server={},
-                 int error_installment=10);
-void run_MISRR_conflict(vector<double> &waiting_time, int server_num=15, int m=8, int workload=8000, double theta=0.3,
-                 string data_path="../data/15-servers-w-20/", vector<int> error_server={},
-                 int error_installment=10);
+double run_MISRR(int server_num = 15, int m = 8, int workload = 8000,
+                 double theta = 0.3,
+                 string data_path = "../data/15-servers-w-20/",
+                 vector<int> error_server = {}, int error_installment = 10);
+void run_MISRR_conflict(vector<double> &waiting_time, int server_num = 15,
+                        int m = 8, int workload = 8000, double theta = 0.3,
+                        string data_path = "../data/15-servers-w-20/",
+                        vector<int> error_server = {},
+                        int error_installment = 10);
 void run_MISRR_check();
 double run_APMISRR(double lambda);
 double run_APMISRR_cost(double lambda, int m);
-double run_myAPMISRR(int server_num=15, double lambda=0.5, int m=8, int workload=8000, double theta=0.3,
-                     string data_path="../data/15-servers-w-20/", vector<int> error_server={}, int error_installment=10);
+double run_myAPMISRR(int server_num = 15, double lambda = 0.5, int m = 8,
+                     int workload = 8000, double theta = 0.3,
+                     string data_path = "../data/15-servers-w-20/",
+                     vector<int> error_server = {}, int error_installment = 10);
 double run_MISRRL(double lambda, int m);
 double run_MISRRLL(double lambda1, double lambda2, int m);
+}  // namespace ModelRunner
 
 void test_MISRR_theta();
 void test_MISRR_all();
@@ -51,4 +60,4 @@ void test_MISRRLL_2_lambda();
 
 void compare_MISRR_and_MISRRL();
 
-#endif //_METHOD_H
+#endif  //_METHOD_H
