@@ -23,7 +23,7 @@ class Plotter:
         """
         config = {
             "font.family": "serif",  # 衬线字体
-            "font.size": 13,  # 相当于小四大小
+            "font.size": 9,  # 相当于小四大小
             "font.serif": ["SimSun"],  # 宋体
             "mathtext.fontset": "stix",  # matplotlib渲染数学字体时使用的字体，和Times New Roman差别不大
             "axes.unicode_minus": False,  # 处理负号，即-号
@@ -75,14 +75,17 @@ class Plotter:
 
         plt.legend(
             prop={"family": "Times New Roman", "size": 9}, bbox_to_anchor=(0.28, 0.98)
-        )  # 显示上面的label
+        ) 
         plt.yticks(fontproperties="Times New Roman", size=6)
         plt.xticks(fontproperties="Times New Roman", size=6)
 
-        plt.xlabel(r"$\mathit{W(1e3)}$", fontsize=9)
+        plt.xlabel(r"$\mathit{W}$", fontsize=9)
         plt.ylabel(r"$\mathrm{Time}$", fontsize=9)
         # plt.yscale("log")
-        plt.xticks(x_data)
+        x_label = []
+        for i in range(5, 16):
+            x_label.append(str(i * 1000))
+        plt.xticks(x_data, x_label)
 
         # plt.ticklabel_format(style='scientific', scilimits=(0, 2), axis='y')
         # plt.show(block = True)
@@ -91,7 +94,7 @@ class Plotter:
 
     def plot_error_ur(x_data, result_fig):
         """
-        容错-利用率-箱线图
+        deprecated: 容错-利用率-箱线图
         """
         config = {
             "font.family": "serif",  # 衬线字体
@@ -253,7 +256,7 @@ class Plotter:
         plt.yticks(fontproperties="Times New Roman", size=9)
         plt.xticks(fontproperties="Times New Roman", size=9)
 
-        plt.xlabel(r"$\mathrm{Failed \quad Servers\quad Num}$", fontsize=11)
-        plt.ylabel(r"$\mathrm{Utilization \quad Ratio}$", fontsize=11)
+        plt.xlabel(r"$\mathrm{Failed \;\; Servers\;\; Count}$", fontsize=11)
+        plt.ylabel(r"$\mathrm{Utilization \;\; Ratio}$", fontsize=11)
 
         plt.savefig(result_fig, dpi=1000)
