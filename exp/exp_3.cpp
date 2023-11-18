@@ -3,7 +3,7 @@
  * @Description: 带容错的3个模型实验
  * @Author: rthete
  * @Date: 2023-08-19 17:41:41
- * @LastEditTime: 2023-11-04 21:50:40
+ * @LastEditTime: 2023-11-18 18:33:53
  */
 #include "exp_3.h"
 
@@ -79,6 +79,82 @@ void transposeCSV(const std::string &inputFilePath,
 
   inputFile.close();
   outputFile.close();
+}
+
+/*冲突时间实验v2 横坐标任务量*/
+void error_TolerMIS_30_conflict_workload() {
+  std::vector<std::vector<int>> error_places;
+  std::vector<std::vector<int>> error_installment;
+
+  error_places.clear();
+  readTXTFile("../data/exp3-error-conflict/error-place-30-conflict.txt",
+              error_places);
+  readTXTFile("../data/exp3-error-conflict/error-installment-conflict.txt",
+              error_installment);
+
+  auto i = 1;
+  for (const auto &row : error_places) {
+    std::ofstream conflictFile(
+        "../output/exp_3_conflict/error_TolerMIS_30_conflict_workload_n_" +
+        std::to_string(i++) + ".csv");
+    
+    // 5000任务量，总趟数为19
+    for (auto workload = 5000; workload < 16000; workload+=1000) {
+      vector<double> result;
+      // 获取每个处理机的冲突时间
+      ModelRunner::run_MISRR_conflict(result, 30, 0, workload, 0.3,
+                                      "../data/exp1-30-servers/", row,
+                                      18);
+      for (auto it = result.begin(); it != result.end(); ++it) {
+        conflictFile << *it;
+        // 如果不是最后一个元素，添加逗号
+        if (std::next(it) != result.end()) {
+          conflictFile << ",";
+        }
+      }
+      conflictFile << std::endl;
+    }
+    conflictFile.close();
+  }
+
+}
+
+/*冲突时间实验v2 横坐标趟数*/
+void error_TolerMIS_30_conflict_inst() {
+  std::vector<std::vector<int>> error_places;
+  std::vector<std::vector<int>> error_installment;
+
+  error_places.clear();
+  readTXTFile("../data/exp3-error-conflict/error-place-30-conflict.txt",
+              error_places);
+  readTXTFile("../data/exp3-error-conflict/error-installment-conflict.txt",
+              error_installment);
+
+  auto i = 1;
+  for (const auto &row : error_places) {
+    std::ofstream conflictFile(
+        "../output/exp_3_conflict/error_TolerMIS_30_conflict_n_" +
+        std::to_string(i++) + ".csv");
+    
+    // 5000任务量，总趟数为19
+    for (auto inst = 2; inst < 19; inst++) {
+      vector<double> result;
+      // 获取每个处理机的冲突时间
+      ModelRunner::run_MISRR_conflict(result, 30, 0, 5000, 0.3,
+                                      "../data/exp1-30-servers/", row,
+                                      inst);
+      for (auto it = result.begin(); it != result.end(); ++it) {
+        conflictFile << *it;
+        // 如果不是最后一个元素，添加逗号
+        if (std::next(it) != result.end()) {
+          conflictFile << ",";
+        }
+      }
+      conflictFile << std::endl;
+    }
+    conflictFile.close();
+  }
+
 }
 
 /*冲突时间实验*/
@@ -319,14 +395,14 @@ void error_cmp_3_models_ur() {
             30, 0.5, m[index_w], w, 0.3, "../data/exp1-30-servers/", row,
             error_installment[index_w][index_30]);
         // singleFile << result << "\n";
-        allFile << "APMISRR," << i << "," << result << std::endl;  
-        
+        allFile << "APMISRR," << i << "," << result << std::endl;
+
         result =
             ModelRunner::run_MISRR(30, 0, w, 0.3, "../data/exp1-30-servers/",
                                    row, error_installment[index_w][index_30]);
         // singleFile << result << ",";
-        allFile << "TolerMIS," << i << "," << result << std::endl; 
-        
+        allFile << "TolerMIS," << i << "," << result << std::endl;
+
         index_30++;
       }
       index_w++;
