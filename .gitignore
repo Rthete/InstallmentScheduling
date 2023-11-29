@@ -1,5 +1,5 @@
 # ignore
 build/
 .vscode/
-output/
 *.pyc
+*.png

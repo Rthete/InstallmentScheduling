@@ -3,7 +3,7 @@ FilePath: /InstallmentScheduling/scripts/plot_tools/utils.py
 Description:  
 Author: rthete
 Date: 2023-11-04 16:19:15
-LastEditTime: 2023-11-04 17:58:55
+LastEditTime: 2023-11-11 20:37:18
 """
 import numpy as np
 np.random.seed(1)
@@ -32,7 +32,8 @@ def read_data_from_file(file_path):
                     number = float(num_str)
                     row.append(number)
                 except ValueError:
-                    print(f"无法将 '{num_str}' 转换为整数。")
+                    pass
+                    # print(f"无法将 '{num_str}' 转换为整数。")
 
             data.append(row)
 

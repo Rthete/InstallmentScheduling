@@ -256,7 +256,7 @@ class Plotter:
         plt.yticks(fontproperties="Times New Roman", size=9)
         plt.xticks(fontproperties="Times New Roman", size=9)
 
-        plt.xlabel(r"$\mathrm{Failed \;\; Servers\;\; Count}$", fontsize=11)
+        plt.xlabel(r"$\mathrm{Number \;\; of\;\; Failed \;\; Servers}$", fontsize=11)
         plt.ylabel(r"$\mathrm{Utilization \;\; Ratio}$", fontsize=11)
 
         plt.savefig(result_fig, dpi=1000)

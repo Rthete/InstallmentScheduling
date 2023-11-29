@@ -1,0 +1,15 @@
+gap[0]: 	0.00
+gap[1]: 	nan
+gap[2]: 	nan
+gap[3]: 	nan
+gap[4]: 	nan
+gap[5]: 	nan
+gap[6]: 	nan
+gap[7]: 	nan
+gap[8]: 	nan
+gap[9]: 	nan
+gap[10]: 	nan
+gap[11]: 	nan
+gap[12]: 	nan
+gap[13]: 	nan
+gap[14]: 	nan
