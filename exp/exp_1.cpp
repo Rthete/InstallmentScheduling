@@ -1,6 +1,6 @@
 /*
  * @FilePath: \InstallmentScheduling\exp\exp_1.cpp
- * @Description: 对比SIS, APMISRR, TolerMIS 
+ * @Description: 对比SIS, APMISRR, TolerMIS (不含容错)
  * @Author: rthete
  * @Date: 2023-06-12 18:59:30
  * @LastEditTime: 2023-09-13 13:08:02
