@@ -1,9 +1,9 @@
 /*
- * @FilePath: /InstallmentScheduling/main.cpp
+ * @FilePath: \InstallmentScheduling\main.cpp
  * @Description:
  * @Author: rthete
  * @Date: 2023-03-14 16:19:26
- * @LastEditTime: 2023-11-18 18:34:54
+ * @LastEditTime: 2024-01-25 14:39:13
  */
 
 #include "include/exp_1.h"
@@ -44,7 +44,7 @@ int main() {
   // exp_3::error_cmp_3_models_ur();
   // exp_3::error_save_each_time();
   // exp_3::error_TolerMIS_30_conflict_inst();
-  exp_3::error_TolerMIS_30_conflict_workload();
+  // exp_3::error_TolerMIS_30_conflict_workload();
 
   // exp_2::W_vs_m_15();
   // exp_2::theta_vs_m_15();
@@ -75,7 +75,11 @@ int main() {
   // ModelRunner::run_APMISRR_cost(0.6, 8);
   // ModelRunner::run_MISRRL(1, 8);
   // ModelRunner::run_MISRRLL(1, 0.7, 8);
-  // ModelRunner::run_MISRRLL(0.6, 0.6, 9);
+
+  // ModelRunner::run_MISRRLL(1, 1, 34, 8000);
+  // ModelRunner::run_MISRR(15, 34, 8000, 0.3, "../data/exp1-15-servers/");
+  ModelRunner::run_MISRR(15, 10, 5000, 0.3, "../data/15-servers-w-20/", {6, 12}, 5);
+  // ModelRunner::run_MISRR(3, 3, 300, 0.3, "../data/3-servers-example/");
 
   // test_MISRR_theta();
   // test_MISRR_all();
@@ -90,6 +94,7 @@ int main() {
   // test_MISRRL_all();
   // test_MISRRLL_lambda2();
   // test_MISRRLL_lambda1();
+  // test_MISRRLL_installment();
   // test_MISRRLL_all();
   // test_MISRRLL_2_lambda();
 

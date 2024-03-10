@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-05-24 13:45:33
- * @LastEditTime: 2023-06-12 19:33:30
+ * @LastEditTime: 2024-01-08 17:39:14
  */
 
 #include "MISRRLL.h"
@@ -162,7 +162,6 @@ void MISRRLL::initValue() {
 
     // cal Psi
     for (int i = 1; i < this->n; ++i) {
-        // psi[i] = (servers[i - 1].getG() * this->theta) / servers[i].getW() * (this->V / this->Vb);
         psi[i] = (servers[i - 1].getG() * this->theta) / servers[i].getW();
         // cout << "psi[i] = " << psi[i] << endl;
     }
@@ -196,7 +195,7 @@ void MISRRLL::initValue() {
     }
 
     // lambda <= 1时，修改最后一趟方程
-    if(this->l_2 <= 1) {
+    if(this->l_2 < 1) {
         // cal Lambda *
         for (int i = 1; i < this->n; ++i) {
             lambda[i] = (servers[i - 1].getW() + servers[i - 1].getG() * this->theta) / servers[i].getW();
@@ -450,7 +449,7 @@ void MISRRLL::calOptimalM() {
         D += servers[i].getG() * theta * (Psi[i] * KAPPA - Lambda[i] * OMEGA + P[i]);
     }
 
-    // cal A_prime
+    // cal A_prime and C_prime
     A_prime = A + (l_1 + l_2) / 2 * C;
     C_prime = (2 - l_1 - l_2) / 2 * C;
 
@@ -506,45 +505,51 @@ void MISRRLL::getOptimalModel() {
 
 /**
  * @brief Read o & s & g & w & WTotal from "/data" and set every server.
- * 
+ *
  */
-void MISRRLL::getDataFromFile() {
-    FILE *fpo, *fps, *fpg, *fpw, *totalW;
-    double valueO[this->n], valueS[this->n], valueG[this->n], valueW[this->n];
+void MISRRLL::getDataFromFile(string data_path) {
+  FILE *fpo, *fps, *fpg, *fpw, *totalW;
+  double valueO[this->n], valueS[this->n], valueG[this->n], valueW[this->n];
+  ;
 
-    fpo = fopen("../data/15-servers-w-20/o.txt", "r");
-    fps = fopen("../data/15-servers-w-20/s.txt", "r");
-    fpg = fopen("../data/15-servers-w-20/g.txt", "r");
-    fpw = fopen("../data/15-servers-w-20/w.txt", "r");
-    totalW  = fopen("../data/15-servers-w-20/WTotal.txt", "r");
+  fpo = fopen((data_path + "o.txt").c_str(), "r");
+  fps = fopen((data_path + "s.txt").c_str(), "r");
+  fpg = fopen((data_path + "g.txt").c_str(), "r");
+  fpw = fopen((data_path + "w.txt").c_str(), "r");
+  totalW = fopen((data_path + "WTotal.txt").c_str(), "r");
 
-    if (fpo == nullptr || fps == nullptr || fpg == nullptr || fpw == nullptr || totalW == nullptr) {
-        printf("The file can not be opened:\n");
-        exit(-1);
-    }
+  if (fpo == nullptr || fps == nullptr || fpg == nullptr || fpw == nullptr ||
+      totalW == nullptr) {
+    printf("The file can not be opened:\n");
+    exit(-1);
+  }
 
-    fscanf(totalW, "%lf", &this->W);
-    for (int i = 0; fscanf(fpo, "%lf", &valueO[i]) != EOF; ++i);
-    for (int i = 0; fscanf(fps, "%lf", &valueS[i]) != EOF; ++i);
-    for (int i = 0; fscanf(fpg, "%lf", &valueG[i]) != EOF; ++i);
-    for (int i = 0; fscanf(fpw, "%lf", &valueW[i]) != EOF; ++i);
+  fscanf(totalW, "%lf", &this->W);
+  for (int i = 0; fscanf(fpo, "%lf", &valueO[i]) != EOF; ++i)
+    ;
+  for (int i = 0; fscanf(fps, "%lf", &valueS[i]) != EOF; ++i)
+    ;
+  for (int i = 0; fscanf(fpg, "%lf", &valueG[i]) != EOF; ++i)
+    ;
+  for (int i = 0; fscanf(fpw, "%lf", &valueW[i]) != EOF; ++i)
+    ;
 
-    for (int i = 0; i < this->n; i++) {
-        Server demo(i);
+  for (int i = 0; i < this->n; i++) {
+    Server demo(i);
 
-        demo.setO(valueO[i]);
-        demo.setS(valueS[i]);
-        demo.setG(valueG[i]);
-        demo.setW(valueW[i]);
+    demo.setO(valueO[i]);
+    demo.setS(valueS[i]);
+    demo.setG(valueG[i]);
+    demo.setW(valueW[i]);
 
-        servers[i] = demo;
-    }
+    servers[i] = demo;
+  }
 
-    fclose(fpo);
-    fclose(fps);
-    fclose(fpg);
-    fclose(fpw);
-    fclose(totalW);
+  fclose(fpo);
+  fclose(fps);
+  fclose(fpg);
+  fclose(fpw);
+  fclose(totalW);
 }
 
 /**
@@ -661,6 +666,69 @@ void MISRRLL::theLastInstallmentGap(string title) {
             isSchedulable = 0;
         }
         fprintf(fresult, "gap[%d]: \t%.2f\n", i, timeGap[i]);
+    }
+}
+
+void MISRRLL::addServer(int installment) {
+    // 暂时只处理增加一台处理机
+
+    // 重调度开始时间
+    this->startTime =
+        servers[0].getO() +
+        servers[0].getS() * (installment + 1) +
+        servers[0].getW() * alpha[0] * this->Va +
+        servers[0].getW() * beta[0] * installment * this->V +
+        servers[0].getG() * beta[0] * this->V * theta;
+    
+    // 第x+1趟各处理机释放时间(相对于startTime)
+    vector<double> release_time(this->n + 1, 0);
+    release_time[1] = - servers[1].getG() * beta[1] * this->V * theta;
+    for (int i = 2; i < this->n + 1; i++) {
+        release_time[i] = release_time[i - 1] + servers[i - 1].getO() +
+                  servers[i - 1].getG() * alpha[i - 1] * this->Va * (1 + theta) +
+                  servers[i - 1].getG() * beta[i - 1] * this->V * (1 + theta) +
+                  servers[i].getO();
+    }
+
+    // 重置处理机
+    Server demo(this->n);
+    for (int i = 1; i < this->n + 1; i++) {
+        servers[i].setO(servers[i - 1].getO());
+        servers[i].setS(servers[i - 1].getS());
+        servers[i].setG(servers[i - 1].getG());
+        servers[i].setW(servers[i - 1].getW());
+    }
+    
+    servers[0].setO(3);
+    servers[0].setS(2);
+    servers[0].setG(0.4);
+    servers[0].setW(40);
+    
+    this->leftW = 0;
+    this->leftW += (this->Vb + (this->m - installment - 2) * this->V);
+    this->W = this->leftW;
+    // this->m = this->m - installment - 1;
+    // this->m = this->m - installment - 17;
+    this->m = 12;
+    this->n += 1;
+    
+    initValue();
+    getOptimalModel();
+    this->optimalTime += this->startTime;
+    cout << "new optimal time: " << this->optimalTime << endl;
+
+    // 重调度第一趟各处理机开始计算的时间
+    vector<double> restart_time(this->n, 0);
+    restart_time[0] = servers[0].getO();
+    for(int i = 1; i < this->n; i++) {
+        restart_time[i] = restart_time[i - 1] + 
+                            servers[i - 1].getG() * alpha[i - 1] * this->Va +
+                            servers[i].getO();
+    }
+
+    for(int i = 0; i < this->n; i++) {
+        std::cout << release_time[i] << ", " << restart_time[i] << std::endl;
+
     }
 }
 

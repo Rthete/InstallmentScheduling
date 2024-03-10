@@ -3,7 +3,7 @@
  * @Description:  
  * @Author: rthete
  * @Date: 2023-03-13 22:37:48
- * @LastEditTime: 2023-06-05 16:36:19
+ * @LastEditTime: 2023-12-29 19:42:54
  */
 
 #ifndef _MISRRLL_H
@@ -18,7 +18,7 @@ public:
     MISRRLL(int valueN, double valueTheta, int installment);
 
     void initValue();
-    void getDataFromFile();
+    void getDataFromFile(string data_path);
     void getOptimalModel();
     void setW(double value);
     void printResult();
@@ -29,6 +29,8 @@ public:
 
     void calOptimalM();
     void setLambda(double value1, double value2);
+
+    void addServer(int installment);
     
     int isSchedulable = 1;
 

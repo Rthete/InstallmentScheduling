@@ -199,6 +199,7 @@ void MISRR::initValue() {
 
   // cal load for each installment
   this->V = this->W / this->m;
+  cout << "this->V: " << this->V << endl;
 
   // cal beta & alpha & gamma
   calBeta();
@@ -245,12 +246,12 @@ void MISRR::calBeta() {
     if (i == 0) {
       beta[i] = (1.0 - sum_2_n_eta / this->V) / (1.0 + sum_2_n_mu);
       sum += beta[i];
-      // cout << "beta["<< i << "]: " << beta[i] << endl;
+      cout << "beta["<< i << "]: " << beta[i] << endl;
       continue;
     }
     beta[i] = mu[i] * beta[0] + (eta[i] / this->V);
     // 计算每趟内部调度所用时间
-    // cout << "beta["<< i << "]: " << beta[i] << endl;
+    cout << "beta["<< i << "]: " << beta[i] << endl;
     // cout << "\tserver[i].getS(): " << servers[i].getS() << "\ttime: "
     //     << beta[i] * servers[i].getW() * this->V + servers[i].getS() << endl;
 
@@ -282,11 +283,11 @@ void MISRR::calAlpha() {
     if (i == 0) {
       alpha[i] = (1.0 - beta[0] * sum_2_n_phi - (sum_2_n_epsilon / this->V)) /
                  (1.0 + sum_2_n_delta);
-      // cout << "alpha[" << i << "]: " << alpha[i] << endl;
+      cout << "alpha[" << i << "]: " << alpha[i] << endl;
       continue;
     }
     alpha[i] = Delta[i] * alpha[0] + Phi[i] * beta[0] + (Epsilon[i] / this->V);
-    // cout << "alpha[" << i << "]: " << alpha[i] << endl;
+    cout << "alpha[" << i << "]: " << alpha[i] << endl;
   }
 }
 
@@ -306,11 +307,11 @@ void MISRR::calGamma() {
     if (i == 0) {
       gamma[i] = (1.0 + beta[0] * sum_2_n_psi - (sum_2_n_p / this->V)) /
                  (1.0 + sum_2_n_lambda);
-      // cout << "gamma[" << i << "]: " << gamma[i] << endl;
+      cout << "gamma[" << i << "]: " << gamma[i] << endl;
       continue;
     }
     gamma[i] = Lambda[i] * gamma[0] - Psi[i] * beta[0] + P[i] / this->V;
-    // cout << "gamma[" << i << "]: " << gamma[i] << endl;
+    cout << "gamma[" << i << "]: " << gamma[i] << endl;
   }
 }
 
@@ -386,7 +387,7 @@ void MISRR::calOptimalM() {
   // cal B
   B = servers[0].getS() - servers[0].getW() * KAPPA;
 
-  cout << "A: " << A << ", B: " << B << endl;
+  // cout << "A: " << A << ", B: " << B << endl;
 
   // cal m
   this->m = (int)(sqrt(1.0 / 4.0 + A / B) + 1.0 / 2.0);
@@ -414,7 +415,7 @@ void MISRR::getOptimalModel() {
     this->optimalTime += gamma[i] * this->V * servers[i].getG() * this->theta;
   }
 
-  cout << "original optimal time: " << this->optimalTime << endl;
+  // cout << "original optimal time: " << this->optimalTime << endl;
 
   // update usingTime
   for (int i = 0; i < this->n; i++) {
@@ -435,7 +436,7 @@ void MISRR::getOptimalModel() {
     usingRate += ((double)usingTime[i] / ((double)(this->optimalTime) *
                                           this->serversNumberWithoutError));
   }
-  cout << "original optimal using rate: " << this->usingRate << endl;
+  // cout << "original optimal using rate: " << this->usingRate << endl;
 }
 
 /**
@@ -555,12 +556,13 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
 
   // cal each server's release time
   vector<double> busyTime(this->n, 0);
-  double preTime = servers[0].getO();
+  // double preTime = servers[0].getO();
+  double preTime = 0;
   for (int i = 0; i < this->n; ++i) {
     if (i != 0) {
       preTime += (servers[i - 1].getO() +
-                  servers[i - 1].getG() * beta[i - 1] * this->V * (1 + theta) +
-                  servers[i].getO());
+                  servers[i - 1].getG() * beta[i - 1] * this->V * (1 + theta));
+                  // servers[i].getO());
     }
     busyTime[i] = preTime;
   }
@@ -614,6 +616,8 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
     }
   }
 
+  cout << "left workload: " << this->leftW << endl;
+
   // re-schedule
   this->W = this->leftW;
   beforeInstallment = errorInstallment + 1;
@@ -630,11 +634,12 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
 
   // cal each server's restart time
   position = 0;
-  preTime = servers[0].getO();
+  // preTime = servers[0].getO();
+  preTime = 0;
   vector<double> reTime(serversNumberWithoutError, 0);
   for (int i = 0; i < this->n; ++i) {
     if (i != 0) {
-      preTime += (servers[i].getO() + servers[i - 1].getG() * alpha[i - 1] * V);
+      preTime += (servers[i-1].getO() + servers[i - 1].getG() * alpha[i - 1] * V);
     }
     reTime[servers[i].getId()] = preTime;
   }
@@ -643,6 +648,10 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
   vector<double> codeTimeGap(serversNumberWithoutError, 0);
   for (int i = 0; i < serversNumberWithoutError; ++i) {
     if (reTime[i] != 0) codeTimeGap[i] = busyTime[i] - reTime[i];
+
+    cout << "Ts time[" << i << "]: " << reTime[i] << endl;
+    cout << "Tf time[" << i << "]: " << busyTime[i] << endl;
+    cout << "conflict time[" << i << "]: " << codeTimeGap[i] << endl;
   }
 
   // mathTimeGap

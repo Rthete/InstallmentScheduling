@@ -1,9 +1,9 @@
 /*
- * @FilePath: /InstallmentScheduling/include/method.h
+ * @FilePath: \InstallmentScheduling\include\method.h
  * @Description:
  * @Author: rthete
  * @Date: 2023-05-15 15:54:33
- * @LastEditTime: 2023-11-04 16:05:52
+ * @LastEditTime: 2024-01-05 18:06:05
  */
 #ifndef _METHOD_H
 #define _METHOD_H
@@ -39,7 +39,7 @@ double run_myAPMISRR(int server_num = 15, double lambda = 0.5, int m = 8,
                      string data_path = "../data/15-servers-w-20/",
                      vector<int> error_server = {}, int error_installment = 10);
 double run_MISRRL(double lambda, int m);
-double run_MISRRLL(double lambda1, double lambda2, int m);
+double run_MISRRLL(double lambda1, double lambda2, int m, int workload);
 }  // namespace ModelRunner
 
 void test_MISRR_theta();
@@ -55,6 +55,7 @@ void test_MISRRL_installment();
 void test_MISRRL_all();
 void test_MISRRLL_lambda2();
 void test_MISRRLL_lambda1();
+void test_MISRRLL_installment();
 void test_MISRRLL_all();
 void test_MISRRLL_2_lambda();
 
