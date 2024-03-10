@@ -40,6 +40,7 @@ double run_myAPMISRR(int server_num = 15, double lambda = 0.5, int m = 8,
                      vector<int> error_server = {}, int error_installment = 10);
 double run_MISRRL(double lambda, int m);
 double run_MISRRLL(double lambda1, double lambda2, int m, int workload);
+double run_MISRRLL_add(double lambda1, double lambda2, int m, int workload);
 }  // namespace ModelRunner
 
 void test_MISRR_theta();

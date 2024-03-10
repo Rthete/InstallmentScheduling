@@ -284,7 +284,42 @@ double run_MISRRLL(double lambda1, double lambda2, int m, int workload) {
   // return misrrll.getUsingRate();
   misrrll.calOptimalM();
 
-  misrrll.addServer(3);
+  return misrrll.getOptimalTime();
+}
+
+double run_MISRRLL_add(double lambda1, double lambda2, int m, int workload) {
+  auto serverN = 15;
+  auto theta = 0.3;
+
+  cout << "**********************run MISRRLL**********************" << endl;
+  cout << serverN << " servers, m = " << m << ", theta = " << theta
+       << ", lambda1 = " << lambda1 << ", lambda2 = " << lambda2 << endl;
+  cout << "total load = " << workload << endl;
+  cout << "last installment load = " << lambda1 / m * workload << endl;
+  cout << "first installment load = " << lambda2 / m * workload << endl;
+  cout << "each internal installment load = "
+       << (m - lambda1 - lambda2) * workload / (m * (m - 2)) << endl;
+
+  MISRRLL misrrll(serverN, theta, m);
+  misrrll.getDataFromFile("../data/exp1-15-servers/");
+  misrrll.setW((double)workload);
+  misrrll.setLambda((double)lambda1, (double)lambda2);
+  misrrll.initValue();
+  misrrll.getOptimalModel();
+  misrrll.theLastInstallmentGap(to_string(lambda1));
+  if (misrrll.isSchedulable == 0) {
+    cout << "not schedulable" << endl;
+    // return 0;
+  }
+  cout << "misrrll.getUsingRate(): " << misrrll.getUsingRate() << endl;
+  cout << "misrrll.getOptimalTime(): " << misrrll.getOptimalTime() << endl;
+  // return misrrll.getUsingRate();
+  misrrll.calOptimalM();
+
+  // 加入处理机
+  vector<Server> new_servers = {Server(3.37, 3.80, 0.28, 43.96),
+                                Server(2.71, 5.31, 0.28, 44.25)};
+  misrrll.addServer(3, new_servers);
   return misrrll.getOptimalTime();
 }
 
@@ -300,9 +335,10 @@ void test_MISRR_theta() {
     ModelRunner::run_MISRR(i, 8);
     // cout << "theta = " << i;
     // cout<< get<0>(ModelRunner::run_MISRR(i, 8)) << endl;
-    // cout << "\ttime = " << get<0>(ModelRunner::run_MISRR(i, 0)) << "\tusing rate = " <<
-    // get<1>(ModelRunner::run_MISRR(i, 0)) << endl; fprintf(fpResult, "%d,%lf,%lf\n", i,
-    // get<0>(ModelRunner::run_MISRR(i, 0)), get<1>(ModelRunner::run_MISRR(i, 0)));
+    // cout << "\ttime = " << get<0>(ModelRunner::run_MISRR(i, 0)) << "\tusing
+    // rate = " << get<1>(ModelRunner::run_MISRR(i, 0)) << endl;
+    // fprintf(fpResult, "%d,%lf,%lf\n", i, get<0>(ModelRunner::run_MISRR(i,
+    // 0)), get<1>(ModelRunner::run_MISRR(i, 0)));
   }
   // fclose(fpResult);
 }
@@ -427,7 +463,8 @@ void test_myAPMISRR_installment() {
   fpResult = fopen("../output/myAPMISRR/test_myAPMISRR_time.csv", "w");
   for (int m = 3; m <= 40; m++) {
     for (double lambda = 0.1; lambda < 1; lambda += 0.1) {
-      fprintf(fpResult, "%lf,", ModelRunner::run_myAPMISRR(lambda, m, 8000, 0.3));
+      fprintf(fpResult, "%lf,",
+              ModelRunner::run_myAPMISRR(lambda, m, 8000, 0.3));
     }
     fprintf(fpResult, "\n");
   }
@@ -488,7 +525,7 @@ void test_MISRRLL_installment() {
     time_list.push_back(ModelRunner::run_MISRRLL(0.6, 0.6, m, 8000));
   }
 
-  for(auto i = 0; i < time_list.size(); i++) {
+  for (auto i = 0; i < time_list.size(); i++) {
     cout << time_list[i] << endl;
   }
 }
@@ -510,7 +547,8 @@ void test_MISRRLL_2_lambda() {
   fpResult = fopen("../output/MISRRLL/test_MISRRL_time_2_lambda.csv", "w");
   for (double lambda1 = 0.1; lambda1 < 1; lambda1 += 0.1) {
     for (double lambda2 = 0.1; lambda2 < 1; lambda2 += 0.1) {
-      fprintf(fpResult, "%lf,", ModelRunner::run_MISRRLL(lambda1, lambda2, 15, 8000));
+      fprintf(fpResult, "%lf,",
+              ModelRunner::run_MISRRLL(lambda1, lambda2, 15, 8000));
     }
     fprintf(fpResult, "\n");
   }

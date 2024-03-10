@@ -78,8 +78,10 @@ int main() {
 
   // ModelRunner::run_MISRRLL(1, 1, 34, 8000);
   // ModelRunner::run_MISRR(15, 34, 8000, 0.3, "../data/exp1-15-servers/");
-  ModelRunner::run_MISRR(15, 10, 5000, 0.3, "../data/15-servers-w-20/", {6, 12}, 5);
-  // ModelRunner::run_MISRR(3, 3, 300, 0.3, "../data/3-servers-example/");
+  // ModelRunner::run_MISRR(15, 10, 5000, 0.3, "../data/15-servers-w-20/", {6,
+  // 12}, 5); ModelRunner::run_MISRR(3, 3, 300, 0.3,
+  // "../data/3-servers-example/");
+  ModelRunner::run_MISRRLL_add(1, 1, 8, 8000);
 
   // test_MISRR_theta();
   // test_MISRR_all();
