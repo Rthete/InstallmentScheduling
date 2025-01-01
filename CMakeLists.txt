@@ -1,9 +1,13 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.8)
 project(Installments_Scheduling)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/include/
 )
+
+include_directories(/usr/include/eigen3)
 
 add_library(${PROJECT_NAME} SHARED
     models/MISRRLL.cpp
@@ -19,6 +23,7 @@ add_library(${PROJECT_NAME} SHARED
     exp/exp_1.cpp
     exp/exp_2.cpp
     exp/exp_3.cpp
+    exp/exp_4.cpp
 )
 
 add_executable(main main.cpp)

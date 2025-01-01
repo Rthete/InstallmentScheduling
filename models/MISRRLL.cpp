@@ -7,79 +7,71 @@
  */
 
 #include "MISRRLL.h"
+#include "Eigen/src/Core/util/Constants.h"
+#include "unsupported/Eigen/src/Polynomials/PolynomialSolver.h"
+#include <complex>
 
 MISRRLL::MISRRLL(int valueN, double valueTheta, int installment)
-    : n(valueN),
-      m(installment),
-      theta(valueTheta),
-      usingRate(0),
-      serversNumberWithoutError(valueN),
-      servers(vector<Server>(MAX_N)),
+    : n(valueN), m(installment), theta(valueTheta), usingRate(0),
+      serversNumberWithoutError(valueN), servers(vector<Server>(MAX_N)),
 
       // beta
-      beta(vector<double>(MAX_N, 0)),
-      mu(vector<double>(MAX_N, 0)),
+      beta(vector<double>(MAX_N, 0)), mu(vector<double>(MAX_N, 0)),
       eta(vector<double>(MAX_N, 0)),
 
       // alpha
-      alpha(vector<double>(MAX_N, 0)),
-      Delta(vector<double>(MAX_N, 0)),
-      Phi(vector<double>(MAX_N, 0)),
-      Epsilon(vector<double>(MAX_N, 0)),
+      alpha(vector<double>(MAX_N, 0)), Delta(vector<double>(MAX_N, 0)),
+      Phi(vector<double>(MAX_N, 0)), Epsilon(vector<double>(MAX_N, 0)),
 
       // gamma
-      gamma(vector<double>(MAX_N, 0)),
-      Lambda(vector<double>(MAX_N, 0)),
-      Psi(vector<double>(MAX_N, 0)),
-      P(vector<double>(MAX_N, 0)),
+      gamma(vector<double>(MAX_N, 0)), Lambda(vector<double>(MAX_N, 0)),
+      Psi(vector<double>(MAX_N, 0)), P(vector<double>(MAX_N, 0)),
 
       // time gap
       old_beta(vector<double>(MAX_N)),
 
       // time
-      usingTime(vector<double>(MAX_N, 0)),
-      outputName("MISRRLL_print_result") {}
+      usingTime(vector<double>(MAX_N, 0)), outputName("MISRRLL_print_result") {}
 
 MISRRLL::MISRRLL(int valueN, double valueTheta)
-    : n(valueN),
-      theta(valueTheta),
-      usingRate(0),
-      serversNumberWithoutError(valueN),
-      servers(vector<Server>(MAX_N)),
+    : n(valueN), theta(valueTheta), usingRate(0),
+      serversNumberWithoutError(valueN), servers(vector<Server>(MAX_N)),
 
       // beta
-      beta(vector<double>(MAX_N, 0)),
-      mu(vector<double>(MAX_N, 0)),
+      beta(vector<double>(MAX_N, 0)), mu(vector<double>(MAX_N, 0)),
       eta(vector<double>(MAX_N, 0)),
 
       // alpha
-      alpha(vector<double>(MAX_N, 0)),
-      Delta(vector<double>(MAX_N, 0)),
-      Phi(vector<double>(MAX_N, 0)),
-      Epsilon(vector<double>(MAX_N, 0)),
+      alpha(vector<double>(MAX_N, 0)), Delta(vector<double>(MAX_N, 0)),
+      Phi(vector<double>(MAX_N, 0)), Epsilon(vector<double>(MAX_N, 0)),
 
       // gamma
-      gamma(vector<double>(MAX_N, 0)),
-      Lambda(vector<double>(MAX_N, 0)),
-      Psi(vector<double>(MAX_N, 0)),
-      P(vector<double>(MAX_N, 0)),
+      gamma(vector<double>(MAX_N, 0)), Lambda(vector<double>(MAX_N, 0)),
+      Psi(vector<double>(MAX_N, 0)), P(vector<double>(MAX_N, 0)),
 
       // time gap
       old_beta(vector<double>(MAX_N)),
 
       // time
-      usingTime(vector<double>(MAX_N, 0)),
-      outputName("MIS-CRR") {}
+      usingTime(vector<double>(MAX_N, 0)), outputName("MIS-CRR") {}
 
 /**
  * @brief Assign model.
  *
  */
 void MISRRLL::initValue() {
+  if (m == 0) {
+    calOptimalM();
+  }
+
   // cal load for each installment
   // V: 内部调度的每趟任务量
+  // cout << "1-this->V" << this->V << endl;
+  // cout << "1-this->m=" << this->m << endl;
+  // cout << "1-this->W=" << this->W << endl;
   this->V =
       (this->m - this->l_2 - this->l_1) * this->W / (this->m * (this->m - 2));
+  // cout << "2-this->V" << this->V << endl;
   // Vb: 最后一趟的任务量
   this->Vb = this->l_2 / this->m * this->W;
   // Va: 第一趟的任务量
@@ -275,10 +267,10 @@ void MISRRLL::initValue() {
     if (alpha[i] * this->Va < 0 || beta[i] * this->V < 0 ||
         gamma[i] * this->Vb < 0) {
       isSchedulable = 0;
-      cout << this->W << " error "
-           << "alpha * Va - " << alpha[i] * this->Va << " beta * V - "
-           << beta[i] * this->V << " gamma * Vb - " << gamma[i] * this->Vb
-           << endl;
+      // cout << this->W << " error "
+      //      << "alpha * Va - " << alpha[i] * this->Va << " beta * V - "
+      //      << beta[i] * this->V << " gamma * Vb - " << gamma[i] * this->Vb
+      //      << endl;
     }
   }
 
@@ -326,10 +318,11 @@ void MISRRLL::calBeta() {
     }
     beta[i] = mu[i] * beta[0] + (eta[i] / this->V);
     // 计算每趟内部调度所用时间
-    // cout << "beta[i]: " << beta[i] << endl;
+    // cout << "i=" << i << " beta[i]: " << beta[i] << endl;
     // cout << "\tserver[i].getS(): " << servers[i].getS() << "\ttime: "
-    //     << beta[i] * servers[i].getW() * this->V + servers[i].getS() << endl;
-
+    //      << beta[i] * servers[i].getW() * this->V + servers[i].getS() <<
+    //      endl;
+    // cout << "this->V=" << this->V << endl;
     sum += beta[i];
   }
   // beta[i]之和为1
@@ -363,7 +356,8 @@ void MISRRLL::calAlpha() {
     // this->Va);
     alpha[i] = Delta[i] * alpha[0] + Phi[i] * beta[0] * this->V / this->Va +
                (Epsilon[i] / this->Va);
-    // cout << "alpha[i]: " << alpha[i] << endl;
+    // cout << "i=" << i << " "
+    //      << "alpha[i] : " << alpha[i] << endl;
   }
 }
 
@@ -475,13 +469,19 @@ void MISRRLL::calOptimalM() {
   A_prime = A + (l_1 + l_2) / 2 * C;
   C_prime = (2 - l_1 - l_2) / 2 * C;
 
-  // cal T1
-  double T1 = A_prime / m + C_prime / (m - 2) + B * m;
-  cout << "```````````` cal optimal M ````````````" << endl;
-  cout << "A_prime: " << A_prime << ", C_prime: " << C_prime << ", B: " << B
-       << ", D: " << D << endl;
-  cout << "T1: " << T1 << endl;
-  cout << "T(m): " << T1 + D << endl;
+  //// cal T1
+  // double T1 = A_prime / m + C_prime / (m - 2) + B * m;
+  // cout << "```````````` cal optimal M ````````````" << endl;
+  // cout << "A_prime: " << A_prime << ", C_prime: " << C_prime << ", B: " << B
+  //      << ", D: " << D << endl;
+  // cout << "T1: " << T1 << endl;
+  // cout << "T(m): " << T1 + D << endl;
+
+  this->m = findFirstPositiveRealRoot(B, 2 * B, -A - B - C, 3 * A + 2 * B - C,
+                                      -2 * A);
+  if (this->m < 3)
+    this->m = 3;
+  cout << "cal optimal m: " << m << endl;
 }
 
 /**
@@ -635,7 +635,7 @@ double MISRRLL::getOptimalTime() const { return this->optimalTime; }
 
 double MISRRLL::getUsingRate() const { return this->usingRate; }
 
-int MISRRLL::getOptimalM() const { return this->m; }
+int MISRRLL::getOptimalM() { return this->m; }
 
 /**
  * @brief Calculate the idle time between servers in last installment.
@@ -643,8 +643,8 @@ int MISRRLL::getOptimalM() const { return this->m; }
  *
  */
 void MISRRLL::theLastInstallmentGap(string title) {
-  vector<double> freeTime(this->n, 0);   // 倒数第二趟计算结束时间
-  vector<double> startTime(this->n, 0);  // 最后一趟计算开始时间
+  vector<double> freeTime(this->n, 0);  // 倒数第二趟计算结束时间
+  vector<double> startTime(this->n, 0); // 最后一趟计算开始时间
   vector<double> timeGap(this->n, 0);
 
   double preTime = 0;
@@ -696,8 +696,6 @@ void MISRRLL::theLastInstallmentGap(string title) {
 }
 
 void MISRRLL::addServer(int installment, vector<Server> &new_servers) {
-  // 暂时只处理增加一台处理机
-
   // 重调度开始时间
   this->startTime = servers[0].getO() + servers[0].getS() * (installment + 1) +
                     servers[0].getW() * alpha[0] * this->Va +
@@ -771,6 +769,203 @@ void MISRRLL::addServer(int installment, vector<Server> &new_servers) {
     std::cout << beta[i] << ", ";
     std::cout << gamma[i] << std::endl;
   }
+}
+
+void MISRRLL::error(vector<int> &errorPlace, int errorInstallment) {
+  this->l_1 = 0.4;
+  this->l_2 = 0.4;
+  this->errorPlace = errorPlace;
+  this->errorInstallment = errorInstallment;
+
+  outputName = outputName + '_' + to_string((int)errorPlace.size()) +
+               "_installment_" + to_string(errorInstallment) + "_ server";
+  for (auto i : errorPlace) {
+    outputName = outputName + '_' + to_string(i);
+  }
+
+  // cal re-schedule start time
+  if (errorInstallment == 1) {
+    this->startTime = servers[0].getS() * 2 +
+                      servers[0].getW() * (alpha[0] + beta[0]) * this->V;
+  } else if (errorInstallment == this->m || errorInstallment == this->m - 1) {
+    this->startTime = optimalTime;
+  } else {
+    // 。。。很难搞
+    this->startTime =
+        servers[0].getS() * (errorInstallment + 1) +
+        servers[0].getW() *
+            (alpha[0] * this->Va + beta[0] * errorInstallment * this->V);
+  }
+
+  // cal each server's release time
+  vector<double> busyTime(this->n, 0);
+  // double preTime = servers[0].getO();
+  double preTime = 0;
+  for (int i = 0; i < this->n; ++i) {
+    if (i != 0) {
+      preTime += (servers[i - 1].getO() +
+                  servers[i - 1].getG() * beta[i - 1] * this->V * (1 + theta));
+      // servers[i].getO());
+    }
+    busyTime[i] = preTime;
+  }
+
+  // cal each server's using time
+  for (int i = 0; i < n; ++i) {
+    auto iter = find(errorPlace.begin(), errorPlace.end(), i + 1);
+    if (iter == errorPlace.end()) {
+      usingTime[i] =
+          (servers[i].getS() + alpha[i] * this->Va * servers[i].getW() +
+           errorInstallment *
+               (servers[i - 1].getS() + beta[i] * V * servers[i].getW()));
+    } else {
+      usingTime[i] =
+          (servers[i].getS() + alpha[i] * this->Va * servers[i - 1].getW() +
+           errorInstallment *
+               (servers[i].getS() + beta[i] * V * servers[i].getW()));
+    }
+  }
+
+  // cal left operating server
+  int position = 0;
+  vector<Server> oldServers = servers;
+  servers.clear();
+  for (int i = 0; i < oldServers.size(); ++i) {
+    auto iter = find(errorPlace.begin(), errorPlace.end(), i + 1);
+    if (iter == errorPlace.end()) {
+      servers[position] = oldServers[i];
+      position++;
+    }
+  }
+  this->n -= (int)errorPlace.size();
+
+  // cal left workload
+  this->leftW = 0.0;
+  if (errorInstallment == 1) {
+    this->leftW += ((this->m - errorInstallment - 1) * this->V);
+    for (auto i : errorPlace) {
+      this->leftW += (alpha[i - 1] * this->Va + beta[i - 1] * this->V);
+    }
+  } else if (errorInstallment == this->m - 1) {
+    for (auto i : errorPlace) {
+      this->leftW += (beta[i - 1] * this->V + gamma[i - 1] * this->Vb);
+    }
+  } else if (errorInstallment == this->m) {
+    for (auto i : errorPlace) {
+      this->leftW += gamma[i - 1] * this->Vb;
+    }
+  } else {
+    // this->leftW += ((this->m - errorInstallment - 1) * this->V);
+    // 适配新模型
+    this->leftW += ((this->m - errorInstallment - 2) * this->V + this->Vb);
+    for (auto i : errorPlace) {
+      this->leftW += (2 * beta[i - 1] * this->V);
+    }
+  }
+
+  cout << "left workload: " << this->leftW << endl;
+
+  // re-schedule
+  this->W = this->leftW;
+  beforeInstallment = errorInstallment + 1;
+
+  old_V = V;
+  old_beta = beta;
+
+  m = 0;
+  initValue();
+  getOptimalModel();
+
+  cout << "error optimal m=" << m << endl;
+  cout << "error this->optimalTime=" << this->optimalTime << endl;
+  cout << "this->startTime=" << this->startTime << endl;
+  this->optimalTime += this->startTime;
+  this->m += beforeInstallment;
+
+  // cal each server's restart time
+  position = 0;
+  // preTime = servers[0].getO();
+  preTime = 0;
+  vector<double> reTime(serversNumberWithoutError, 0);
+  for (int i = 0; i < this->n; ++i) {
+    if (i != 0) {
+      preTime += (servers[i - 1].getO() +
+                  servers[i - 1].getG() * alpha[i - 1] * this->Va);
+    }
+    reTime[servers[i].getId()] = preTime;
+  }
+
+  // cal each server's conflict time
+  vector<double> codeTimeGap(serversNumberWithoutError, 0);
+  for (int i = 0; i < serversNumberWithoutError; ++i) {
+    if (reTime[i] != 0)
+      codeTimeGap[i] = busyTime[i] - reTime[i];
+
+    // cout << "Ts time[" << i << "]: " << reTime[i] << endl;
+    // cout << "Tf time[" << i << "]: " << busyTime[i] << endl;
+    // cout << "conflict time[" << i << "]: " << codeTimeGap[i] << endl;
+  }
+
+  // mathTimeGap
+  vector<double> mathTimeGap(serversNumberWithoutError, 0);
+  preTime = 0, position = 1;
+  for (int i = 0; i < serversNumberWithoutError; ++i) {
+    if (i == 0)
+      continue;
+    if (find(errorPlace.begin(), errorPlace.end(), i + 1) != errorPlace.end()) {
+      preTime +=
+          (2 * oldServers[i - 1].getO() +
+           (theta + 1.0) * oldServers[i - 1].getG() * old_beta[i - 1] * old_V);
+      continue;
+    }
+    int demo = servers[position].getId();
+    preTime +=
+        (2 * oldServers[i - 1].getO() +
+         (theta + 1.0) * oldServers[i - 1].getG() * old_beta[i - 1] * old_V -
+         servers[position - 1].getO() -
+         servers[position - 1].getG() * alpha[position - 1] * V);
+
+    mathTimeGap[demo] = preTime;
+    ++position;
+  }
+
+  // compare codeTimeGap & mathTimeGap
+  // cout << "code: " << codeTimeGap[serversNumberWithoutError - 1] <<
+  //     "math: " << mathTimeGap[serversNumberWithoutError - 1] << endl;
+
+  // cal server[0]'s optimal waiting time
+  timeGap = *max_element(codeTimeGap.begin(), codeTimeGap.end());
+
+  // get whole schedule's optimal makespan
+  this->optimalTime += timeGap;
+}
+
+int MISRRLL::findFirstPositiveRealRoot(double a, double b, double c, double d,
+                                       double e) {
+  // 定义四次方程的系数
+  Eigen::VectorXd coefficients(5);
+  coefficients << e, d, c, b, a;
+  cout << e << " " << d << " " << c << " " << b << " " << a << endl;
+
+  // 使用 Eigen 的多项式求根功能
+  Eigen::PolynomialSolver<double, Eigen::Dynamic> solver;
+  solver.compute(coefficients);
+
+  // 获取方程的根（直接使用 Eigen 的 RootsType 遍历）
+  const auto &roots = solver.roots();
+
+  // 遍历根，筛选出第一个大于0的实数根
+  for (int i = 0; i < roots.size(); ++i) {
+    const auto &root = roots[i];
+    cout << root.real() << " + " << root.imag() << "i" << endl;
+    if (std::abs(root.imag()) < 1e-8 &&
+        root.real() > 3) { // 判断是否为大于3的实数根
+      return std::lround(root.real());
+    }
+  }
+
+  // 如果没有找到符合条件的根，返回 std::nullopt
+  return 0;
 }
 
 // /**

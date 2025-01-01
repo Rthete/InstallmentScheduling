@@ -1,69 +1,50 @@
 #include "MISRR.h"
 
 MISRR::MISRR(int valueN, double valueTheta, int installment)
-    : n(valueN),
-      m(installment),
-      theta(valueTheta),
-      usingRate(0),
-      serversNumberWithoutError(valueN),
-      servers(vector<Server>(MAX_N)),
+    : n(valueN), m(installment), theta(valueTheta), usingRate(0),
+      serversNumberWithoutError(valueN), servers(vector<Server>(MAX_N)),
 
       // beta
-      beta(vector<double>(MAX_N, 0)),
-      mu(vector<double>(MAX_N, 0)),
+      beta(vector<double>(MAX_N, 0)), mu(vector<double>(MAX_N, 0)),
       eta(vector<double>(MAX_N, 0)),
 
       // alpha
-      alpha(vector<double>(MAX_N, 0)),
-      Delta(vector<double>(MAX_N, 0)),
-      Phi(vector<double>(MAX_N, 0)),
-      Epsilon(vector<double>(MAX_N, 0)),
+      alpha(vector<double>(MAX_N, 0)), Delta(vector<double>(MAX_N, 0)),
+      Phi(vector<double>(MAX_N, 0)), Epsilon(vector<double>(MAX_N, 0)),
 
       // gamma
-      gamma(vector<double>(MAX_N, 0)),
-      Lambda(vector<double>(MAX_N, 0)),
-      Psi(vector<double>(MAX_N, 0)),
-      P(vector<double>(MAX_N, 0)),
+      gamma(vector<double>(MAX_N, 0)), Lambda(vector<double>(MAX_N, 0)),
+      Psi(vector<double>(MAX_N, 0)), P(vector<double>(MAX_N, 0)),
 
       // time gap
       old_beta(vector<double>(MAX_N)),
 
       // time
-      usingTime(vector<double>(MAX_N, 0)),
-      usingTime1(vector<double>(MAX_N, 0)),
+      usingTime(vector<double>(MAX_N, 0)), usingTime1(vector<double>(MAX_N, 0)),
       waiting_time(vector<double>(valueN, 0)),
       outputName("MISRR_print_result") {}
 
 MISRR::MISRR(int valueN, double valueTheta)
-    : n(valueN),
-      theta(valueTheta),
-      usingRate(0),
-      serversNumberWithoutError(valueN),
-      servers(vector<Server>(MAX_N)),
+    : n(valueN), theta(valueTheta), usingRate(0),
+      serversNumberWithoutError(valueN), servers(vector<Server>(MAX_N)),
 
       // beta
-      beta(vector<double>(MAX_N, 0)),
-      mu(vector<double>(MAX_N, 0)),
+      beta(vector<double>(MAX_N, 0)), mu(vector<double>(MAX_N, 0)),
       eta(vector<double>(MAX_N, 0)),
 
       // alpha
-      alpha(vector<double>(MAX_N, 0)),
-      Delta(vector<double>(MAX_N, 0)),
-      Phi(vector<double>(MAX_N, 0)),
-      Epsilon(vector<double>(MAX_N, 0)),
+      alpha(vector<double>(MAX_N, 0)), Delta(vector<double>(MAX_N, 0)),
+      Phi(vector<double>(MAX_N, 0)), Epsilon(vector<double>(MAX_N, 0)),
 
       // gamma
-      gamma(vector<double>(MAX_N, 0)),
-      Lambda(vector<double>(MAX_N, 0)),
-      Psi(vector<double>(MAX_N, 0)),
-      P(vector<double>(MAX_N, 0)),
+      gamma(vector<double>(MAX_N, 0)), Lambda(vector<double>(MAX_N, 0)),
+      Psi(vector<double>(MAX_N, 0)), P(vector<double>(MAX_N, 0)),
 
       // time gap
       old_beta(vector<double>(MAX_N)),
 
       // time
-      usingTime(vector<double>(MAX_N, 0)),
-      outputName("MIS-CRR") {}
+      usingTime(vector<double>(MAX_N, 0)), outputName("MIS-CRR") {}
 
 /**
  * @brief Assign model.
@@ -213,6 +194,7 @@ void MISRR::initValue() {
     count_beta += beta[i];
     count_gamma += gamma[i];
     if (alpha[i] < 0 || beta[i] < 0 || gamma[i] < 0) {
+      isSchedulable = 0;
       cout << this->W << " error "
            << "alpha - " << alpha[i] << " beta - " << beta[i] << " gamma - "
            << gamma[i] << endl;
@@ -246,12 +228,12 @@ void MISRR::calBeta() {
     if (i == 0) {
       beta[i] = (1.0 - sum_2_n_eta / this->V) / (1.0 + sum_2_n_mu);
       sum += beta[i];
-      cout << "beta["<< i << "]: " << beta[i] << endl;
+      // cout << "beta[" << i << "]: " << beta[i] << endl;
       continue;
     }
     beta[i] = mu[i] * beta[0] + (eta[i] / this->V);
     // 计算每趟内部调度所用时间
-    cout << "beta["<< i << "]: " << beta[i] << endl;
+    // cout << "beta[" << i << "]: " << beta[i] << endl;
     // cout << "\tserver[i].getS(): " << servers[i].getS() << "\ttime: "
     //     << beta[i] * servers[i].getW() * this->V + servers[i].getS() << endl;
 
@@ -283,11 +265,11 @@ void MISRR::calAlpha() {
     if (i == 0) {
       alpha[i] = (1.0 - beta[0] * sum_2_n_phi - (sum_2_n_epsilon / this->V)) /
                  (1.0 + sum_2_n_delta);
-      cout << "alpha[" << i << "]: " << alpha[i] << endl;
+      // cout << "alpha[" << i << "]: " << alpha[i] << endl;
       continue;
     }
     alpha[i] = Delta[i] * alpha[0] + Phi[i] * beta[0] + (Epsilon[i] / this->V);
-    cout << "alpha[" << i << "]: " << alpha[i] << endl;
+    // cout << "alpha[" << i << "]: " << alpha[i] << endl;
   }
 }
 
@@ -307,11 +289,11 @@ void MISRR::calGamma() {
     if (i == 0) {
       gamma[i] = (1.0 + beta[0] * sum_2_n_psi - (sum_2_n_p / this->V)) /
                  (1.0 + sum_2_n_lambda);
-      cout << "gamma[" << i << "]: " << gamma[i] << endl;
+      // cout << "gamma[" << i << "]: " << gamma[i] << endl;
       continue;
     }
     gamma[i] = Lambda[i] * gamma[0] - Psi[i] * beta[0] + P[i] / this->V;
-    cout << "gamma[" << i << "]: " << gamma[i] << endl;
+    // cout << "gamma[" << i << "]: " << gamma[i] << endl;
   }
 }
 
@@ -562,7 +544,7 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
     if (i != 0) {
       preTime += (servers[i - 1].getO() +
                   servers[i - 1].getG() * beta[i - 1] * this->V * (1 + theta));
-                  // servers[i].getO());
+      // servers[i].getO());
     }
     busyTime[i] = preTime;
   }
@@ -625,7 +607,7 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
   old_V = V;
   old_beta = beta;
 
-  m = 0;
+  // m = 0;
   initValue();
   getOptimalModel();
 
@@ -639,7 +621,8 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
   vector<double> reTime(serversNumberWithoutError, 0);
   for (int i = 0; i < this->n; ++i) {
     if (i != 0) {
-      preTime += (servers[i-1].getO() + servers[i - 1].getG() * alpha[i - 1] * V);
+      preTime +=
+          (servers[i - 1].getO() + servers[i - 1].getG() * alpha[i - 1] * V);
     }
     reTime[servers[i].getId()] = preTime;
   }
@@ -647,18 +630,20 @@ void MISRR::error(vector<int> &errorPlace, int errorInstallment) {
   // cal each server's conflict time
   vector<double> codeTimeGap(serversNumberWithoutError, 0);
   for (int i = 0; i < serversNumberWithoutError; ++i) {
-    if (reTime[i] != 0) codeTimeGap[i] = busyTime[i] - reTime[i];
+    if (reTime[i] != 0)
+      codeTimeGap[i] = busyTime[i] - reTime[i];
 
-    cout << "Ts time[" << i << "]: " << reTime[i] << endl;
-    cout << "Tf time[" << i << "]: " << busyTime[i] << endl;
-    cout << "conflict time[" << i << "]: " << codeTimeGap[i] << endl;
+    // cout << "Ts time[" << i << "]: " << reTime[i] << endl;
+    // cout << "Tf time[" << i << "]: " << busyTime[i] << endl;
+    // cout << "conflict time[" << i << "]: " << codeTimeGap[i] << endl;
   }
 
   // mathTimeGap
   vector<double> mathTimeGap(serversNumberWithoutError, 0);
   preTime = 0, position = 1;
   for (int i = 0; i < serversNumberWithoutError; ++i) {
-    if (i == 0) continue;
+    if (i == 0)
+      continue;
     if (find(errorPlace.begin(), errorPlace.end(), i + 1) != errorPlace.end()) {
       preTime +=
           (2 * oldServers[i - 1].getO() +
@@ -893,10 +878,10 @@ void MISRR::theLastInstallmentGap() {
 
 void MISRR::checkTime() {
   // 方法1
-  double lastServerTime = 0;   // 最后一个处理机第二趟结束时间
-  double firstServerTime = 0;  // 第一个处理机第二趟结束时间
-  double period = servers[n - 1].getS() + servers[n - 1].getW() * beta[n - 1] *
-                                              this->V;  // 内部调度周期
+  double lastServerTime = 0;  // 最后一个处理机第二趟结束时间
+  double firstServerTime = 0; // 第一个处理机第二趟结束时间
+  double period = servers[n - 1].getS() +
+                  servers[n - 1].getW() * beta[n - 1] * this->V; // 内部调度周期
 
   cout << "internal installment P = " << period << endl;
 
@@ -914,7 +899,7 @@ void MISRR::checkTime() {
   }
 
   // 方法2
-  double lateTime = 0;  // Pn比P1晚开始的时间
+  double lateTime = 0; // Pn比P1晚开始的时间
   lateTime = lastServerTime - period;
   // 比较lateTime和period
   if (lateTime > period) {

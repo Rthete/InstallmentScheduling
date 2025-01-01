@@ -6,9 +6,11 @@
  * @LastEditTime: 2024-01-25 14:39:13
  */
 
+#include "MISRR.h"
 #include "include/exp_1.h"
 #include "include/exp_2.h"
 #include "include/exp_3.h"
+#include "include/exp_4.h"
 #include "include/method.h"
 
 int main() {
@@ -46,11 +48,18 @@ int main() {
   // exp_3::error_TolerMIS_30_conflict_inst();
   // exp_3::error_TolerMIS_30_conflict_workload();
 
+  /**
+   * @brief 不带容错的单模型实验
+   */
+
   // exp_2::W_vs_m_15();
   // exp_2::theta_vs_m_15();
   // exp_2::W_vs_m_30();
   // exp_2::theta_vs_m_30();
 
+  /**
+   * @brief 不带容错的三个模型实验
+   */
   // without_error_15_m();
   // ur_without_error_15_m();
   // without_error_15_W();
@@ -64,6 +73,49 @@ int main() {
   // ur_without_error_30_W();
   // without_error_30_theta();
   // ur_without_error_30_theta();
+
+  /**
+   * @brief 不带容错的三个模型实验MISRRLL
+   */
+  // exp_4::without_error_15_m();
+  // exp_4::ur_without_error_15_m();
+  // exp_4::without_error_15_W();
+  // exp_4::ur_without_error_15_W();
+  // exp_4::without_error_15_theta();
+  // exp_4::ur_without_error_15_theta();
+
+  // exp_4::without_error_30_m();
+  // exp_4::ur_without_error_30_m();
+  // exp_4::without_error_30_W();
+  // exp_4::ur_without_error_30_W();
+  // exp_4::without_error_30_theta();
+  // exp_4::ur_without_error_30_theta();
+
+  /**
+   * @brief 不带容错单模型实验MISRRLL
+   */
+  // exp_4::W_vs_m_15();
+  // exp_4::W_vs_m_30();
+  // exp_4::theta_vs_m_15();
+  // exp_4::theta_vs_m_30();
+
+  /**
+   * @brief 不带容错单模型实验lambda MISRRLL
+   */
+  // exp_4::labmda1_T_vs_m_15();
+  // exp_4::labmda1_T_vs_m_30();
+  // exp_4::labmda2_T_vs_m_15();
+  // exp_4::labmda2_T_vs_m_30();
+
+  /**
+   * @brief 带容错单模型实验MISRRLL
+   */
+  exp_4::error_MISRRLL_30();
+  // exp_4::ur_error_MISRRLL_30();
+
+  // MISRRLL misrrll(15, 0.3, 24);
+  // cout << misrrll.findFirstPositiveRealRoot(3, -6, -1200, 3000, -2000) <<
+  // endl;
 
   // with_error_15();
 
@@ -81,7 +133,7 @@ int main() {
   // ModelRunner::run_MISRR(15, 10, 5000, 0.3, "../data/15-servers-w-20/", {6,
   // 12}, 5); ModelRunner::run_MISRR(3, 3, 300, 0.3,
   // "../data/3-servers-example/");
-  ModelRunner::run_MISRRLL_add(1, 1, 8, 8000);
+  // ModelRunner::run_MISRRLL_add(1, 1, 8, 8000);
 
   // test_MISRR_theta();
   // test_MISRR_all();

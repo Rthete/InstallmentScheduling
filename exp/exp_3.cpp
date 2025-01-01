@@ -97,14 +97,13 @@ void error_TolerMIS_30_conflict_workload() {
     std::ofstream conflictFile(
         "../output/exp_3_conflict/error_TolerMIS_30_conflict_workload_n_" +
         std::to_string(i++) + ".csv");
-    
+
     // 5000任务量，总趟数为19
-    for (auto workload = 5000; workload < 16000; workload+=1000) {
+    for (auto workload = 5000; workload < 16000; workload += 1000) {
       vector<double> result;
       // 获取每个处理机的冲突时间
       ModelRunner::run_MISRR_conflict(result, 30, 0, workload, 0.3,
-                                      "../data/exp1-30-servers/", row,
-                                      18);
+                                      "../data/exp1-30-servers/", row, 18);
       for (auto it = result.begin(); it != result.end(); ++it) {
         conflictFile << *it;
         // 如果不是最后一个元素，添加逗号
@@ -116,7 +115,6 @@ void error_TolerMIS_30_conflict_workload() {
     }
     conflictFile.close();
   }
-
 }
 
 /*冲突时间实验v2 横坐标趟数*/
@@ -135,14 +133,13 @@ void error_TolerMIS_30_conflict_inst() {
     std::ofstream conflictFile(
         "../output/exp_3_conflict/error_TolerMIS_30_conflict_n_" +
         std::to_string(i++) + ".csv");
-    
+
     // 5000任务量，总趟数为19
     for (auto inst = 2; inst < 19; inst++) {
       vector<double> result;
       // 获取每个处理机的冲突时间
       ModelRunner::run_MISRR_conflict(result, 30, 0, 5000, 0.3,
-                                      "../data/exp1-30-servers/", row,
-                                      inst);
+                                      "../data/exp1-30-servers/", row, inst);
       for (auto it = result.begin(); it != result.end(); ++it) {
         conflictFile << *it;
         // 如果不是最后一个元素，添加逗号
@@ -154,7 +151,6 @@ void error_TolerMIS_30_conflict_inst() {
     }
     conflictFile.close();
   }
-
 }
 
 /*冲突时间实验*/
@@ -210,9 +206,9 @@ void error_SIS_30() {
   /* 故障i个处理机 */
   for (int i = 1; i <= 4; ++i) {
     error_places.clear();
-    readTXTFile(
-        "../data/exp3-error-place/error-place-30-" + std::to_string(i) + ".txt",
-        error_places);
+    readTXTFile("../data/exp3-error-place/error-place-30-" + std::to_string(i) +
+                    ".txt",
+                error_places);
     /* 任务量w */
     for (int w = 5000; w < 16000; w += 1000) {
       double result_sum = 0;
@@ -258,9 +254,9 @@ void error_TolerMIS_30() {
   /* 故障i个处理机 */
   for (int i = 1; i <= 4; ++i) {
     error_places.clear();
-    readTXTFile(
-        "../data/exp3-error-place/error-place-30-" + std::to_string(i) + ".txt",
-        error_places);
+    readTXTFile("../data/exp3-error-place/error-place-30-" + std::to_string(i) +
+                    ".txt",
+                error_places);
     readTXTFile("../data/exp3-error-place/error-installment-2.txt",
                 error_installment);
 
@@ -272,15 +268,20 @@ void error_TolerMIS_30() {
       double result_min = 100000, result_max = 0;
 
       /* 每种30次取平均 */
+      int not_schedulable_cnt = 0;
       for (const auto &row : error_places) {
         double result =
             ModelRunner::run_MISRR(30, 0, w, 0.3, "../data/exp1-30-servers/",
                                    row, error_installment[index_w][index_30++]);
+        if (result == 0) {
+          not_schedulable_cnt++;
+          cout << "!!!!!!!!" << endl;
+        }
         result_sum += result;
         result_min = std::min(result_min, result);
         result_max = std::max(result_max, result);
       }
-      meanFile << result_sum / 30 << ",";
+      meanFile << result_sum / (30 - not_schedulable_cnt) << ",";
       diffFile << result_max - result_min << ",";
       maxFile << result_max << ",";
       minFile << result_min << ",";
@@ -316,9 +317,9 @@ void error_APMISRR_30() {
   vector<int> m = {19, 21, 23, 25, 26, 28, 29, 30, 31, 33, 34};
   for (int i = 1; i <= 4; ++i) {
     error_places.clear();
-    readTXTFile(
-        "../data/exp3-error-place/error-place-30-" + std::to_string(i) + ".txt",
-        error_places);
+    readTXTFile("../data/exp3-error-place/error-place-30-" + std::to_string(i) +
+                    ".txt",
+                error_places);
     readTXTFile("../data/exp3-error-place/error-installment-2.txt",
                 error_installment);
 
@@ -372,9 +373,9 @@ void error_cmp_3_models_ur() {
   /* 故障i个处理机 */
   for (int i = 1; i <= 4; ++i) {
     error_places.clear();
-    readTXTFile(
-        "../data/exp3-error-place/error-place-30-" + std::to_string(i) + ".txt",
-        error_places);
+    readTXTFile("../data/exp3-error-place/error-place-30-" + std::to_string(i) +
+                    ".txt",
+                error_places);
     readTXTFile("../data/exp3-error-place/error-installment-2.txt",
                 error_installment);
     // std::ofstream singleFile("../output/exp_3_all_exps/error_ur_30_" +
@@ -421,9 +422,9 @@ void error_save_each_time() {
   /* 故障i个处理机 */
   for (int i = 1; i <= 4; ++i) {
     error_places.clear();
-    readTXTFile(
-        "../data/exp3-error-place/error-place-30-" + std::to_string(i) + ".txt",
-        error_places);
+    readTXTFile("../data/exp3-error-place/error-place-30-" + std::to_string(i) +
+                    ".txt",
+                error_places);
     readTXTFile("../data/exp3-error-place/error-installment-2.txt",
                 error_installment);
 
@@ -468,4 +469,4 @@ void error_save_each_time() {
     }
   }
 }
-}  // namespace exp_3
+} // namespace exp_3
