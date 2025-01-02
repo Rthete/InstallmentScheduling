@@ -278,7 +278,8 @@ void error_TolerMIS_30() {
           cout << "!!!!!!!!" << endl;
         }
         result_sum += result;
-        result_min = std::min(result_min, result);
+        if (result != 0)
+          result_min = std::min(result_min, result);
         result_max = std::max(result_max, result);
       }
       meanFile << result_sum / (30 - not_schedulable_cnt) << ",";
