@@ -88,7 +88,7 @@ double run_MISRR(int server_num, int m, int workload, double theta,
   if (!error_server.empty()) {
     cout << "error server size: " << to_string(error_server.size())
          << ", error installment: " << error_installment << endl;
-    misrr.error(error_server, error_installment);
+    misrr.error_2(error_server, error_installment);
   }
 
   if (misrr.isSchedulable == 0) {
