@@ -774,6 +774,7 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
   // cal using rate
   usingRate = 0.0;
   for (int i = 0; i < this->serversNumberWithoutError; ++i) {
+    // cout << "using time[" << i << "]: " << usingTime[i] << endl;
     usingRate += ((double)usingTime[i] / ((double)(this->optimalTime) *
                                           this->serversNumberWithoutError));
   }

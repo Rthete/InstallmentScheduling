@@ -267,10 +267,10 @@ void MISRRLL::initValue() {
     if (alpha[i] * this->Va < 0 || beta[i] * this->V < 0 ||
         gamma[i] * this->Vb < 0) {
       isSchedulable = 0;
-      // cout << this->W << " error "
-      //      << "alpha * Va - " << alpha[i] * this->Va << " beta * V - "
-      //      << beta[i] * this->V << " gamma * Vb - " << gamma[i] * this->Vb
-      //      << endl;
+      cout << this->W << " error "
+           << "alpha * Va - " << alpha[i] * this->Va << " beta * V - "
+           << beta[i] * this->V << " gamma * Vb - " << gamma[i] * this->Vb
+           << endl;
     }
   }
 
@@ -776,8 +776,9 @@ void MISRRLL::addServer(int installment, vector<Server> &new_servers) {
 }
 
 void MISRRLL::error(vector<int> &errorPlace, int errorInstallment) {
-  this->l_1 = 0.4;
-  this->l_2 = 0.4;
+  // 最优参数
+  this->l_1 = 1;
+  this->l_2 = 1;
   this->errorPlace = errorPlace;
   this->errorInstallment = errorInstallment;
 

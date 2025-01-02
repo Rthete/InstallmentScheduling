@@ -263,6 +263,7 @@ void error_TolerMIS_30() {
     /* 任务量w */
     int index_w = 0;
     for (int w = 5000; w < 16000; w += 1000) {
+      // for (int w = 5000; w < 10500; w += 500) {
       int index_30 = 0;
       double result_sum = 0;
       double result_min = 100000, result_max = 0;
@@ -327,6 +328,7 @@ void error_APMISRR_30() {
     /* 任务量w */
     int index_w = 0;
     for (int w = 5000; w < 16000; w += 1000) {
+      // for (int w = 5000; w < 10500; w += 500) {
       int index_30 = 0;
       double result_sum = 0;
       double result_min = 100000, result_max = 0;

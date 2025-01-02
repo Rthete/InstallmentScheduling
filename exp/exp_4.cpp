@@ -123,14 +123,15 @@ void without_error_30_W() {
   FILE *fpResult;
   fpResult = fopen("../output/exp_4/MISRRLL_without_error_30_W.csv", "w");
   fprintf(fpResult, "APMISRR,tolerMIS,MISRRLL\n");
-  for (int W = 5000; W <= 25000; W += 1000) {
+  // for (int W = 5000; W <= 25000; W += 1000) {
+  for (int W = 5000; W <= 5100; W += 10) {
     fprintf(fpResult, "%.4f,",
             ModelRunner::run_myAPMISRR(30, 0.5, 24, W, 0.3,
                                        "../data/exp1-30-servers/"));
     fprintf(fpResult, "%.4f,",
             ModelRunner::run_MISRR(30, 24, W, 0.3, "../data/exp1-30-servers/"));
     fprintf(fpResult, "%.4f\n",
-            ModelRunner::run_MISRRLL(30, 0.2, 0.3, 24, W, 0.3,
+            ModelRunner::run_MISRRLL(30, 0.3, 0.3, 24, W, 0.3,
                                      "../data/exp1-30-servers/"));
   }
   fclose(fpResult);
@@ -418,6 +419,7 @@ void error_MISRRLL_30() {
     /* 任务量w */
     int index_w = 0;
     for (int w = 5000; w < 16000; w += 1000) {
+      // for (int w = 5000; w < 10500; w += 500) {
       int index_30 = 0;
       double result_sum = 0;
       double result_min = 100000, result_max = 0;
@@ -425,8 +427,11 @@ void error_MISRRLL_30() {
       /* 每种30次取平均 */
       int not_schedulable_cnt = 0;
       for (const auto &row : error_places) {
+        // double result = ModelRunner::run_MISRRLL(
+        //     30, 0.7, 0.7, 0, w, 0.3, "../data/exp1-30-servers/", row,
+        //     error_installment[index_w][index_30++]);
         double result = ModelRunner::run_MISRRLL(
-            30, 0.8, 0.7, 0, w, 0.3, "../data/exp1-30-servers/", row,
+            30, 0.6, 0.6, 0, w, 0.3, "../data/exp1-30-servers/", row,
             error_installment[index_w][index_30++]);
         if (result == 0)
           not_schedulable_cnt++;
@@ -452,6 +457,11 @@ void error_MISRRLL_30() {
   diffFile.close();
   maxFile.close();
   minFile.close();
+
+  exp_3::transposeCSV("../output/exp_4_error/error_MISRRLL_30_mean.csv",
+                      "../output/exp_4_error/t_error_MISRRLL_30_mean.csv");
+  exp_3::transposeCSV("../output/exp_4_error/error_MISRRLL_30_diff.csv",
+                      "../output/exp_4_error/t_error_MISRRLL_30_diff.csv");
   //   transposeCSV("../output/exp_3/error_TolerMIS_30_mean.csv",
   //                "../output/exp_3/t_error_TolerMIS_30_mean.csv");
   //   transposeCSV("../output/exp_3/error_TolerMIS_30_diff.csv",
@@ -480,6 +490,7 @@ void ur_error_MISRRLL_30() {
     /* 任务量w */
     int index_w = 0;
     for (int w = 5000; w < 16000; w += 1000) {
+      // for (int w = 5000; w < 10500; w += 500) {
       int index_30 = 0;
       double result_sum = 0;
       double result_min = 100000, result_max = 0;
@@ -487,7 +498,7 @@ void ur_error_MISRRLL_30() {
       /* 每种30次取平均 */
       for (const auto &row : error_places) { // 这里直接用20趟
         double result = ModelRunner::run_MISRRLL(
-            30, 0.2, 0.3, 34, w, 0.3, "../data/exp1-30-servers/", row,
+            30, 0.6, 0.6, 0, w, 0.3, "../data/exp1-30-servers/", row,
             error_installment[index_w][index_30++]);
         result_sum += result;
         result_min = std::min(result_min, result);
@@ -513,5 +524,60 @@ void ur_error_MISRRLL_30() {
   //                "../output/exp_3/t_error_TolerMIS_30_mean.csv");
   //   transposeCSV("../output/exp_3/error_TolerMIS_30_diff.csv",
   //                "../output/exp_3/t_error_TolerMIS_30_diff.csv");
+}
+
+/*利用率，3个模型，共30个处理机，故障1/2/3/4个处理机，任务量5000，每种实验30次
+ */
+void error_cmp_3_models_ur() {
+  ModelRunner::output_using_rate = 1;
+
+  std::vector<std::vector<int>> error_places;
+  std::vector<std::vector<int>> error_installment;
+  vector<int> m = {19, 21, 23, 25, 26, 28, 29, 30, 31, 33, 34};
+
+  std::ofstream allFile("../output/exp_4_error/MISRRLL_error_ur_s30_w5000.csv");
+  allFile << "model,error_num,value" << std::endl;
+
+  /* 故障i个处理机 */
+  for (int i = 1; i <= 4; ++i) {
+    error_places.clear();
+    exp_3::readTXTFile("../data/exp3-error-place/error-place-30-" +
+                           std::to_string(i) + ".txt",
+                       error_places);
+    exp_3::readTXTFile("../data/exp3-error-place/error-installment-2.txt",
+                       error_installment);
+    std::ofstream singleFile("../output/exp_4_error/MISRRLL_error_ur_30_" +
+                             std::to_string(i) + ".csv");
+    /* 任务量w */
+    int index_w = 0;
+    for (int w = 5000; w < 5500; w += 1000) {
+      int index_30 = 0;
+
+      /* 每种30次 */
+      for (const auto &row : error_places) {
+        double result = ModelRunner::run_myAPMISRR(
+            30, 0.5, m[index_w], w, 0.3, "../data/exp1-30-servers/", row,
+            error_installment[index_w][index_30]);
+        singleFile << result << ",";
+        allFile << "APMISRR," << i << "," << result << std::endl;
+
+        result =
+            ModelRunner::run_MISRR(30, 0, w, 0.3, "../data/exp1-30-servers/",
+                                   row, error_installment[index_w][index_30]);
+        singleFile << result << ",";
+        allFile << "TolerMIS," << i << "," << result << std::endl;
+
+        result = ModelRunner::run_MISRRLL(30, 0.6, 0.6, 0, w, 0.3,
+                                          "../data/exp1-30-servers/", row,
+                                          error_installment[index_w][index_30]);
+        singleFile << result << "\n";
+        allFile << "MISRRLL," << i << "," << result << std::endl;
+
+        index_30++;
+      }
+      index_w++;
+    }
+    singleFile.close();
+  }
 }
 } // namespace exp_4

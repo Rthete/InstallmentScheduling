@@ -61,6 +61,7 @@ void labmda2_T_vs_m_30();
 // 第四部分：容错实验
 void error_MISRRLL_30();
 void ur_error_MISRRLL_30();
+void error_cmp_3_models_ur();
 
 } // namespace exp_4
 
