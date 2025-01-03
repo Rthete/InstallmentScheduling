@@ -123,7 +123,8 @@ int main() {
    */
   // exp_4::recover_MISRRLL_15();
   // exp_4::recover_TolerMIS_15();
-  exp_4::recover_myAPMISRR_15();
+  // exp_4::recover_myAPMISRR_15();
+  exp_4::recover_cmp_3_models_ur();
 
   // MISRRLL misrrll(15, 0.3, 24);
   // cout << misrrll.findFirstPositiveRealRoot(3, -6, -1200, 3000, -2000) <<

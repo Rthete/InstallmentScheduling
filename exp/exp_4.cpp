@@ -920,7 +920,7 @@ void recover_myAPMISRR_15() {
         int not_schedulable_cnt = 0;
         for (const auto &row : add_servers) {
           double result = ModelRunner::run_myAPMISRR(
-              15, 0.7, m[index_w], w, 0.3, "../data/exp1-15-servers/", {}, 0,
+              15, 0.5, m[index_w], w, 0.3, "../data/exp1-15-servers/", {}, 0,
               row, add_installment[index_w][index_30++]);
           // 去掉不可调度的case
           if (result == 0)
@@ -959,6 +959,84 @@ void recover_myAPMISRR_15() {
   }
 }
 
-void recover_cmp_3_models_ur() {}
+void recover_cmp_3_models_ur() {
+  ModelRunner::output_using_rate = 1;
 
+  std::vector<std::vector<int>> add_installment;
+  exp_3::readTXTFile("../data/exp_4_recover/add-installment.txt",
+                     add_installment);
+
+  vector<int> m = {19, 21, 23, 25, 26, 28, 29, 30, 31, 33, 34};
+
+  std::ofstream allFile(
+      "../output/exp_4_recover/MISRRLL_recover_ur_s15_w5000.csv");
+  allFile << "model,add_num,value" << std::endl;
+
+  /* 增加i个处理机 */
+  for (int i = 1; i <= 4; ++i) {
+    std::vector<std::vector<double>> add_servers_data_o;
+    std::vector<std::vector<double>> add_servers_data_g;
+    std::vector<std::vector<double>> add_servers_data_s;
+    std::vector<std::vector<double>> add_servers_data_w;
+    exp_3::readTXTFile("../data/exp_4_recover/add-server-15-" +
+                           std::to_string(i) + "-o.txt",
+                       add_servers_data_o);
+    exp_3::readTXTFile("../data/exp_4_recover/add-server-15-" +
+                           std::to_string(i) + "-g.txt",
+                       add_servers_data_g);
+    exp_3::readTXTFile("../data/exp_4_recover/add-server-15-" +
+                           std::to_string(i) + "-s.txt",
+                       add_servers_data_s);
+    exp_3::readTXTFile("../data/exp_4_recover/add-server-15-" +
+                           std::to_string(i) + "-w.txt",
+                       add_servers_data_w);
+
+    // 将data转为server实例 30组 1/2/3/4台 o,s,g,w
+    std::vector<vector<Server>> add_servers;
+    for (int j = 0; j < 30; ++j) {
+      std::vector<Server> servers;
+      for (int k = 0; k < i; ++k) {
+        servers.push_back(
+            Server(add_servers_data_o[j][k], add_servers_data_g[j][k],
+                   add_servers_data_s[j][k], add_servers_data_w[j][k]));
+      }
+      add_servers.push_back(servers);
+    }
+
+    std::ofstream singleFile("../output/exp_4_recover/MISRRLL_recover_ur_15_" +
+                             std::to_string(i) + ".csv");
+
+    /* 任务量w */
+    int index_w = 0;
+    for (int w = 5000; w < 5500; w += 1000) {
+      int index_30 = 0;
+
+      /* 每种30次 */
+      for (const auto &row : add_servers) {
+        double result = ModelRunner::run_myAPMISRR(
+            15, 0.5, m[index_w], w, 0.3, "../data/exp1-15-servers/", {}, 0, row,
+            add_installment[index_w][index_30]);
+        singleFile << result << ",";
+        allFile << "APMISRR," << i << "," << result << std::endl;
+
+        result = ModelRunner::run_MISRR(15, 0, w, 0.3,
+                                        "../data/exp1-15-servers/", {}, 0, row,
+                                        add_installment[index_w][index_30]);
+        singleFile << result << ",";
+        allFile << "TolerMIS," << i << "," << result << std::endl;
+
+        result = ModelRunner::run_MISRRLL(
+            15, 1, 1, 0, w, 0.3, "../data/exp1-15-servers/", {}, 0, row,
+            add_installment[index_w][index_30]);
+        singleFile << result << "\n";
+        allFile << "MISRRLL," << i << "," << result << std::endl;
+
+        index_30++;
+      }
+      index_w++;
+    }
+    singleFile.close();
+  }
+  allFile.close();
+}
 } // namespace exp_4

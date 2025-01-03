@@ -206,6 +206,95 @@ class PlotterLauncher:
         fig_path = f"../../output/MISRRLL_error_plots/ur_error_place_w5000_{time_str}"
         Plotter.MISRRLL_plot_error_ur_box_combined(data_path, fig_path)
 
+    def MISRRLL_recover_time_bar():
+        """
+        15处理机，时间，柱状图
+        """
+        current_time = datetime.now()
+        time_str = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+
+        # 任务量5000~15000，共11组数据
+        x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        x_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+
+        APMISRR_diff = read_data_from_file(
+            "../../output/exp_4_recover/recover_myAPMISRR_15_diff.csv"
+        )
+        TolerMIS_diff = read_data_from_file(
+            "../../output/exp_4_recover/recover_TolerMIS_15_diff.csv"
+        )
+        MISRRLL_diff = read_data_from_file(
+            "../../output/exp_4_recover/recover_MISRRLL_15_diff.csv"
+        )
+
+        APMISRR_mean = read_data_from_file(
+            "../../output/exp_4_recover/recover_myAPMISRR_15_mean.csv"
+        )
+        TolerMIS_mean = read_data_from_file(
+            "../../output/exp_4_recover/recover_TolerMIS_15_mean.csv"
+        )
+        MISRRLL_mean = read_data_from_file(
+            "../../output/exp_4_recover/recover_MISRRLL_15_mean.csv"
+        )
+
+        Plotter.MISRRLL_plot_recover_time_bar(
+            x,
+            x_data,
+            MISRRLL_mean[0],
+            MISRRLL_diff[0],
+            TolerMIS_mean[0],
+            TolerMIS_diff[0],
+            APMISRR_mean[0],
+            APMISRR_diff[0],
+            f"../../output/MISRRLL_recover_plots/time_1_recover_place_{time_str}",
+        )
+        Plotter.MISRRLL_plot_recover_time_bar(
+            x,
+            x_data,
+            MISRRLL_mean[1],
+            MISRRLL_diff[1],
+            TolerMIS_mean[1],
+            TolerMIS_diff[1],
+            APMISRR_mean[1],
+            APMISRR_diff[1],
+            f"../../output/MISRRLL_recover_plots/time_2_recover_place_{time_str}",
+        )
+        Plotter.MISRRLL_plot_recover_time_bar(
+            x,
+            x_data,
+            MISRRLL_mean[2],
+            MISRRLL_diff[2],
+            TolerMIS_mean[2],
+            TolerMIS_diff[2],
+            APMISRR_mean[2],
+            APMISRR_diff[2],
+            f"../../output/MISRRLL_recover_plots/time_3_recover_place_{time_str}",
+        )
+        Plotter.MISRRLL_plot_recover_time_bar(
+            x,
+            x_data,
+            MISRRLL_mean[3],
+            MISRRLL_diff[3],
+            TolerMIS_mean[3],
+            TolerMIS_diff[3],
+            APMISRR_mean[3],
+            APMISRR_diff[3],
+            f"../../output/MISRRLL_recover_plots/time_4_recover_place_{time_str}",
+        )
+
+    def MISRRLL_recover_ur_box_combined():
+        """
+        15处理机，利用率，箱线图，四种情况组合
+        """
+        current_time = datetime.now()
+        time_str = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+
+        data_path = "../../output/exp_4_recover/MISRRLL_recover_ur_s15_w5000.csv"
+        fig_path = (
+            f"../../output/MISRRLL_recover_plots/ur_recover_place_w5000_{time_str}"
+        )
+        Plotter.MISRRLL_plot_recover_ur_box_combined(data_path, fig_path)
+
 
 if __name__ == "__main__":
     # PlotterLauncher.error_time_bar()
@@ -213,5 +302,7 @@ if __name__ == "__main__":
     # PlotterLauncher.error_time_box()
     # PlotterLauncher.error_ur_box_combined()
     # PlotterLauncher.MISRRLL_error_time_bar()
-    PlotterLauncher.MISRRLL_error_ur_box_combined()
+    # PlotterLauncher.MISRRLL_error_ur_box_combined()
+    PlotterLauncher.MISRRLL_recover_time_bar()
+    PlotterLauncher.MISRRLL_recover_ur_box_combined()
     print("wtf")
