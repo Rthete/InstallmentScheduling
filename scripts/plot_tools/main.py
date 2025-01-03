@@ -295,6 +295,19 @@ class PlotterLauncher:
         )
         Plotter.MISRRLL_plot_recover_ur_box_combined(data_path, fig_path)
 
+    def MISRRLL_recover_ur_box_combined_30():
+        """
+        30处理机，利用率，箱线图，四种情况组合
+        """
+        current_time = datetime.now()
+        time_str = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+
+        data_path = "../../output/exp_4_recover/MISRRLL_recover_ur_s30_w5000.csv"
+        fig_path = (
+            f"../../output/MISRRLL_recover_plots/ur_recover_place_w5000_30_{time_str}"
+        )
+        Plotter.MISRRLL_plot_recover_ur_box_combined(data_path, fig_path)
+
 
 if __name__ == "__main__":
     # PlotterLauncher.error_time_bar()
@@ -303,6 +316,7 @@ if __name__ == "__main__":
     # PlotterLauncher.error_ur_box_combined()
     # PlotterLauncher.MISRRLL_error_time_bar()
     # PlotterLauncher.MISRRLL_error_ur_box_combined()
-    PlotterLauncher.MISRRLL_recover_time_bar()
-    PlotterLauncher.MISRRLL_recover_ur_box_combined()
+    # PlotterLauncher.MISRRLL_recover_time_bar()
+    # PlotterLauncher.MISRRLL_recover_ur_box_combined()
+    PlotterLauncher.MISRRLL_recover_ur_box_combined_30()
     print("wtf")
