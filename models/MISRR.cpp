@@ -856,17 +856,6 @@ void MISRR::addServer(int add_installment, vector<Server> &new_servers) {
     new_servers[i].setID(this->n + i);
   }
 
-  // 第x+1趟各处理机释放时间(相对于startTime)
-  vector<double> release_time(this->n + 1, 0);
-  release_time[1] = -servers[1].getG() * beta[1] * this->V * theta;
-  for (int i = 2; i < this->n + 1; i++) {
-    release_time[i] =
-        release_time[i - 1] + servers[i - 1].getO() +
-        servers[i - 1].getG() * alpha[i - 1] * this->V * (1 + theta) +
-        servers[i - 1].getG() * beta[i - 1] * this->V * (1 + theta) +
-        servers[i].getO();
-  }
-
   // 重置处理机
   int num_new_servers = new_servers.size();
   int original_size = this->n;

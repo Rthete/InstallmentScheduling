@@ -135,14 +135,35 @@ void myAPMISRR::initValue() {
 
 void myAPMISRR::calOptimalTime() {
   // 式(29)
-  optimalTime = (m - 1) * P + servers[0].getO() + servers[0].getS() +
-                beta[0] * servers[0].getW() * this->Vb;
+  this->optimalTime = (m - 1) * P + servers[0].getO() + servers[0].getS() +
+                      beta[0] * servers[0].getW() * this->Vb;
   for (int i = 0; i < this->n; ++i) {
-    optimalTime +=
+    this->optimalTime +=
         servers[i].getO() + beta[i] * servers[i].getG() * theta * this->Vb;
   }
-  optimalTime -= servers[0].getO();
+  this->optimalTime -= servers[0].getO();
   // cout << "optimalTime = " << optimalTime << endl;
+
+  this->optimalTime += this->startTime;
+}
+
+void myAPMISRR::calUsingRate() {
+
+  for (int i = 0; i < this->n; i++) {
+    int id = servers[i].getId();
+    usingTime[id] +=
+        ((m - 1) * (alpha[i] * V * servers[i].getW() + servers[i].getS()) +
+         beta[i] * Vb * servers[i].getW() + servers[i].getS() +
+         beta[i] * Vb * servers[i].getG() * theta);
+  }
+
+  // cal using rate
+  usingRate = 0.0;
+  for (int i = 0; i < this->numberWithoutError; ++i) {
+    // cout << "usingTime[" << i << "] = " << usingTime[i] << endl;
+    usingRate += ((double)usingTime[i] /
+                  ((double)(this->optimalTime) * this->numberWithoutError));
+  }
 }
 
 int myAPMISRR::isSchedulable() {
@@ -191,24 +212,6 @@ int myAPMISRR::isSchedulable() {
     return 1;
   } else {
     return 0;
-  }
-}
-
-void myAPMISRR::calUsingRate() {
-
-  for (int i = 0; i < this->n; i++) {
-    int id = servers[i].getId();
-    usingTime[id] +=
-        ((m - 1) * (alpha[i] * V * servers[i].getW() + servers[i].getS()) +
-         beta[i] * Vb * servers[i].getW() + servers[i].getS() +
-         beta[i] * Vb * servers[i].getG() * theta);
-  }
-
-  // cal using rate
-  usingRate = 0.0;
-  for (int i = 0; i < this->numberWithoutError; ++i) {
-    usingRate += ((double)usingTime[i] /
-                  ((double)(this->optimalTime) * this->numberWithoutError));
   }
 }
 
@@ -330,6 +333,83 @@ void myAPMISRR::error(vector<int> &errorPlace, int errorInstallment) {
     // cout << i << " " << ((double)usingTime[i] /
     // ((double)(this->optimalTime))) << endl;
   }
+}
+
+void myAPMISRR::addServer(int add_installment, vector<Server> &new_servers) {
+  cout << "**********************start myAPMISRR recover**********************"
+       << endl;
+
+  // 重调度开始时间，在最后一个处理机回传结束后才开始新调度
+  this->startTime = servers[0].getS() * (add_installment + 1) +
+                    servers[0].getW() * alpha[0] * this->V +
+                    servers[0].getW() * alpha[0] * add_installment * this->V +
+                    servers[0].getG() * beta[0] * this->V * theta;
+  cout << "startTime: " << startTime << endl;
+  for (int i = 0; i < this->n; ++i) {
+    this->startTime += 2 * servers[i].getO() +
+                       servers[i].getG() * alpha[i] * this->V * (1 + theta);
+  }
+  cout << "startTime: " << startTime << endl;
+
+  // 重置usingTime(把新处理机的usingTime加到最后了)
+  usingTime.clear();
+  usingTime.resize(this->n + new_servers.size(), 0);
+  for (int i = 0; i < this->n; ++i) {
+    usingTime[i] =
+        (servers[i].getS() + alpha[i] * this->V * servers[i].getW()) *
+        (add_installment + 1);
+  }
+
+  // 给新处理机设置编号
+  for (int i = 0; i < new_servers.size(); i++) {
+    new_servers[i].setID(this->n + i);
+  }
+
+  // 重置处理机
+  int num_new_servers = new_servers.size();
+  int original_size = this->n;
+  servers.resize(original_size + num_new_servers);
+  for (int i = num_new_servers; i < this->n + num_new_servers; i++) {
+    servers[i].setO(servers[i - num_new_servers].getO());
+    servers[i].setS(servers[i - num_new_servers].getS());
+    servers[i].setG(servers[i - num_new_servers].getG());
+    servers[i].setW(servers[i - num_new_servers].getW());
+  }
+
+  // 设置新处理机的参数
+  for (int i = 0; i < num_new_servers; i++) {
+    servers[i] = new_servers[i];
+  }
+
+  this->leftW = 0;
+  this->leftW += (this->Vb + (this->m - add_installment - 2) * this->V);
+  cout << "this->leftW=" << this->leftW << endl;
+  this->W = this->leftW;
+  this->m = this->m - add_installment - 1;
+  // 若剩余趟数小于3，则设置为3，否则无法调度
+  this->m = this->m < 3 ? 3 : this->m;
+  this->n += num_new_servers;
+  this->numberWithoutError = this->n;
+
+  this->lambda = 1;
+
+  initValue();
+  calOptimalTime();
+  calUsingRate();
+  cout << "this->startTime=" << this->startTime << endl;
+  cout << "recover new optimal time: " << this->optimalTime << endl;
+
+  // 重新计算usingRate
+  usingRate = 0.0;
+  for (int i = 0; i < this->n; ++i) {
+    // cout << "usingTime[" << i << "] = " << usingTime[i] << endl;
+    usingRate += ((double)usingTime[i] /
+                  ((double)(this->optimalTime) * (this->n - num_new_servers) +
+                   (this->optimalTime - this->startTime) * num_new_servers));
+  }
+
+  cout << "**********************end myAPMISRR recover**********************"
+       << endl;
 }
 
 double myAPMISRR::getOptimalTime() { return this->optimalTime; }

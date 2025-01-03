@@ -39,7 +39,8 @@ double run_APMISRR_cost(double lambda, int m);
 double run_myAPMISRR(int server_num = 15, double lambda = 0.5, int m = 8,
                      int workload = 8000, double theta = 0.3,
                      string data_path = "../data/15-servers-w-20/",
-                     vector<int> error_server = {}, int error_installment = 10);
+                     vector<int> error_server = {}, int error_installment = 10,
+                     vector<Server> add_servers = {}, int add_installment = 10);
 double run_MISRRL(double lambda, int m);
 double run_MISRRLL(int server_num = 15, double lambda1 = 0.2,
                    double lambda2 = 0.3, int m = 24, int workload = 8000,

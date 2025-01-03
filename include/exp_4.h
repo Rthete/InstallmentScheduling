@@ -74,7 +74,7 @@ void error_cmp_3_models_ur();
 // 第五部分：恢复实验
 void recover_MISRRLL_15();
 void recover_TolerMIS_15();
-void ur_recover_MISRRLL_15();
+void recover_myAPMISRR_15();
 void recover_cmp_3_models_ur();
 
 } // namespace exp_4

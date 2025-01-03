@@ -214,7 +214,8 @@ double run_APMISRR_cost(double lambda, int m) {
  */
 double run_myAPMISRR(int server_num, double lambda, int m, int workload,
                      double theta, string data_path, vector<int> error_server,
-                     int error_installment) {
+                     int error_installment, vector<Server> add_servers,
+                     int add_installment) {
   auto serverN = server_num;
 
   cout << "**********************run myAPMISRR**********************" << endl;
@@ -236,15 +237,43 @@ double run_myAPMISRR(int server_num, double lambda, int m, int workload,
   myapmisrr.calOptimalTime();
   myapmisrr.calUsingRate();
 
-  // auto error_installment = 10;
+  cout << "myapmisrr.getUsingRate(): " << myapmisrr.getUsingRate() << endl;
+  cout << "myapmisrr.getOptimalTime(): " << myapmisrr.getOptimalTime() << endl;
+
+  // 无故障/恢复，直接返回
+  if (error_server.empty() && add_servers.empty()) {
+    if (output_using_rate == 1)
+      return myapmisrr.getUsingRate();
+    return myapmisrr.getOptimalTime();
+  }
+
+  // 有故障，重新计算
   if (!error_server.empty()) {
     cout << "error server size: " << to_string(error_server.size())
          << ", error installment: " << error_installment << endl;
     myapmisrr.error(error_server, error_installment);
   }
 
-  cout << "myapmisrr.getUsingRate(): " << myapmisrr.getUsingRate() << endl;
-  cout << "myapmisrr.getOptimalTime(): " << myapmisrr.getOptimalTime() << endl;
+  // 有恢复，重新计算
+  if (!add_servers.empty()) {
+    cout << "add servers size: " << to_string(add_servers.size())
+         << ", add installment: " << add_installment << endl;
+    // 限制add_installment的大小
+    if (m - add_installment < 2) {
+      add_installment = m - 2;
+      cout << "new add installment: " << add_installment << endl;
+    }
+    // 打印新增处理机信息(double)
+    for (auto &server : add_servers) {
+      cout << "server ogsw: " << server.getO() << " " << server.getG() << " "
+           << server.getS() << " " << server.getW() << endl;
+    }
+    myapmisrr.addServer(add_installment, add_servers);
+  }
+
+  cout << "new myapmisrr.getUsingRate(): " << myapmisrr.getUsingRate() << endl;
+  cout << "new myapmisrr.getOptimalTime(): " << myapmisrr.getOptimalTime()
+       << endl;
 
   if (output_using_rate == 1)
     return myapmisrr.getUsingRate();

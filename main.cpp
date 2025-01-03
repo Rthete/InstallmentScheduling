@@ -121,8 +121,9 @@ int main() {
   /**
    * @brief 带恢复单模型实验MISRRLL
    */
-  exp_4::recover_MISRRLL_15();
-  exp_4::recover_TolerMIS_15();
+  // exp_4::recover_MISRRLL_15();
+  // exp_4::recover_TolerMIS_15();
+  exp_4::recover_myAPMISRR_15();
 
   // MISRRLL misrrll(15, 0.3, 24);
   // cout << misrrll.findFirstPositiveRealRoot(3, -6, -1200, 3000, -2000) <<
