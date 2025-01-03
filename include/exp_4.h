@@ -76,6 +76,7 @@ void recover_MISRRLL_15();
 void recover_TolerMIS_15();
 void recover_myAPMISRR_15();
 void recover_cmp_3_models_ur();
+void recover_cmp_3_models_ur_30();
 
 } // namespace exp_4
 
