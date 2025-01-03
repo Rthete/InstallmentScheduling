@@ -313,6 +313,86 @@ void theta_vs_m_30() {
   }
 }
 
+void lambda1_vs_m_15() {
+  ModelRunner::output_using_rate = 0;
+  FILE *fpResult;
+  fpResult = fopen("../output/exp_4/MISRRLL_lambda1_vs_m_15.csv", "w");
+  fprintf(fpResult, "m,");
+  for (double lambda1 = 0.1; lambda1 <= 1; lambda1 += 0.1) {
+    fprintf(fpResult, "%.1f,", lambda1);
+  }
+  fprintf(fpResult, "\n");
+  for (int m = 3; m <= 40; m += 1) {
+    fprintf(fpResult, "%d,", m);
+    for (double lambda1 = 0.1; lambda1 <= 1; lambda1 += 0.1) {
+      fprintf(fpResult, "%.2f,",
+              ModelRunner::run_MISRRLL(15, lambda1, 0.6, m, 5000, 0.3,
+                                       "../data/exp1-15-servers/"));
+    }
+    fprintf(fpResult, "\n");
+  }
+}
+
+void lambda1_vs_m_30() {
+  ModelRunner::output_using_rate = 0;
+  FILE *fpResult;
+  fpResult = fopen("../output/exp_4/MISRRLL_lambda1_vs_m_30.csv", "w");
+  fprintf(fpResult, "m,");
+  for (double lambda1 = 0.1; lambda1 <= 1; lambda1 += 0.1) {
+    fprintf(fpResult, "%.1f,", lambda1);
+  }
+  fprintf(fpResult, "\n");
+  for (int m = 3; m <= 40; m += 1) {
+    fprintf(fpResult, "%d,", m);
+    for (double lambda1 = 0.1; lambda1 <= 1; lambda1 += 0.1) {
+      fprintf(fpResult, "%.2f,",
+              ModelRunner::run_MISRRLL(30, lambda1, 0.6, m, 10000, 0.3,
+                                       "../data/exp1-30-servers/"));
+    }
+    fprintf(fpResult, "\n");
+  }
+}
+
+void lambda2_vs_m_15() {
+  ModelRunner::output_using_rate = 0;
+  FILE *fpResult;
+  fpResult = fopen("../output/exp_4/MISRRLL_lambda2_vs_m_15.csv", "w");
+  fprintf(fpResult, "m,");
+  for (double lambda2 = 0.1; lambda2 <= 1; lambda2 += 0.1) {
+    fprintf(fpResult, "%.1f,", lambda2);
+  }
+  fprintf(fpResult, "\n");
+  for (int m = 3; m <= 40; m += 1) {
+    fprintf(fpResult, "%d,", m);
+    for (double lambda2 = 0.1; lambda2 <= 1; lambda2 += 0.1) {
+      fprintf(fpResult, "%.2f,",
+              ModelRunner::run_MISRRLL(15, 0.6, lambda2, m, 5000, 0.3,
+                                       "../data/exp1-15-servers/"));
+    }
+    fprintf(fpResult, "\n");
+  }
+}
+
+void lambda2_vs_m_30() {
+  ModelRunner::output_using_rate = 0;
+  FILE *fpResult;
+  fpResult = fopen("../output/exp_4/MISRRLL_lambda2_vs_m_30.csv", "w");
+  fprintf(fpResult, "m,");
+  for (double lambda2 = 0.1; lambda2 <= 1; lambda2 += 0.1) {
+    fprintf(fpResult, "%.1f,", lambda2);
+  }
+  fprintf(fpResult, "\n");
+  for (int m = 3; m <= 40; m += 1) {
+    fprintf(fpResult, "%d,", m);
+    for (double lambda2 = 0.1; lambda2 <= 1; lambda2 += 0.1) {
+      fprintf(fpResult, "%.2f,",
+              ModelRunner::run_MISRRLL(30, 0.6, lambda2, m, 10000, 0.3,
+                                       "../data/exp1-30-servers/"));
+    }
+    fprintf(fpResult, "\n");
+  }
+}
+
 void labmda1_T_vs_m_15() {
   ModelRunner::output_using_rate = 0;
   FILE *fpResult;
@@ -580,4 +660,190 @@ void error_cmp_3_models_ur() {
     singleFile.close();
   }
 }
+
+void recover_MISRRLL_15() {
+  ModelRunner::output_using_rate = 0;
+
+  std::ofstream meanFile("../output/exp_4_recover/recover_MISRRLL_15_mean.csv");
+  std::ofstream diffFile("../output/exp_4_recover/recover_MISRRLL_15_diff.csv");
+  std::ofstream maxFile("../output/exp_4_recover/recover_MISRRLL_15_max.csv");
+  std::ofstream minFile("../output/exp_4_recover/recover_MISRRLL_15_min.csv");
+
+  std::vector<std::vector<int>> add_installment;
+
+  exp_3::readTXTFile("../data/exp_4_recover/add-installment.txt",
+                     add_installment);
+
+  /* 增加i个处理机 */
+  for (int i = 1; i <= 4; ++i) {
+    std::vector<std::vector<double>> add_servers_data_o;
+    std::vector<std::vector<double>> add_servers_data_g;
+    std::vector<std::vector<double>> add_servers_data_s;
+    std::vector<std::vector<double>> add_servers_data_w;
+    exp_3::readTXTFile("../data/exp_4_recover/add-server-15-" +
+                           std::to_string(i) + "-o.txt",
+                       add_servers_data_o);
+    exp_3::readTXTFile("../data/exp_4_recover/add-server-15-" +
+                           std::to_string(i) + "-g.txt",
+                       add_servers_data_g);
+    exp_3::readTXTFile("../data/exp_4_recover/add-server-15-" +
+                           std::to_string(i) + "-s.txt",
+                       add_servers_data_s);
+    exp_3::readTXTFile("../data/exp_4_recover/add-server-15-" +
+                           std::to_string(i) + "-w.txt",
+                       add_servers_data_w);
+
+    // 将data转为server实例 30组 1/2/3/4台 o,s,g,w
+    std::vector<vector<Server>> add_servers;
+    for (int j = 0; j < 30; ++j) {
+      std::vector<Server> servers;
+      for (int k = 0; k < i; ++k) {
+        servers.push_back(
+            Server(add_servers_data_o[j][k], add_servers_data_g[j][k],
+                   add_servers_data_s[j][k], add_servers_data_w[j][k]));
+      }
+      add_servers.push_back(servers);
+    }
+
+    /* 任务量w */
+    int index_w = 0;
+    for (int w = 5000; w < 16000; w += 1000) {
+      // for (int w = 5000; w < 10500; w += 500) {
+      int index_30 = 0;
+      double result_sum = 0;
+      double result_min = 100000, result_max = 0;
+
+      /* 每种30次取平均 */
+      int not_schedulable_cnt = 0;
+      for (const auto &row : add_servers) {
+        double result = ModelRunner::run_MISRRLL(
+            15, 1, 1, 0, w, 0.3, "../data/exp1-15-servers/", {}, 0, row,
+            add_installment[index_w][index_30++]);
+        // 去掉不可调度的case
+        if (result == 0)
+          not_schedulable_cnt++;
+        result_sum += result;
+        if (result != 0)
+          result_min = std::min(result_min, result);
+        result_max = std::max(result_max, result);
+        // return;
+      }
+      meanFile << result_sum / (30 - not_schedulable_cnt) << ",";
+      diffFile << result_max - result_min << ",";
+      maxFile << result_max << ",";
+      minFile << result_min << ",";
+
+      index_w++;
+    }
+    meanFile << std::endl;
+    diffFile << std::endl;
+    maxFile << std::endl;
+    minFile << std::endl;
+  }
+  meanFile.close();
+  diffFile.close();
+  maxFile.close();
+  minFile.close();
+
+  exp_3::transposeCSV("../output/exp_4_recover/recover_MISRRLL_15_mean.csv",
+                      "../output/exp_4_recover/t_recover_MISRRLL_15_mean.csv");
+  exp_3::transposeCSV("../output/exp_4_recover/recover_MISRRLL_15_diff.csv",
+                      "../output/exp_4_recover/t_recover_MISRRLL_15_diff.csv");
+}
+
+void recover_TolerMIS_15() {
+  ModelRunner::output_using_rate = 0;
+
+  std::ofstream meanFile(
+      "../output/exp_4_recover/recover_TolerMIS_15_mean.csv");
+  std::ofstream diffFile(
+      "../output/exp_4_recover/recover_TolerMIS_15_diff.csv");
+  std::ofstream maxFile("../output/exp_4_recover/recover_TolerMIS_15_max.csv");
+  std::ofstream minFile("../output/exp_4_recover/recover_TolerMIS_15_min.csv");
+
+  std::vector<std::vector<int>> add_installment;
+
+  exp_3::readTXTFile("../data/exp_4_recover/add-installment.txt",
+                     add_installment);
+
+  /* 增加i个处理机 */
+  for (int i = 1; i <= 4; ++i) {
+    std::vector<std::vector<double>> add_servers_data_o;
+    std::vector<std::vector<double>> add_servers_data_g;
+    std::vector<std::vector<double>> add_servers_data_s;
+    std::vector<std::vector<double>> add_servers_data_w;
+    exp_3::readTXTFile("../data/exp_4_recover/add-server-15-" +
+                           std::to_string(i) + "-o.txt",
+                       add_servers_data_o);
+    exp_3::readTXTFile("../data/exp_4_recover/add-server-15-" +
+                           std::to_string(i) + "-g.txt",
+                       add_servers_data_g);
+    exp_3::readTXTFile("../data/exp_4_recover/add-server-15-" +
+                           std::to_string(i) + "-s.txt",
+                       add_servers_data_s);
+    exp_3::readTXTFile("../data/exp_4_recover/add-server-15-" +
+                           std::to_string(i) + "-w.txt",
+                       add_servers_data_w);
+
+    // 将data转为server实例 30组 1/2/3/4台 o,s,g,w
+    std::vector<vector<Server>> add_servers;
+    for (int j = 0; j < 30; ++j) {
+      std::vector<Server> servers;
+      for (int k = 0; k < i; ++k) {
+        servers.push_back(
+            Server(add_servers_data_o[j][k], add_servers_data_g[j][k],
+                   add_servers_data_s[j][k], add_servers_data_w[j][k]));
+      }
+      add_servers.push_back(servers);
+    }
+
+    /* 任务量w */
+    int index_w = 0;
+    for (int w = 5000; w < 16000; w += 1000) {
+      // for (int w = 5000; w < 10500; w += 500) {
+      int index_30 = 0;
+      double result_sum = 0;
+      double result_min = 100000, result_max = 0;
+
+      /* 每种30次取平均 */
+      int not_schedulable_cnt = 0;
+      for (const auto &row : add_servers) {
+        double result = ModelRunner::run_MISRR(
+            15, 0, w, 0.3, "../data/exp1-15-servers/", {}, 0, row,
+            add_installment[index_w][index_30++]);
+        // 去掉不可调度的case
+        if (result == 0)
+          not_schedulable_cnt++;
+        result_sum += result;
+        if (result != 0)
+          result_min = std::min(result_min, result);
+        result_max = std::max(result_max, result);
+        // return;
+      }
+      meanFile << result_sum / (30 - not_schedulable_cnt) << ",";
+      diffFile << result_max - result_min << ",";
+      maxFile << result_max << ",";
+      minFile << result_min << ",";
+
+      index_w++;
+    }
+    meanFile << std::endl;
+    diffFile << std::endl;
+    maxFile << std::endl;
+    minFile << std::endl;
+  }
+  meanFile.close();
+  diffFile.close();
+  maxFile.close();
+  minFile.close();
+
+  exp_3::transposeCSV("../output/exp_4_recover/recover_TolerMIS_15_mean.csv",
+                      "../output/exp_4_recover/t_recover_TolerMIS_15_mean.csv");
+  exp_3::transposeCSV("../output/exp_4_recover/recover_TolerMIS_15_diff.csv",
+                      "../output/exp_4_recover/t_recover_TolerMIS_15_diff.csv");
+}
+
+void ur_recover_MISRRLL_15() {}
+void recover_cmp_3_models_ur() {}
+
 } // namespace exp_4

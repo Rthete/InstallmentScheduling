@@ -98,6 +98,10 @@ int main() {
   // exp_4::W_vs_m_30();
   // exp_4::theta_vs_m_15();
   // exp_4::theta_vs_m_30();
+  // exp_4::lambda1_vs_m_15();
+  // exp_4::lambda1_vs_m_30();
+  // exp_4::lambda2_vs_m_15();
+  // exp_4::lambda2_vs_m_30();
 
   /**
    * @brief 不带容错单模型实验lambda MISRRLL
@@ -110,8 +114,15 @@ int main() {
   /**
    * @brief 带容错单模型实验MISRRLL
    */
-  exp_4::error_MISRRLL_30();
+  // exp_4::error_MISRRLL_30();
   // exp_4::ur_error_MISRRLL_30();
+  // exp_4::error_cmp_3_models_ur();
+
+  /**
+   * @brief 带恢复单模型实验MISRRLL
+   */
+  exp_4::recover_MISRRLL_15();
+  exp_4::recover_TolerMIS_15();
 
   // MISRRLL misrrll(15, 0.3, 24);
   // cout << misrrll.findFirstPositiveRealRoot(3, -6, -1200, 3000, -2000) <<
@@ -133,7 +144,6 @@ int main() {
   // ModelRunner::run_MISRR(15, 10, 5000, 0.3, "../data/15-servers-w-20/", {6,
   // 12}, 5); ModelRunner::run_MISRR(3, 3, 300, 0.3,
   // "../data/3-servers-example/");
-  // ModelRunner::run_MISRRLL_add(1, 1, 8, 8000);
 
   // test_MISRR_theta();
   // test_MISRR_all();

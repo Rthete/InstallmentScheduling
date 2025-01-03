@@ -66,7 +66,8 @@ void run_PMIS() {
  */
 double run_MISRR(int server_num, int m, int workload, double theta,
                  string data_path, vector<int> error_server,
-                 int error_installment) {
+                 int error_installment, vector<Server> add_servers,
+                 int add_installment) {
   // auto workload = 8000;   // total workload
   // auto theta = 0.3;       // Ratio of the output load size to input load size
   // auto m = 8;            // installment size
@@ -84,11 +85,34 @@ double run_MISRR(int server_num, int m, int workload, double theta,
   cout << "misrr.getUsingRate(): " << misrr.getUsingRate() << endl;
   cout << "misrr.getOptimalTime(): " << misrr.getOptimalTime() << endl;
 
-  // auto error_installment = 10;
+  // 无故障/恢复，直接返回
+  if (error_server.empty() && add_servers.empty()) {
+    if (output_using_rate == 1)
+      return misrr.getUsingRate();
+    return misrr.getOptimalTime();
+  }
+
+  // 有故障，重新计算
   if (!error_server.empty()) {
     cout << "error server size: " << to_string(error_server.size())
          << ", error installment: " << error_installment << endl;
     misrr.error_2(error_server, error_installment);
+  }
+
+  // 有恢复，重新计算
+  if (!add_servers.empty()) {
+    cout << "add servers size: " << to_string(add_servers.size())
+         << ", add installment: " << add_installment << endl;
+    // 打印新增处理机信息(double)
+    for (auto &server : add_servers) {
+      cout << "server ogsw: " << server.getO() << " " << server.getG() << " "
+           << server.getS() << " " << server.getW() << endl;
+    }
+    if (add_installment >= misrr.getOptimalM() - 2) {
+      add_installment = misrr.getOptimalM() - 2;
+      cout << "new add installment: " << add_installment << endl;
+    }
+    misrr.addServer(add_installment, add_servers);
   }
 
   if (misrr.isSchedulable == 0) {
@@ -267,7 +291,8 @@ double run_MISRRL(double lambda, int m) {
  */
 double run_MISRRLL(int server_num, double lambda1, double lambda2, int m,
                    int workload, double theta, string data_path,
-                   vector<int> error_server, int error_installment) {
+                   vector<int> error_server, int error_installment,
+                   vector<Server> add_servers, int add_installment) {
   cout << "**********************run MISRRLL**********************" << endl;
   auto serverN = server_num;
 
@@ -296,7 +321,14 @@ double run_MISRRLL(int server_num, double lambda1, double lambda2, int m,
   cout << "misrrll.getUsingRate(): " << misrrll.getUsingRate() << endl;
   cout << "misrrll.getOptimalTime(): " << misrrll.getOptimalTime() << endl;
 
-  // auto error_installment = 10;
+  // 无故障/恢复，直接返回
+  if (error_server.empty() && add_servers.empty()) {
+    if (output_using_rate == 1)
+      return misrrll.getUsingRate();
+    return misrrll.getOptimalTime();
+  }
+
+  // 有故障，重新计算
   if (!error_server.empty()) {
     cout << "error server size: " << to_string(error_server.size())
          << ", error installment: " << error_installment << endl;
@@ -308,9 +340,24 @@ double run_MISRRLL(int server_num, double lambda1, double lambda2, int m,
     // cout << "error optimal m = " << misrrll.getOptimalM() << endl;
   }
 
+  // 有恢复，重新计算
+  if (!add_servers.empty()) {
+    cout << "add servers size: " << to_string(add_servers.size())
+         << ", add installment: " << add_installment << endl;
+    // 打印新增处理机信息(double)
+    for (auto &server : add_servers) {
+      cout << "server ogsw: " << server.getO() << " " << server.getG() << " "
+           << server.getS() << " " << server.getW() << endl;
+    }
+    if (add_installment >= misrrll.getOptimalM() - 2) {
+      add_installment = misrrll.getOptimalM() - 2;
+      cout << "new add installment: " << add_installment << endl;
+    }
+    misrrll.addServer(add_installment, add_servers);
+  }
+
   cout << "new misrrll.getUsingRate(): " << misrrll.getUsingRate() << endl;
   cout << "new misrrll.getOptimalTime(): " << misrrll.getOptimalTime() << endl;
-  // misrrll.calOptimalM();
 
   if (misrrll.isSchedulable == 0) {
     cout << "not schedulable" << endl;
@@ -319,73 +366,6 @@ double run_MISRRLL(int server_num, double lambda1, double lambda2, int m,
 
   if (output_using_rate == 1)
     return misrrll.getUsingRate();
-  return misrrll.getOptimalTime();
-}
-
-// 没写完
-double run_MISRRLL_conflict(vector<double> &waiting_time, int server_num, int m,
-                            int workload, double theta, string data_path,
-                            vector<int> error_server, int error_installment) {
-  // auto workload = 8000;   // total workload
-  // auto theta = 0.3;       // Ratio of the output load size to input load size
-  // auto m = 8;            // installment size
-
-  cout << "**********************run MISRRLL conflict**********************"
-       << endl;
-  cout << server_num << " servers, m = " << m << ", theta = " << theta << endl;
-  cout << "total load = " << workload << endl;
-
-  MISRRLL misrrll(server_num, theta, m);
-  misrrll.getDataFromFile(data_path);
-  misrrll.setW((double)workload);
-  misrrll.initValue();
-  misrrll.getOptimalModel();
-
-  // auto error_installment = 10;
-  if (!error_server.empty()) {
-    cout << "error server size: " << to_string(error_server.size())
-         << ", error installment: " << error_installment << endl;
-    misrrll.error(error_server, error_installment);
-  }
-
-  cout << "misrr.getUsingRate(): " << misrrll.getUsingRate() << endl;
-  cout << "misrr.getOptimalTime(): " << misrrll.getOptimalTime() << endl;
-  return misrrll.getOptimalTime();
-}
-
-double run_MISRRLL_add(double lambda1, double lambda2, int m, int workload) {
-  auto serverN = 15;
-  auto theta = 0.3;
-
-  cout << "**********************run MISRRLL**********************" << endl;
-  cout << serverN << " servers, m = " << m << ", theta = " << theta
-       << ", lambda1 = " << lambda1 << ", lambda2 = " << lambda2 << endl;
-  cout << "total load = " << workload << endl;
-  cout << "last installment load = " << lambda1 / m * workload << endl;
-  cout << "first installment load = " << lambda2 / m * workload << endl;
-  cout << "each internal installment load = "
-       << (m - lambda1 - lambda2) * workload / (m * (m - 2)) << endl;
-
-  MISRRLL misrrll(serverN, theta, m);
-  misrrll.getDataFromFile("../data/exp1-15-servers/");
-  misrrll.setW((double)workload);
-  misrrll.setLambda((double)lambda1, (double)lambda2);
-  misrrll.initValue();
-  misrrll.getOptimalModel();
-  misrrll.theLastInstallmentGap(to_string(lambda1));
-  if (misrrll.isSchedulable == 0) {
-    cout << "not schedulable" << endl;
-    // return 0;
-  }
-  cout << "misrrll.getUsingRate(): " << misrrll.getUsingRate() << endl;
-  cout << "misrrll.getOptimalTime(): " << misrrll.getOptimalTime() << endl;
-  // return misrrll.getUsingRate();
-  misrrll.calOptimalM();
-
-  // 加入处理机
-  vector<Server> new_servers = {Server(3.37, 3.80, 0.28, 43.96),
-                                Server(2.71, 5.31, 0.28, 44.25)};
-  misrrll.addServer(3, new_servers);
   return misrrll.getOptimalTime();
 }
 

@@ -41,11 +41,19 @@ void ur_without_error_30_theta();
 void W_vs_m_15();
 // 不含容错_15台处理机_图例回传比例theta_时间T-趟数m
 void theta_vs_m_15();
+// 不含容错_15台处理机_图例lambda1_时间T-趟数m
+void lambda1_vs_m_15();
+// 不含容错_15台处理机_图例lambda2_时间T-趟数m
+void lambda2_vs_m_15();
 
 // 不含容错_30台处理机_图例任务量W_时间T-趟数m
 void W_vs_m_30();
 // 不含容错_30台处理机_图例回传比例theta_时间T-趟数m
 void theta_vs_m_30();
+// 不含容错_30台处理机_图例lambda1_时间T-趟数m
+void lambda1_vs_m_30();
+// 不含容错_30台处理机_图例lambda2_时间T-趟数m
+void lambda2_vs_m_30();
 
 // 第三部分：对比MISRRLL单模型 lambda
 
@@ -62,6 +70,12 @@ void labmda2_T_vs_m_30();
 void error_MISRRLL_30();
 void ur_error_MISRRLL_30();
 void error_cmp_3_models_ur();
+
+// 第五部分：恢复实验
+void recover_MISRRLL_15();
+void recover_TolerMIS_15();
+void ur_recover_MISRRLL_15();
+void recover_cmp_3_models_ur();
 
 } // namespace exp_4
 

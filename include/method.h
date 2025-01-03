@@ -26,7 +26,8 @@ void run_PMIS();
 double run_MISRR(int server_num = 15, int m = 8, int workload = 8000,
                  double theta = 0.3,
                  string data_path = "../data/15-servers-w-20/",
-                 vector<int> error_server = {}, int error_installment = 10);
+                 vector<int> error_server = {}, int error_installment = 10,
+                 vector<Server> add_servers = {}, int add_installment = 10);
 void run_MISRR_conflict(vector<double> &waiting_time, int server_num = 15,
                         int m = 8, int workload = 8000, double theta = 0.3,
                         string data_path = "../data/15-servers-w-20/",
@@ -44,11 +45,8 @@ double run_MISRRLL(int server_num = 15, double lambda1 = 0.2,
                    double lambda2 = 0.3, int m = 24, int workload = 8000,
                    double theta = 0.3,
                    string data_path = "../data/15-servers-w-20/",
-                   vector<int> error_server = {}, int error_installment = 10);
-double run_MISRRLL_conflict(vector<double> &waiting_time, int server_num, int m,
-                            int workload, double theta, string data_path,
-                            vector<int> error_server, int error_installment);
-double run_MISRRLL_add(double lambda1, double lambda2, int m, int workload);
+                   vector<int> error_server = {}, int error_installment = 10,
+                   vector<Server> add_servers = {}, int add_installment = 10);
 } // namespace ModelRunner
 
 void test_MISRR_theta();

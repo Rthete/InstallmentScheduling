@@ -491,7 +491,6 @@ void MISRRLL::calOptimalM() {
 void MISRRLL::getOptimalModel() {
   // cal optimal time(4.15)
   this->optimalTime = 0;
-  this->optimalTime += this->startTime;
 
   this->optimalTime += servers[0].getO();
   this->optimalTime +=
@@ -506,6 +505,8 @@ void MISRRLL::getOptimalModel() {
     this->optimalTime += servers[i].getO();
     this->optimalTime += gamma[i] * this->Vb * servers[i].getG() * this->theta;
   }
+  cout << "getOptimalModel::this->optimalTime: " << this->optimalTime << endl;
+  this->optimalTime += this->startTime;
 
   // update usingTime
   for (int i = 0; i < this->n; i++) {
@@ -694,17 +695,41 @@ void MISRRLL::theLastInstallmentGap(string title) {
     timeGap[i] = startTime[i] - freeTime[i];
     if (timeGap[i] < 0) {
       isSchedulable = 0;
+      cout << "MISRRLL 最后一趟冲突不可调度" << endl;
     }
     fprintf(fresult, "gap[%d]: \t%.2f\n", i, timeGap[i]);
   }
 }
 
-void MISRRLL::addServer(int installment, vector<Server> &new_servers) {
+void MISRRLL::addServer(int add_installment, vector<Server> &new_servers) {
+  cout << "**********************start MISRRLL recover**********************"
+       << endl;
+
+  // 最优参数
+  this->l_1 = 0.9;
+  this->l_2 = 0.9;
+
   // 重调度开始时间
-  this->startTime = servers[0].getO() + servers[0].getS() * (installment + 1) +
+  this->startTime = servers[0].getO() +
+                    servers[0].getS() * (add_installment + 1) +
                     servers[0].getW() * alpha[0] * this->Va +
-                    servers[0].getW() * beta[0] * installment * this->V +
+                    servers[0].getW() * beta[0] * add_installment * this->V +
                     servers[0].getG() * beta[0] * this->V * theta;
+
+  // 重置usingTime(把新处理机的usingTime加到最后了)
+  usingTime.clear();
+  usingTime.resize(this->n + new_servers.size(), 0);
+  for (int i = 0; i < this->n; ++i) {
+    usingTime[i] =
+        (servers[i].getS() + alpha[i] * this->Va * servers[i].getW() +
+         add_installment *
+             (servers[i].getS() + beta[i] * this->V * servers[i].getW()));
+  }
+
+  // 给新处理机设置编号
+  for (int i = 0; i < new_servers.size(); i++) {
+    new_servers[i].setID(this->n + i);
+  }
 
   // 第x+1趟各处理机释放时间(相对于startTime)
   vector<double> release_time(this->n + 1, 0);
@@ -734,17 +759,19 @@ void MISRRLL::addServer(int installment, vector<Server> &new_servers) {
   }
 
   this->leftW = 0;
-  this->leftW += (this->Vb + (this->m - installment - 2) * this->V);
+  this->leftW += (this->Vb + (this->m - add_installment - 2) * this->V);
+  cout << "this->leftW=" << this->leftW << endl;
   this->W = this->leftW;
-  this->m = this->m - installment - 1;
+  this->m = this->m - add_installment - 1;
   // this->m = this->m - installment - 17;
   //   this->m = 12;
   this->n += num_new_servers;
+  this->serversNumberWithoutError = this->n;
 
   initValue();
   getOptimalModel();
-  this->optimalTime += this->startTime;
-  cout << "new optimal time: " << this->optimalTime << endl;
+  cout << "this->startTime=" << this->startTime << endl;
+  cout << "recover new optimal time: " << this->optimalTime << endl;
 
   // 重调度第一趟各处理机开始计算的时间
   vector<double> restart_time(this->n, 0);
@@ -758,21 +785,33 @@ void MISRRLL::addServer(int installment, vector<Server> &new_servers) {
   vector<double> gap(this->n, 0);
   for (int i = 0; i < this->n; i++) {
     gap[i] = restart_time[i] - release_time[i];
-    std::cout << release_time[i] << ", " << restart_time[i] << std::endl;
+    // std::cout << release_time[i] << ", " << restart_time[i] << std::endl;
   }
 
   double waiting_time = *(std::min_element(gap.begin(), gap.end()));
-  std::cout << "wating_time: " << waiting_time << std::endl;
+  // std::cout << "wating_time: " << waiting_time << std::endl;
   waiting_time = waiting_time < 0 ? -waiting_time : 0;
   std::cout << "wating_time: " << waiting_time << std::endl;
-  std::cout << "final optimal time: " << this->optimalTime + waiting_time
-            << std::endl;
+  this->optimalTime += waiting_time;
+  std::cout << "final optimal time: " << this->optimalTime << std::endl;
 
-  for (int i = 0; i < this->n; i++) {
-    std::cout << alpha[i] << ", ";
-    std::cout << beta[i] << ", ";
-    std::cout << gamma[i] << std::endl;
+  // 重新计算usingRate
+  usingRate = 0.0;
+  for (int i = 0; i < this->n; ++i) {
+    // cout << "usingTime[" << i << "] = " << usingTime[i] << endl;
+    usingRate += ((double)usingTime[i] /
+                  ((double)(this->optimalTime) * (this->n - num_new_servers) +
+                   (this->optimalTime - this->startTime) * num_new_servers));
   }
+
+  // for (int i = 0; i < this->n; i++) {
+  //   std::cout << alpha[i] << ", ";
+  //   std::cout << beta[i] << ", ";
+  //   std::cout << gamma[i] << std::endl;
+  // }
+
+  cout << "**********************end MISRRLL recover**********************"
+       << endl;
 }
 
 void MISRRLL::error(vector<int> &errorPlace, int errorInstallment) {

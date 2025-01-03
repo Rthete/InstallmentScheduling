@@ -30,8 +30,7 @@ public:
   void calOptimalM();
   void setLambda(double value1, double value2);
 
-  void addServer(int installment, vector<Server> &new_servers);
-  void resetServer(int installment, vector<Server> &new_servers);
+  void addServer(int add_installment, vector<Server> &new_servers);
 
   void error(vector<int> &errorPlace, int errorInstallment);
   int findFirstPositiveRealRoot(double a, double b, double c, double d,

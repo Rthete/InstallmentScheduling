@@ -397,7 +397,8 @@ void MISRR::getOptimalModel() {
     this->optimalTime += gamma[i] * this->V * servers[i].getG() * this->theta;
   }
 
-  // cout << "original optimal time: " << this->optimalTime << endl;
+  cout << "original optimal time: " << this->optimalTime << endl;
+  this->optimalTime += this->startTime;
 
   // update usingTime
   for (int i = 0; i < this->n; i++) {
@@ -823,6 +824,97 @@ void MISRR::error_2(vector<int> &errorPlace, int errorInstallment) {
   // 若冲突则等待
   this->optimalTime +=
       *max_element(this->waiting_time.begin(), this->waiting_time.end());
+}
+
+void MISRR::addServer(int add_installment, vector<Server> &new_servers) {
+  cout << "**********************start TolerMIS recover**********************"
+       << endl;
+
+  // 重调度开始时间，在最后一个处理机回传结束后才开始新调度
+  this->startTime = servers[0].getS() * (add_installment + 1) +
+                    servers[0].getW() * alpha[0] * this->V +
+                    servers[0].getW() * beta[0] * add_installment * this->V +
+                    servers[0].getG() * beta[0] * this->V * theta;
+  cout << "startTime: " << startTime << endl;
+  for (int i = 0; i < this->n; ++i) {
+    this->startTime += 2 * servers[i].getO() +
+                       servers[i].getG() * beta[i] * this->V * (1 + theta);
+  }
+  cout << "startTime: " << startTime << endl;
+
+  // 重置usingTime(把新处理机的usingTime加到最后了)
+  usingTime.clear();
+  usingTime.resize(this->n + new_servers.size(), 0);
+  for (int i = 0; i < this->n; ++i) {
+    usingTime[i] = (servers[i].getS() + alpha[i] * this->V * servers[i].getW() +
+                    add_installment * (servers[i].getS() +
+                                       beta[i] * this->V * servers[i].getW()));
+  }
+
+  // 给新处理机设置编号
+  for (int i = 0; i < new_servers.size(); i++) {
+    new_servers[i].setID(this->n + i);
+  }
+
+  // 第x+1趟各处理机释放时间(相对于startTime)
+  vector<double> release_time(this->n + 1, 0);
+  release_time[1] = -servers[1].getG() * beta[1] * this->V * theta;
+  for (int i = 2; i < this->n + 1; i++) {
+    release_time[i] =
+        release_time[i - 1] + servers[i - 1].getO() +
+        servers[i - 1].getG() * alpha[i - 1] * this->V * (1 + theta) +
+        servers[i - 1].getG() * beta[i - 1] * this->V * (1 + theta) +
+        servers[i].getO();
+  }
+
+  // 重置处理机
+  int num_new_servers = new_servers.size();
+  int original_size = this->n;
+  servers.resize(original_size + num_new_servers);
+  for (int i = num_new_servers; i < this->n + num_new_servers; i++) {
+    servers[i].setO(servers[i - num_new_servers].getO());
+    servers[i].setS(servers[i - num_new_servers].getS());
+    servers[i].setG(servers[i - num_new_servers].getG());
+    servers[i].setW(servers[i - num_new_servers].getW());
+  }
+
+  // 设置新处理机的参数
+  for (int i = 0; i < num_new_servers; i++) {
+    servers[i] = new_servers[i];
+  }
+
+  this->leftW = 0;
+  this->leftW += (this->V + (this->m - add_installment - 2) * this->V);
+  cout << "this->leftW=" << this->leftW << endl;
+  this->W = this->leftW;
+  this->m = this->m - add_installment - 1;
+  // this->m = this->m - installment - 17;
+  //   this->m = 12;
+  this->n += num_new_servers;
+  this->serversNumberWithoutError = this->n;
+
+  initValue();
+  getOptimalModel();
+  cout << "this->startTime=" << this->startTime << endl;
+  cout << "recover new optimal time: " << this->optimalTime << endl;
+
+  // 重新计算usingRate
+  usingRate = 0.0;
+  for (int i = 0; i < this->n; ++i) {
+    // cout << "usingTime[" << i << "] = " << usingTime[i] << endl;
+    usingRate += ((double)usingTime[i] /
+                  ((double)(this->optimalTime) * (this->n - num_new_servers) +
+                   (this->optimalTime - this->startTime) * num_new_servers));
+  }
+
+  // for (int i = 0; i < this->n; i++) {
+  //   std::cout << alpha[i] << ", ";
+  //   std::cout << beta[i] << ", ";
+  //   std::cout << gamma[i] << std::endl;
+  // }
+
+  cout << "**********************end TolerMIS recover**********************"
+       << endl;
 }
 
 void MISRR::setW(double value) {

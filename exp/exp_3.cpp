@@ -8,26 +8,6 @@
 #include "exp_3.h"
 
 namespace exp_3 {
-// 从txt文件中读取数据
-void readTXTFile(const std::string &file_path,
-                 std::vector<std::vector<int>> &error_place) {
-  std::ifstream file(file_path);
-  if (file.is_open()) {
-    std::string line;
-    while (std::getline(file, line)) {
-      std::vector<int> row;
-      std::stringstream ss(line);
-      std::string num;
-      while (std::getline(ss, num, ',')) {
-        row.push_back(std::stoi(num));
-      }
-      error_place.push_back(row);
-    }
-    file.close();
-  } else {
-    std::cerr << "Error opening file for reading: " << file_path << std::endl;
-  }
-}
 
 // 表格数据调换xy轴
 void transposeCSV(const std::string &inputFilePath,

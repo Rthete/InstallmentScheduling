@@ -23,6 +23,7 @@ public:
   void setW(double value);
   void error(vector<int> &errorPlace, int errorInstallment);
   void error_2(vector<int> &errorPlace, int errorInstallment);
+  void addServer(int installment, vector<Server> &new_servers);
   void printResult();
   double getOptimalTime() const;
   double getUsingRate() const;
